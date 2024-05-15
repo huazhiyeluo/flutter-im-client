@@ -81,8 +81,7 @@ class _TalkState extends State<Talk> {
 }
 
 class TalkPage extends StatefulWidget {
-  final ScrollController scrollController;
-  const TalkPage({super.key, required this.scrollController});
+  const TalkPage({super.key});
 
   @override
   State<TalkPage> createState() => _TalkPageState();
@@ -92,13 +91,11 @@ class _TalkPageState extends State<TalkPage> {
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
   final TextEditingController inputController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
   final ChatController chatController = Get.put(ChatController());
 
   int uid = 0;
   Map userInfo = {};
   Map talkObj = {};
-  String key = "";
   int isShowEmoji = 0;
   int isShowSend = 0;
 
@@ -110,15 +107,6 @@ class _TalkPageState extends State<TalkPage> {
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
-    key = getKey(msgType: talkObj['type'], fromId: talkObj['objId'], toId: uid);
-
-    _getMessageList().then((result) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (messageController.allUserMessages[key] != null) {
-          _scrollToBottom();
-        }
-      });
-    });
 
     for (var i = 0; i <= 124; i++) {
       String temp = i < 10 ? '0$i' : '$i';
@@ -128,7 +116,6 @@ class _TalkPageState extends State<TalkPage> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
     inputController.dispose();
     super.dispose();
   }
@@ -137,27 +124,9 @@ class _TalkPageState extends State<TalkPage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Expanded(
-          child: Obx(
-            () {
-              messageController.listenToMessages(key, onChange: () {
-                _scrollToBottom();
-              });
-              return ListView.builder(
-                key: UniqueKey(),
-                controller: _scrollController,
-                itemCount: messageController.allUserMessages[key]?.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final messageList = messageController.allUserMessages[key];
-                  if (messageList != null && index < messageList.length) {
-                    return ChatMessage(arguments: messageList[index], uid: uid);
-                  } else {
-                    return const Text(""); // 返回一个空的SizedBox ,会有问题
-                  }
-                },
-              );
-            },
-          ),
+        const Expanded(
+          flex: 1,
+          child: ChatMessage(),
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
@@ -200,7 +169,6 @@ class _TalkPageState extends State<TalkPage> {
                       onPressed: () {
                         setState(() {
                           isShowEmoji = 1 - isShowEmoji;
-                          _scrollToBottom();
                         });
                       },
                     ),
@@ -281,29 +249,5 @@ class _TalkPageState extends State<TalkPage> {
     processReceivedMessage(uid, msg, chatController);
 
     saveMessage(msg);
-  }
-
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-        // _scrollController.animateTo(
-        //   _scrollController.position.maxScrollExtent,
-        //   duration: const Duration(milliseconds: 300), // 根据需要调整持续时间
-        //   curve: Curves.easeOut, // 根据需要调整曲线
-        // );
-      }
-    });
-  }
-
-  Future<void> _getMessageList() async {
-    if (messageController.allUserMessages.isEmpty) {
-      List messages = await DBHelper.getData('message', []);
-      for (var item in messages) {
-        Map<String, dynamic> modifiedItem = Map.from(item); // 复制到新的Map
-        modifiedItem['content'] = jsonDecode(item['content']); // 修改新的Map中的内容
-        messageController.addMessage(modifiedItem);
-      }
-    }
   }
 }
