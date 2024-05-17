@@ -90,7 +90,7 @@ class _GroupPageState extends State<GroupPage> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         Column(
@@ -119,7 +119,7 @@ class _GroupPageState extends State<GroupPage> {
               ],
             ),
             Container(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(), // 禁止滚动
@@ -178,7 +178,7 @@ class _GroupPageState extends State<GroupPage> {
           ],
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         Row(
@@ -204,7 +204,7 @@ class _GroupPageState extends State<GroupPage> {
           ],
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         ListTile(
@@ -216,7 +216,7 @@ class _GroupPageState extends State<GroupPage> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         Row(
@@ -242,7 +242,7 @@ class _GroupPageState extends State<GroupPage> {
           ],
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         Row(
@@ -268,7 +268,7 @@ class _GroupPageState extends State<GroupPage> {
           ],
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         Row(
@@ -294,7 +294,7 @@ class _GroupPageState extends State<GroupPage> {
           ],
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         ListTile(
@@ -305,7 +305,7 @@ class _GroupPageState extends State<GroupPage> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         ListTile(
@@ -316,7 +316,7 @@ class _GroupPageState extends State<GroupPage> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         ListTile(
@@ -327,14 +327,14 @@ class _GroupPageState extends State<GroupPage> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         const ListTile(
           title: Text("删除聊天记录"),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: const Divider(),
         ),
         Row(

@@ -141,10 +141,10 @@ class _ContactPageState extends State<ContactPage> {
                     Map talkobj = {
                       "objId": _firendArr[index].uid,
                       "type": 1,
-                      "name": _firendArr[index].remark != "" ? _firendArr[index].remark : _firendArr[index].name,
+                      "name": _firendArr[index].name,
                       "icon": _firendArr[index].icon,
                       "info": _firendArr[index].info,
-                      "remark": _firendArr[index].remark,
+                      "remark": _firendArr[index].remark != "" ? _firendArr[index].remark : _firendArr[index].name,
                     };
                     talkobjController.setTalkObj(talkobj);
                     Navigator.pushNamed(

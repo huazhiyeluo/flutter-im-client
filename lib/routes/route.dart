@@ -3,7 +3,9 @@ import 'package:qim/common/keys.dart';
 import 'package:qim/middleware/homeMiddleware.dart';
 import 'package:qim/pages/chat/group.dart';
 import 'package:qim/pages/chat/group_user.dart';
+import 'package:qim/pages/chat/talk_phone_to.dart';
 import 'package:qim/pages/chat/talk.dart';
+import 'package:qim/pages/chat/talk_phone_from.dart';
 import 'package:qim/pages/chat/user.dart';
 import 'package:qim/pages/home.dart';
 import 'package:qim/pages/search.dart';
@@ -26,6 +28,9 @@ class AppPage {
     GetPage(name: "/repasswd", page: () => const Repasswd()),
     GetPage(name: "/search", page: () => const Search()),
     GetPage(name: "/talk", page: () => const Talk()),
+    GetPage(name: "/talk-phone-to", page: () => const TalkPhoneTo()),
+    GetPage(name: "/talk-phone-from", page: () => const TalkPhoneFrom()),
+    GetPage(name: "/talk-phone", page: () => const TalkPhone()),
     GetPage(name: "/user", page: () => const User()),
     GetPage(name: "/group", page: () => const Group()),
     GetPage(name: "/group-user", page: () => const GroupUser()),

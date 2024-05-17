@@ -103,7 +103,7 @@ class _ChatPageState extends State<ChatPage> {
             useTextDirection: false,
             endActionPane: ActionPane(
               motion: const ScrollMotion(),
-              extentRatio: 1.9 / 3,
+              extentRatio: 2 / 3,
               children: [
                 CustomSlidableAction(
                   flex: 3,

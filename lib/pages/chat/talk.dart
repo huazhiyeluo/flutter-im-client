@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/api/common.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/message.dart';
@@ -9,10 +10,13 @@ import 'package:qim/controller/talkobj.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
-import 'package:qim/utils/db.dart';
+import 'package:qim/utils/permission.dart';
 import 'package:qim/utils/savedata.dart';
+import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/chat_message.dart';
 import 'package:qim/widget/custom_chat_text_field.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart' as dio;
 
 class Talk extends StatefulWidget {
   const Talk({super.key});
@@ -46,9 +50,9 @@ class _TalkState extends State<Talk> {
             const SizedBox(width: 8),
             Obx(
               () => Text(
-                talkObj['remark'] ?? talkObj['name'],
+                talkObj['remark'] != '' ? talkObj['remark'] : talkObj['name'],
                 style: const TextStyle(
-                  fontSize: 22,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -98,8 +102,15 @@ class _TalkPageState extends State<TalkPage> {
   Map talkObj = {};
   int isShowEmoji = 0;
   int isShowSend = 0;
+  int isShowPlus = 0;
 
   final List<String> emojis = [];
+  final List<IconData> icons = [
+    Icons.image,
+    Icons.camera_alt,
+    Icons.call,
+    Icons.folder,
+  ];
 
   @override
   void initState() {
@@ -114,6 +125,8 @@ class _TalkPageState extends State<TalkPage> {
     }
   }
 
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void dispose() {
     inputController.dispose();
@@ -125,7 +138,6 @@ class _TalkPageState extends State<TalkPage> {
     return Column(
       children: [
         const Expanded(
-          flex: 1,
           child: ChatMessage(),
         ),
         Container(
@@ -169,6 +181,7 @@ class _TalkPageState extends State<TalkPage> {
                       onPressed: () {
                         setState(() {
                           isShowEmoji = 1 - isShowEmoji;
+                          isShowPlus = 0;
                         });
                       },
                     ),
@@ -180,7 +193,12 @@ class _TalkPageState extends State<TalkPage> {
                             icon: const Icon(Icons.add),
                             iconSize: 35,
                             padding: const EdgeInsets.all(2),
-                            onPressed: () {},
+                            onPressed: () {
+                              setState(() {
+                                isShowPlus = 1 - isShowPlus;
+                                isShowEmoji = 0;
+                              });
+                            },
                           ),
                         )
                       : SizedBox(
@@ -190,7 +208,7 @@ class _TalkPageState extends State<TalkPage> {
                             iconSize: 35,
                             padding: const EdgeInsets.all(2),
                             onPressed: () {
-                              _send();
+                              _sendText();
                             },
                           ),
                         ),
@@ -215,7 +233,12 @@ class _TalkPageState extends State<TalkPage> {
                   itemCount: emojis.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        _sendEmoji(emojis[index]);
+                        setState(() {
+                          isShowEmoji = 1 - isShowEmoji;
+                        });
+                      },
                       child: Image.asset(
                         emojis[index],
                         scale: 0.75,
@@ -225,11 +248,39 @@ class _TalkPageState extends State<TalkPage> {
                 ),
               )
             : Container(),
+        isShowPlus == 1
+            ? Container(
+                height: 100,
+                padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
+                color: const Color.fromARGB(255, 237, 237, 237),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    crossAxisSpacing: 10.0, // 列之间的间距
+                    mainAxisSpacing: 0.0, // 行之间的间距
+                    childAspectRatio: 1.2, // 宽高比
+                  ),
+                  itemCount: icons.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () async {
+                        setState(() {
+                          _pick(index);
+                          isShowPlus = 1 - isShowPlus;
+                        });
+                      },
+                      child: Icon(icons[index], size: 56),
+                    );
+                  },
+                ),
+              )
+            : Container(),
       ],
     );
   }
 
-  void _send() async {
+  void _sendText() async {
     // 发送按钮的操作
     Map msg = {
       'fromId': uid,
@@ -238,16 +289,128 @@ class _TalkPageState extends State<TalkPage> {
       'msgMedia': 1,
       'msgType': talkObj['type']
     };
+    _send(msg);
+
+    inputController.text = "";
+    setState(() {
+      isShowSend = 1 - isShowSend;
+    });
+  }
+
+  void _sendEmoji(String url) async {
+    // 发送按钮的操作
+    Map msg = {
+      'fromId': uid,
+      'toId': talkObj['objId'],
+      'content': {"data": "", "url": url, "name": ""},
+      'msgMedia': 6,
+      'msgType': talkObj['type']
+    };
+    _send(msg);
+  }
+
+  void _sendFile(String url, int msgMedia) async {
+    // 发送按钮的操作
+    Map msg = {
+      'fromId': uid,
+      'toId': talkObj['objId'],
+      'content': {"data": "", "url": url, "name": ""},
+      'msgMedia': msgMedia,
+      'msgType': talkObj['type']
+    };
+    _send(msg);
+  }
+
+  void _send(Map msg) async {
+    // 发送按钮的操作
 
     String jsonStr = jsonEncode(msg);
     Get.arguments['channel'].sendMessage(jsonStr);
+
+    if (![1, 2].contains(msg['msgType'])) {
+      return;
+    }
+
     msg['createTime'] = getTime();
     msg['avatar'] = userInfo['avatar'];
     messageController.addMessage(msg);
-    inputController.text = "";
 
     processReceivedMessage(uid, msg, chatController);
 
     saveMessage(msg);
+  }
+
+  //----------------------------------------------------------------文件处理----------------------------------------------------------------
+
+  Future<void> _pick(int index) async {
+    if (index == 0) {
+      _pickFile(2);
+    }
+    if (index == 1) {
+      _pickCamera();
+    }
+    if (index == 2) {
+      _goPhone();
+    }
+    if (index == 3) {
+      _pickFile(5);
+    }
+  }
+
+  Future<void> _pickCamera() async {
+    // 申请相机等权限
+    var isGrantedCamera = await PermissionUtil.requestCameraPermission();
+    if (!isGrantedCamera) {
+      TipHelper.instance.showToast("未允许相机权限");
+      return;
+    }
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    // Handle the picked image file
+    if (pickedFile != null) {
+      // Use the picked file (e.g., display it in an Image widget)
+      print('Picked image path: ${pickedFile.path}');
+    } else {
+      // User canceled the image picking
+      print('No image selected.');
+    }
+  }
+
+  Future<void> _pickFile(int msgMedia) async {
+    // 申请存储等权限
+    var isGrantedStorage = await PermissionUtil.requestStoragePermission();
+    if (!isGrantedStorage) {
+      TipHelper.instance.showToast("未允许存储读写权限");
+      return;
+    }
+
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    // Handle the picked image file
+    if (pickedFile != null) {
+      dio.MultipartFile file = await dio.MultipartFile.fromFile(pickedFile.path);
+      CommonApi.upload({'file': file}, onSuccess: (res) {
+        setState(() {
+          _sendFile(res['data'], msgMedia);
+        });
+      }, onError: (res) {
+        TipHelper.instance.showToast(res['msg']);
+      });
+    } else {
+      // User canceled the image picking
+      print('No image selected.');
+    }
+  }
+
+  // ----------------------------------------------------------------语音通话 ----------------------------------------------------------------
+  _goPhone() {
+    _send({
+      'content': {'data': ""},
+      'fromId': uid,
+      'toId': talkObj['objId'],
+      'msgMedia': 0,
+      'msgType': 4
+    });
+    Navigator.pushNamed(context, '/talk-phone-to', arguments: {
+      "channel": Get.arguments['channel'],
+    });
   }
 }

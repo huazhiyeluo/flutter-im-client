@@ -27,6 +27,7 @@ class RequestHelper {
     Function? onError,
     Map<String, dynamic>? headers,
     String method = 'POST',
+    bool isUpload = false, // 新增的参数，用于标识是否是文件上传请求
   }) async {
     try {
       var connectivityResult = await Connectivity().checkConnectivity();
@@ -38,11 +39,24 @@ class RequestHelper {
       Response response;
       final mergedHeaders = headers ?? {'Content-Type': 'application/json'};
 
-      response = await _dio.request(
-        endpoint,
-        data: data,
-        options: Options(headers: mergedHeaders, method: method),
-      );
+      if (isUpload) {
+        // 如果是文件上传请求
+        FormData formData = FormData.fromMap(data); // 将传入的数据转换为 FormData 对象
+
+        response = await _dio.post(
+          endpoint,
+          data: formData,
+          options: Options(),
+        );
+      } else {
+        // 如果不是文件上传请求
+        response = await _dio.request(
+          endpoint,
+          data: data,
+          options: Options(headers: mergedHeaders, method: method),
+        );
+      }
+
       if (response.data.containsKey('code') && response.data['code'] == 0) {
         onSuccess?.call(response.data);
       } else {

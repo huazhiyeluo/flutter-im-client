@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/message.dart';
+import 'package:qim/controller/talkobj.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/db.dart';
@@ -26,6 +27,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final ChatController chatController = Get.put(ChatController());
+  final TalkobjController talkobjController = Get.put(TalkobjController());
   late WebSocketClient channel;
   int _currentIndex = 0;
   final MessageController messageController = Get.put(MessageController());
@@ -47,15 +49,38 @@ class _HomeState extends State<Home> {
 
   void onReceive() {
     channel.receiveMessage((message) async {
-      Map temp = json.decode(message);
+      Map msg = json.decode(message);
 
       Map objUser = (await DBHelper.getOne('users', [
-        ['uid', '=', temp['fromId']]
+        ['uid', '=', msg['fromId']]
       ]))!;
-      temp['avatar'] = objUser['avatar'];
-      messageController.addMessage(temp);
-      processReceivedMessage(userInfo['uid'], temp, chatController);
-      saveMessage(temp);
+      msg['avatar'] = objUser['avatar'];
+      processReceivedMessage(userInfo['uid'], msg, chatController);
+
+      if ([1, 2].contains(msg['msgType'])) {
+        messageController.addMessage(msg);
+        saveMessage(msg);
+      }
+      if ([4].contains(msg['msgType'])) {
+        Map talkobj = {
+          "objId": msg['fromId'],
+          "type": 1,
+          "name": objUser['username'],
+          "icon": objUser['avatar'],
+          "info": objUser['info'],
+          "remark": objUser['remark'],
+        };
+        talkobjController.setTalkObj(talkobj);
+
+        if (msg['msgMedia'] == 0) {
+          Navigator.pushNamed(context, '/talk-phone-from', arguments: {
+            "channel": channel,
+          });
+        }
+        if (msg['msgMedia'] == 1) {
+          Get.back();
+        }
+      }
     });
   }
 
