@@ -355,12 +355,9 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
 
   Future<void> _handleIceCandidate(String candidatestr) async {
     Map candidateMap = json.decode(candidatestr);
-    webrtc.RTCIceCandidate candidate = webrtc.RTCIceCandidate(
-        candidateMap['candidate'], // ICE 候选字符串
-        candidateMap['sdpMid'], // SDP mid
-        candidateMap['sdpMLineIndex'] // SDP mline index
-        );
-    _peerConnection.addCandidate(candidate);
+    webrtc.RTCIceCandidate candidate =
+        webrtc.RTCIceCandidate(candidateMap['candidate'], candidateMap['sdpMid'], candidateMap['sdpMLineIndex']);
+    await _peerConnection.addCandidate(candidate);
   }
 
   Future<void> _handleOffer(String offerstr) async {
@@ -373,12 +370,12 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
   Future<void> _handleAnswer(String answerstr) async {
     Map answerMap = json.decode(answerstr);
     webrtc.RTCSessionDescription answer = webrtc.RTCSessionDescription(answerMap['sdp'], answerMap['type']);
-    _peerConnection.setRemoteDescription(answer);
+    await _peerConnection.setRemoteDescription(answer);
   }
 
   Future<void> _sendAnswer() async {
     webrtc.RTCSessionDescription answer = await _peerConnection.createAnswer();
-    _peerConnection.setLocalDescription(answer);
+    await _peerConnection.setLocalDescription(answer);
 
     Map<String, dynamic> answerMap = {
       'sdp': answer.sdp,
