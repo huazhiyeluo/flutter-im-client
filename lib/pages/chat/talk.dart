@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/common.dart';
@@ -7,11 +5,11 @@ import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/websocket.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/permission.dart';
-import 'package:qim/utils/savedata.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/chat_message.dart';
 import 'package:qim/widget/custom_chat_text_field.dart';
@@ -92,6 +90,7 @@ class TalkPage extends StatefulWidget {
 }
 
 class _TalkPageState extends State<TalkPage> {
+  final WebSocketController webSocketController = Get.find();
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
   final TextEditingController inputController = TextEditingController();
@@ -323,21 +322,14 @@ class _TalkPageState extends State<TalkPage> {
 
   void _send(Map msg) async {
     // 发送按钮的操作
-
-    String jsonStr = jsonEncode(msg);
-    Get.arguments['channel'].sendMessage(jsonStr);
-
+    webSocketController.sendMessage(msg);
     if (![1, 2].contains(msg['msgType'])) {
       return;
     }
-
     msg['createTime'] = getTime();
     msg['avatar'] = userInfo['avatar'];
     messageController.addMessage(msg);
-
     processReceivedMessage(uid, msg, chatController);
-
-    saveMessage(msg);
   }
 
   //----------------------------------------------------------------文件处理----------------------------------------------------------------
@@ -376,7 +368,6 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   Future<void> _pickFile(int msgMedia) async {
-    // 申请存储等权限
     var isGrantedStorage = await PermissionUtil.requestStoragePermission();
     if (!isGrantedStorage) {
       TipHelper.instance.showToast("未允许存储读写权限");
@@ -409,8 +400,8 @@ class _TalkPageState extends State<TalkPage> {
       'msgMedia': 0,
       'msgType': 4
     });
-    Navigator.pushNamed(context, '/talk-phone-to', arguments: {
-      "channel": Get.arguments['channel'],
+    Navigator.pushNamed(context, '/talk-phone', arguments: {
+      "type": 1,
     });
   }
 }

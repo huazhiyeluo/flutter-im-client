@@ -14,7 +14,6 @@ class WebSocketClient {
     _isConnected = true;
   }
 
-
   void connect() {
     _channel = IOWebSocketChannel.connect(_serverUrl);
     _isConnected = true;
@@ -41,16 +40,5 @@ class WebSocketClient {
     if (!_isConnected) {
       connect();
     }
-  }
-
-  void startHeartbeat(int uid) {
-    const Duration interval = Duration(seconds: 10);
-    Timer.periodic(interval, (Timer t) {
-      if (_isConnected) {
-        Map msg = { 'FromId': uid, 'Content': {"Data":"心跳","Url":"","Name":""}, 'MsgMedia': 0, 'MsgType': 0 };
-        String jsonStr = jsonEncode(msg);
-        _channel.sink.add(jsonStr);
-      }
-    });
   }
 }

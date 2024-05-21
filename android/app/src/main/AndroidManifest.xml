@@ -61,7 +61,7 @@
     <!-- 如果需要获取视频，添加该权限 -->
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <!-- 如果需要获取音频，添加该权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
-    <!-- 图片选择器使用 -->
-    <!-- 如果compileSdkVersion超过29，必须将android:requestLegacyExternalStorage="true"添加到AndroidManifest.xml中才能获得资源 -->
+
 </manifest>

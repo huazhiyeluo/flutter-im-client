@@ -24,8 +24,7 @@ class ChatModel extends ISuspensionBean {
 }
 
 class Contact extends StatefulWidget {
-  final Map arguments;
-  const Contact({super.key, required this.arguments});
+  const Contact({super.key});
 
   @override
   State<Contact> createState() => _ContactState();
@@ -78,7 +77,6 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
         ),
       ),
       body: ContactPage(
-        arguments: widget.arguments,
         tabController: _tabController,
       ),
     );
@@ -86,9 +84,8 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
 }
 
 class ContactPage extends StatefulWidget {
-  final Map arguments;
   final TabController tabController;
-  const ContactPage({super.key, required this.tabController, required this.arguments});
+  const ContactPage({super.key, required this.tabController});
 
   @override
   State<ContactPage> createState() => _ContactPageState();
@@ -150,9 +147,6 @@ class _ContactPageState extends State<ContactPage> {
                     Navigator.pushNamed(
                       context,
                       '/talk',
-                      arguments: {
-                        "channel": widget.arguments['channel'],
-                      },
                     );
                   },
                 ),
@@ -256,9 +250,6 @@ class _ContactPageState extends State<ContactPage> {
                               Navigator.pushNamed(
                                 context,
                                 '/talk',
-                                arguments: {
-                                  "channel": widget.arguments['channel'],
-                                },
                               );
                             },
                           ),
@@ -303,9 +294,6 @@ class _ContactPageState extends State<ContactPage> {
                   Navigator.pushNamed(
                     context,
                     '/talk',
-                    arguments: {
-                      "channel": widget.arguments['channel'],
-                    },
                   );
                 },
               ),

@@ -20,9 +20,10 @@ class ChatMessage extends StatefulWidget {
 }
 
 class _ChatMessageState extends State<ChatMessage> {
-  final ScrollController _scrollController = ScrollController();
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
+
+  final ScrollController _scrollController = ScrollController();
 
   int uid = 0;
   Map userInfo = {};
@@ -50,7 +51,8 @@ class _ChatMessageState extends State<ChatMessage> {
   Widget build(BuildContext context) {
     return Obx(
       () {
-        messageController.listenToMessages(key, onChange: () {
+        // 初始化 WebSocket 监听
+        messageController.allUserMessages[key]?.listen((message) {
           _scrollToBottom();
         });
         return Container(
@@ -132,7 +134,7 @@ class _ChatMessageState extends State<ChatMessage> {
 
   Widget _getContent(bool isSentByMe, Map data) {
     Widget item = const Text("");
-    if (data['msgMedia'] == 1) {
+    if ([1, 10, 11, 12, 13].contains(data['msgMedia'])) {
       item = Text(
         '${data['content']['data'] ?? ''}',
         style: TextStyle(

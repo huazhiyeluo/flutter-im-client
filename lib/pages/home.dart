@@ -1,22 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
-import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/websocket.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/db.dart';
-import 'package:qim/utils/savedata.dart';
 import 'tabs/chat.dart';
 import 'tabs/chat_bar.dart';
 import 'tabs/contact.dart';
 import 'tabs/contact_bar.dart';
 import 'tabs/person.dart';
 import 'tabs/person_bar.dart';
-import 'package:qim/utils/websocket.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -26,11 +22,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final WebSocketController webSocketController = Get.put(WebSocketController());
   final ChatController chatController = Get.put(ChatController());
   final TalkobjController talkobjController = Get.put(TalkobjController());
-  late WebSocketClient channel;
   int _currentIndex = 0;
-  final MessageController messageController = Get.put(MessageController());
 
   Map userInfo = {};
 
@@ -38,30 +33,21 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    onConnect();
-    onReceive();
-    heart();
+    webSocketController.onConnect(userInfo['uid']);
+    webSocketController.onReceive();
+    webSocketController.heart(userInfo['uid']);
+    initOnReceive();
   }
 
-  void onConnect() {
-    channel = WebSocketClient('wss://im.guiaihai.com/chat?uid=${userInfo['uid']}');
-  }
-
-  void onReceive() {
-    channel.receiveMessage((message) async {
-      Map msg = json.decode(message);
-
-      Map objUser = (await DBHelper.getOne('users', [
-        ['uid', '=', msg['fromId']]
-      ]))!;
-      msg['avatar'] = objUser['avatar'];
+  void initOnReceive() {
+    // 初始化 WebSocket 监听
+    webSocketController.message.listen((msg) async {
       processReceivedMessage(userInfo['uid'], msg, chatController);
 
-      if ([1, 2].contains(msg['msgType'])) {
-        messageController.addMessage(msg);
-        saveMessage(msg);
-      }
       if ([4].contains(msg['msgType'])) {
+        Map objUser = (await DBHelper.getOne('users', [
+          ['uid', '=', msg['fromId']]
+        ]))!;
         Map talkobj = {
           "objId": msg['fromId'],
           "type": 1,
@@ -71,32 +57,27 @@ class _HomeState extends State<Home> {
           "remark": objUser['remark'],
         };
         talkobjController.setTalkObj(talkobj);
-
         if (msg['msgMedia'] == 0) {
-          Navigator.pushNamed(context, '/talk-phone-from', arguments: {
-            "channel": channel,
+          //收到语音通话 - 请求
+          Get.toNamed('/talk-phone', arguments: {
+            "type": 2,
           });
         }
-        if (msg['msgMedia'] == 1) {
-          Get.back();
+        if (msg['msgMedia'] == 2) {
+          //收到语音通话 - 通话
+          Get.toNamed('/talk-phone', arguments: {
+            "type": 0,
+          });
         }
       }
     });
-  }
-
-  void heart() {
-    channel.startHeartbeat(1);
   }
 
   final List<Function> _pagesBar = [chatBar, contactBar, settingBar];
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [
-      Chat(arguments: {'channel': channel}),
-      Contact(arguments: {'channel': channel}),
-      const Setting()
-    ];
+    final List<Widget> pages = [const Chat(), const Contact(), const Setting()];
 
     return Scaffold(
       appBar: _pagesBar[_currentIndex](),

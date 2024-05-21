@@ -11,8 +11,7 @@ import 'package:qim/utils/savedata.dart';
 import 'package:qim/widget/custom_text_field.dart';
 
 class Chat extends StatefulWidget {
-  final Map arguments;
-  const Chat({super.key, required this.arguments});
+  const Chat({super.key});
 
   @override
   State<Chat> createState() => _ChatState();
@@ -68,14 +67,13 @@ class _ChatState extends State<Chat> {
           ),
         ]),
       ),
-      body: ChatPage(arguments: widget.arguments),
+      body: const ChatPage(),
     );
   }
 }
 
 class ChatPage extends StatefulWidget {
-  final Map arguments;
-  const ChatPage({super.key, required this.arguments});
+  const ChatPage({super.key});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -200,9 +198,6 @@ class _ChatPageState extends State<ChatPage> {
                 Navigator.pushNamed(
                   context,
                   '/talk',
-                  arguments: {
-                    "channel": widget.arguments['channel'],
-                  },
                 );
               },
             ),

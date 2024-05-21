@@ -45,5 +45,20 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to the camera for video calls.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need access to the microphone for audio calls.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to upload files</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>We need to add photos to your library</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>We need access to your documents to upload files</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+	<key>NSAllowsArbitraryLoads</key>
+	<true/>
+	</dict>
 </dict>
 </plist>
