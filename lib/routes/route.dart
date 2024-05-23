@@ -9,6 +9,7 @@ import 'package:qim/pages/chat/user.dart';
 import 'package:qim/pages/home.dart';
 import 'package:qim/pages/search.dart';
 import 'package:qim/pages/entry.dart';
+import 'package:qim/pages/test.dart';
 import 'package:qim/pages/users/login.dart';
 import 'package:qim/pages/users/register_one.dart';
 import 'package:qim/pages/users/register_two.dart';
@@ -31,6 +32,7 @@ class AppPage {
     GetPage(name: "/user", page: () => const User()),
     GetPage(name: "/group", page: () => const Group()),
     GetPage(name: "/group-user", page: () => const GroupUser()),
+    GetPage(name: "/test", page: () => const Test()),
   ];
 }
 

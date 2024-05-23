@@ -48,8 +48,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- 应用安装 -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <!-- 拍照权限，允许访问摄像头进行拍照 -->
-    <uses-permission android:name="android.permission.CAMERA" />
+
     <!-- 闪光灯 -->
     <uses-permission android:name="android.permission.FLASHLIGHT" />
 
@@ -61,7 +60,12 @@
     <!-- 如果需要获取视频，添加该权限 -->
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <!-- 如果需要获取音频，添加该权限 -->
+    
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 </manifest>

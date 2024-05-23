@@ -52,6 +52,8 @@ dependencies:
   permission_handler: ^11.3.1
   photo_view: ^0.15.0
   flutter_webrtc: ^0.10.6
+  sqflite_common_ffi: ^2.3.3
+  sqflite_common_ffi_web: ^0.4.3+1
 
 dev_dependencies:
   flutter_test:

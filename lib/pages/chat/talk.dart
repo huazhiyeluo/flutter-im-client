@@ -15,6 +15,7 @@ import 'package:qim/widget/chat_message.dart';
 import 'package:qim/widget/custom_chat_text_field.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 class Talk extends StatefulWidget {
   const Talk({super.key});
@@ -25,10 +26,16 @@ class Talk extends StatefulWidget {
 
 class _TalkState extends State<Talk> {
   final TalkobjController talkobjController = Get.find();
+  Map talkObj = {};
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    talkObj = talkobjController.talkObj;
+  }
 
   @override
   Widget build(BuildContext context) {
-    Map? talkObj = talkobjController.talkObj;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -111,6 +118,51 @@ class _TalkPageState extends State<TalkPage> {
     Icons.folder,
   ];
 
+  //语音通话组件
+  final Map<String, dynamic> mediaConstraints = {
+    'audio': true,
+    'video': {
+      'mandatory': {
+        'minWidth': '480',
+        'minHeight': '320',
+        'minFrameRate': '30',
+      },
+      'facingMode': 'user',
+      'optional': [],
+    }
+  };
+
+  final Map<String, dynamic> sdpConstraints = {
+    'mandatory': {
+      'OfferToReceiveAudio': true,
+      'OfferToReceiveVideo': true,
+    },
+    'optional': [],
+  };
+
+  final Map<String, dynamic> pcConstraints = {
+    'mandatory': {},
+    'optional': [
+      {'DtlsSrtpKeyAgreement': false},
+    ]
+  };
+
+  final Map<String, dynamic> configuration = {
+    'iceServers': [
+      {'url': 'stun:stun.l.google.com:19302'},
+    ]
+  };
+
+  final _localRenderer = webrtc.RTCVideoRenderer();
+  final _remoteRenderer = webrtc.RTCVideoRenderer();
+  late webrtc.MediaStream _localStream;
+  late webrtc.MediaStream _remoteStream;
+  late webrtc.RTCPeerConnection _localConnection;
+  late webrtc.RTCPeerConnection _remoteConnection;
+  bool _isContact = false;
+
+  int ttype = 0;
+
   @override
   void initState() {
     super.initState();
@@ -122,6 +174,13 @@ class _TalkPageState extends State<TalkPage> {
       String temp = i < 10 ? '0$i' : '$i';
       emojis.add('lib/assets/emojis/$temp.gif');
     }
+    onReceive();
+    ttype = Get.arguments != null ? Get.arguments['type'] : 0;
+    if (ttype == 2) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _dialogUI(2);
+      });
+    }
   }
 
   final ImagePicker _picker = ImagePicker();
@@ -129,6 +188,13 @@ class _TalkPageState extends State<TalkPage> {
   @override
   void dispose() {
     inputController.dispose();
+    _localRenderer.dispose();
+    _localStream.dispose();
+    _localConnection.dispose();
+
+    _remoteRenderer.dispose();
+    _remoteStream.dispose();
+    _remoteConnection.dispose();
     super.dispose();
   }
 
@@ -138,6 +204,75 @@ class _TalkPageState extends State<TalkPage> {
       children: [
         const Expanded(
           child: ChatMessage(),
+        ),
+        Container(
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  color: Colors.white,
+                  child: webrtc.RTCVideoView(_localRenderer, mirror: true),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  color: Colors.red,
+                  child: webrtc.RTCVideoView(_remoteRenderer, mirror: true),
+                ),
+              ),
+              Positioned(
+                bottom: 20,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          _quitPhone();
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                            Colors.red,
+                          ), // 按钮背景色
+                          foregroundColor: MaterialStateProperty.all<Color>(
+                            Colors.white,
+                          ), // 文字颜色
+                          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          ), // 内边距
+                          textStyle: MaterialStateProperty.all<TextStyle>(
+                            const TextStyle(fontSize: 18),
+                          ), // 文字样式
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ), // 圆角边框
+                        ),
+                        child: const Text("挂断"),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
@@ -321,7 +456,6 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   void _send(Map msg) async {
-    // 发送按钮的操作
     webSocketController.sendMessage(msg);
     if (![1, 2].contains(msg['msgType'])) {
       return;
@@ -350,16 +484,13 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   Future<void> _pickCamera() async {
-    // 申请相机等权限
     var isGrantedCamera = await PermissionUtil.requestCameraPermission();
     if (!isGrantedCamera) {
       TipHelper.instance.showToast("未允许相机权限");
       return;
     }
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
-    // Handle the picked image file
     if (pickedFile != null) {
-      // Use the picked file (e.g., display it in an Image widget)
       print('Picked image path: ${pickedFile.path}');
     } else {
       // User canceled the image picking
@@ -375,7 +506,6 @@ class _TalkPageState extends State<TalkPage> {
     }
 
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    // Handle the picked image file
     if (pickedFile != null) {
       dio.MultipartFile file = await dio.MultipartFile.fromFile(pickedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) {
@@ -386,12 +516,316 @@ class _TalkPageState extends State<TalkPage> {
         TipHelper.instance.showToast(res['msg']);
       });
     } else {
-      // User canceled the image picking
       print('No image selected.');
     }
   }
 
   // ----------------------------------------------------------------语音通话 ----------------------------------------------------------------
+  Future<void> _dialogUI(int ttype) async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            insetPadding: EdgeInsets.zero, // 设置内容填充为零
+            child: Container(
+              width: MediaQuery.of(context).size.width, // 使用屏幕宽度作为内容宽度
+              height: MediaQuery.of(context).size.height, // 使用屏幕高度作为内容高度
+              color: const Color.fromARGB(125, 0, 0, 125), // 设置背景颜色
+              child: ttype == 1
+                  ? _toUI()
+                  : ttype == 2
+                      ? _fromUI()
+                      : _phoneUI(),
+            ),
+          );
+        });
+  }
+
+  Widget _phoneUI() {
+    return Center();
+  }
+
+  Widget _toUI() {
+    return Center(
+      child: Column(
+        children: [
+          const SizedBox(
+            height: 80,
+          ),
+          CircleAvatar(
+            radius: 80,
+            backgroundImage: NetworkImage(
+              talkObj['icon'],
+              scale: 1,
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Text(
+            talkObj['name'],
+            style: const TextStyle(color: Colors.white),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          const Text(
+            "正在呼叫...",
+            style: TextStyle(color: Colors.white),
+          ),
+          Expanded(
+            child: Container(),
+          ),
+          Row(
+            children: [
+              const SizedBox(width: 30),
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    _quitPhone();
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      Colors.red,
+                    ), // 按钮背景色
+                    foregroundColor: MaterialStateProperty.all<Color>(
+                      Colors.white,
+                    ), // 文字颜色
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    ), // 内边距
+                    textStyle: MaterialStateProperty.all<TextStyle>(
+                      const TextStyle(fontSize: 18),
+                    ), // 文字样式
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ), // 圆角边框
+                  ),
+                  child: const Text("挂断"),
+                ),
+              ),
+              const SizedBox(width: 30),
+            ],
+          ),
+          const SizedBox(
+            height: 50,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _fromUI() {
+    return Center(
+      child: Column(
+        children: [
+          const SizedBox(
+            height: 80,
+          ),
+          CircleAvatar(
+            radius: 80,
+            backgroundImage: NetworkImage(
+              talkObj['icon'],
+              scale: 1,
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Text(
+            talkObj['name'],
+            style: const TextStyle(color: Colors.white),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          const Text(
+            "正在呼叫...",
+            style: TextStyle(color: Colors.white),
+          ),
+          Expanded(
+            child: Container(),
+          ),
+          Row(
+            children: [
+              const SizedBox(width: 40),
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    _quitPhone();
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      Colors.red,
+                    ), // 按钮背景色
+                    foregroundColor: MaterialStateProperty.all<Color>(
+                      Colors.white,
+                    ), // 文字颜色
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    ), // 内边距
+                    textStyle: MaterialStateProperty.all<TextStyle>(
+                      const TextStyle(fontSize: 18),
+                    ), // 文字样式
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ), // 圆角边框
+                  ),
+                  child: const Text("挂断"),
+                ),
+              ),
+              const SizedBox(width: 30),
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    _doPhone();
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      Colors.green,
+                    ), // 按钮背景色
+                    foregroundColor: MaterialStateProperty.all<Color>(
+                      Colors.white,
+                    ), // 文字颜色
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    ), // 内边距
+                    textStyle: MaterialStateProperty.all<TextStyle>(
+                      const TextStyle(fontSize: 18),
+                    ), // 文字样式
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ), // 圆角边框
+                  ),
+                  child: const Text("接听"),
+                ),
+              ),
+              const SizedBox(width: 40),
+            ],
+          ),
+          const SizedBox(
+            height: 50,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void onReceive() {
+    webSocketController.message.listen((msg) async {
+      if ([4].contains(msg['msgType'])) {
+        if (msg['msgMedia'] == 0) {}
+        if (msg['msgMedia'] == 1) {
+          //收到语音通话 - 挂断
+          Navigator.of(context).pop(); // 关闭对话框
+        }
+        if (msg['msgMedia'] == 2) {
+          _doPhone();
+        }
+        if (msg['msgMedia'] == 3) {}
+        if (msg['msgMedia'] == 4) {}
+        if (msg['msgMedia'] == 5) {}
+      }
+    });
+  }
+
+  _initRenderer() async {
+    try {
+      await _localRenderer.initialize();
+      await _remoteRenderer.initialize();
+      print("_initRendere");
+    } catch (e) {
+      print("_initRenderer:$e");
+    }
+  }
+
+  _onIceCandidate(webrtc.RTCIceCandidate candidate) {
+    _remoteConnection.addCandidate(candidate);
+    print("LIAO:_onRemoteIceConnectionState: $candidate");
+  }
+
+  _onIceConnectionState(webrtc.RTCIceConnectionState state) {
+    print("LIAO:_onRemoteIceConnectionState: $state");
+  }
+
+  _onRemoteIceCandidate(webrtc.RTCIceCandidate candidate) {
+    _localConnection.addCandidate(candidate);
+    print("LIAO:_onRemoteIceConnectionState: $candidate");
+  }
+
+  _onRemoteIceConnectionState(webrtc.RTCIceConnectionState state) {
+    print("LIAO:_onRemoteIceConnectionState: $state");
+  }
+
+  _onTrack(webrtc.RTCTrackEvent event) {
+    if (event.track.kind == 'video') {
+      _remoteRenderer.srcObject = event.streams[0];
+    }
+  }
+
+  _open() async {
+    if (_isContact) return;
+    try {
+      print("_open");
+      _localStream = await webrtc.navigator.mediaDevices.getUserMedia(mediaConstraints);
+      setState(() {
+        _localRenderer.srcObject = _localStream;
+      });
+
+      _localConnection = await webrtc.createPeerConnection(configuration, pcConstraints);
+      _localConnection.onIceCandidate = _onIceCandidate;
+      _localConnection.onIceConnectionState = _onIceConnectionState;
+
+      _localStream.getTracks().forEach((track) {
+        _localConnection.addTrack(track, _localStream);
+      });
+      _localStream.getAudioTracks()[0].enableSpeakerphone(false);
+
+      _remoteConnection = await webrtc.createPeerConnection(configuration, pcConstraints);
+      _remoteConnection.onIceCandidate = _onRemoteIceCandidate;
+      _remoteConnection.onIceConnectionState = _onRemoteIceConnectionState;
+      _remoteConnection.onTrack = _onTrack;
+
+      webrtc.RTCSessionDescription offer = await _localConnection.createOffer(sdpConstraints);
+      _localConnection.setLocalDescription(offer);
+      _remoteConnection.setRemoteDescription(offer);
+
+      webrtc.RTCSessionDescription answer = await _remoteConnection.createAnswer(sdpConstraints);
+      _remoteConnection.setLocalDescription(answer);
+      _localConnection.setRemoteDescription(answer);
+    } catch (e) {
+      print('Error: $e');
+    }
+    if (!mounted) return;
+    setState(() {
+      _isContact = true;
+    });
+  }
+
+  _close() async {
+    try {
+      await _localStream.dispose();
+      _localRenderer.srcObject = null;
+      await _localConnection.dispose();
+
+      await _remoteStream.dispose();
+      _remoteRenderer.srcObject = null;
+      await _remoteConnection.dispose();
+    } catch (e) {
+      print('Error: $e');
+    }
+    if (!mounted) return;
+    setState(() {
+      _isContact = false;
+    });
+  }
+
   _goPhone() {
     _send({
       'content': {'data': ""},
@@ -400,8 +834,21 @@ class _TalkPageState extends State<TalkPage> {
       'msgMedia': 0,
       'msgType': 4
     });
-    Navigator.pushNamed(context, '/talk-phone', arguments: {
-      "type": 1,
+    _dialogUI(1);
+  }
+
+  _quitPhone() {
+    _close();
+    Navigator.of(context).pop(); // 关闭对话框
+  }
+
+  _doPhone() async {
+    Navigator.of(context).pop();
+    await _initRenderer();
+    // await _dialogUI(3);
+    setState(() {
+      ttype = 3;
     });
+    _open();
   }
 }

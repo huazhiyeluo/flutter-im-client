@@ -59,14 +59,14 @@ class _HomeState extends State<Home> {
         talkobjController.setTalkObj(talkobj);
         if (msg['msgMedia'] == 0) {
           //收到语音通话 - 请求
-          Get.toNamed('/talk-phone', arguments: {
+          Get.toNamed('/talk', arguments: {
             "type": 2,
           });
         }
         if (msg['msgMedia'] == 2) {
-          //收到语音通话 - 通话
-          Get.toNamed('/talk-phone', arguments: {
-            "type": 0,
+          //收到语音通话 - 接通
+          Get.toNamed('/talk', arguments: {
+            "type": 3,
           });
         }
       }

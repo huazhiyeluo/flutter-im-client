@@ -54,8 +54,8 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
-    onReceive();
     initializeRenderers();
+    onReceive();
     currentType = Get.arguments['type'];
   }
 
@@ -94,8 +94,10 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
               color: Colors.white,
             ),
           ),
-          SizedBox(
+          Container(
             height: 200,
+            width: 200,
+            color: Colors.red,
             child: webrtc.RTCVideoView(_localVideo),
           ),
           const SizedBox(height: 20),
@@ -105,9 +107,44 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
               color: Colors.white,
             ),
           ),
-          SizedBox(
+          Container(
             height: 200,
+            width: 200,
+            color: Colors.red,
             child: webrtc.RTCVideoView(_remoteVideo),
+          ),
+          Row(
+            children: [
+              const SizedBox(width: 30),
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    _quitPhone();
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      Colors.red,
+                    ), // 按钮背景色
+                    foregroundColor: MaterialStateProperty.all<Color>(
+                      Colors.white,
+                    ), // 文字颜色
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    ), // 内边距
+                    textStyle: MaterialStateProperty.all<TextStyle>(
+                      const TextStyle(fontSize: 18),
+                    ), // 文字样式
+                    shape: MaterialStateProperty.all<OutlinedBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ), // 圆角边框
+                  ),
+                  child: const Text("挂断"),
+                ),
+              ),
+              const SizedBox(width: 30),
+            ],
           ),
         ],
       ),
@@ -290,14 +327,17 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
   void onReceive() {
     webSocketController.message.listen((msg) async {
       if ([4].contains(msg['msgType'])) {
-        print(msg);
         if (msg['msgMedia'] == 0) {}
         if (msg['msgMedia'] == 1) {
           //收到语音通话 - 挂断
           Get.toNamed('/talk', arguments: {});
         }
         if (msg['msgMedia'] == 2) {
-          await _getData();
+          setState(() {
+            currentType = 0;
+          });
+          await _createConnection();
+          await _createStream();
         }
         if (msg['msgMedia'] == 3) {
           _handleIceCandidate(msg['content']['data']);
@@ -310,11 +350,6 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
         }
       }
     });
-  }
-
-  Future<void> _getData() async {
-    await _createConnection();
-    await _createStream();
   }
 
   void _quitPhone() {
@@ -339,7 +374,6 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
   }
 
   Future<void> _doPhone() async {
-    await _getData();
     Map msg = {
       'content': {'data': ""},
       'fromId': uid,
@@ -351,20 +385,40 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
     setState(() {
       currentType = 0;
     });
+    await _createConnection();
+    await _createStream();
   }
 
   Future<void> _handleIceCandidate(String candidatestr) async {
-    Map candidateMap = json.decode(candidatestr);
-    webrtc.RTCIceCandidate candidate =
-        webrtc.RTCIceCandidate(candidateMap['candidate'], candidateMap['sdpMid'], candidateMap['sdpMLineIndex']);
-    await _peerConnection.addCandidate(candidate);
+    try {
+      if (_peerConnection.signalingState != webrtc.RTCSignalingState) {
+        Map candidateMap = json.decode(candidatestr);
+        webrtc.RTCIceCandidate candidate =
+            webrtc.RTCIceCandidate(candidateMap['candidate'], candidateMap['sdpMid'], candidateMap['sdpMLineIndex']);
+        await _peerConnection.addCandidate(candidate);
+      } else {
+        print("Error Remote description is null, unable to add ICE candidate");
+      }
+    } catch (e) {
+      print("Error while adding ICE candidate: $e");
+    }
   }
 
   Future<void> _handleOffer(String offerstr) async {
-    Map offerMap = json.decode(offerstr);
-    webrtc.RTCSessionDescription offer = webrtc.RTCSessionDescription(offerMap['sdp'], offerMap['type']);
-    await _peerConnection.setRemoteDescription(offer);
-    await _sendAnswer();
+    try {
+      Map offerMap = json.decode(offerstr);
+      webrtc.RTCSessionDescription offer = webrtc.RTCSessionDescription(offerMap['sdp'], offerMap['type']);
+
+      // 检查当前状态是否为 "stable"，确保不会在错误的状态下设置远程描述
+      if (_peerConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateStable) {
+        await _peerConnection.setRemoteDescription(offer);
+        await _sendAnswer();
+      } else {
+        print("Error: Called setRemoteDescription in wrong state: ${_peerConnection.signalingState}");
+      }
+    } catch (e) {
+      print("Error while handling offer: $e");
+    }
   }
 
   Future<void> _handleAnswer(String answerstr) async {
@@ -374,22 +428,27 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
   }
 
   Future<void> _sendAnswer() async {
-    webrtc.RTCSessionDescription answer = await _peerConnection.createAnswer();
-    await _peerConnection.setLocalDescription(answer);
+    // 检查连接状态是否为 'have-remote-offer'
+    if (_peerConnection.connectionState == webrtc.RTCIceConnectionState.RTCIceConnectionStateConnected) {
+      webrtc.RTCSessionDescription answer = await _peerConnection.createAnswer();
+      await _peerConnection.setLocalDescription(answer);
 
-    Map<String, dynamic> answerMap = {
-      'sdp': answer.sdp,
-      'type': answer.type,
-    };
+      Map<String, dynamic> answerMap = {
+        'sdp': answer.sdp,
+        'type': answer.type,
+      };
 
-    Map msg = {
-      'content': {'data': json.encode(answerMap)},
-      'fromId': uid,
-      'toId': talkObj['objId'],
-      'msgMedia': 5,
-      'msgType': 4
-    };
-    webSocketController.sendMessage(msg);
+      Map msg = {
+        'content': {'data': json.encode(answerMap)},
+        'fromId': uid,
+        'toId': talkObj['objId'],
+        'msgMedia': 5,
+        'msgType': 4
+      };
+      webSocketController.sendMessage(msg);
+    } else {
+      print("Error: Unable to send answer, connection state is not suitable.");
+    }
   }
 
   //RTC--------------------------------
@@ -401,38 +460,44 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
       'audio': true,
       'video': true,
     };
-    _localStream = await webrtc.navigator.mediaDevices.getUserMedia(mediaConstraints);
+    try {
+      _localStream = await webrtc.navigator.mediaDevices.getUserMedia(mediaConstraints);
 
-    _localStream.getTracks().forEach((track) {
-      _peerConnection.addTrack(track, _localStream);
-    });
-    _localVideo.srcObject = _localStream;
+      _localStream.getTracks().forEach((track) {
+        _peerConnection.addTrack(track, _localStream);
+      });
+      _localVideo.srcObject = _localStream;
 
-    // 创建 RTCOfferOptions 对象
-    Map<String, dynamic> offerOptions = {
-      'offerToReceiveAudio': true,
-      'offerToReceiveVideo': true,
-    };
+      // 创建 RTCOfferOptions 对象
+      Map<String, dynamic> offerOptions = {
+        'offerToReceiveAudio': true,
+        'offerToReceiveVideo': true,
+      };
+      // 创建 offer
+      final offer = await _peerConnection.createOffer(offerOptions);
+      if (offer != null) {
+        // 设置本地描述
+        await _peerConnection.setLocalDescription(offer);
 
-    // 创建 offer
-    final offer = await _peerConnection.createOffer(offerOptions);
+        Map<String, dynamic> offerMap = {
+          'sdp': offer.sdp,
+          'type': offer.type,
+        };
+        Map msg = {
+          'content': {'data': json.encode(offerMap)},
+          'fromId': uid,
+          'toId': talkObj['objId'],
+          'msgMedia': 4,
+          'msgType': 4
+        };
 
-    // 设置本地描述
-    await _peerConnection.setLocalDescription(offer);
-
-    Map<String, dynamic> offerMap = {
-      'sdp': offer.sdp,
-      'type': offer.type,
-    };
-    Map msg = {
-      'content': {'data': json.encode(offerMap)},
-      'fromId': uid,
-      'toId': talkObj['objId'],
-      'msgMedia': 4,
-      'msgType': 4
-    };
-
-    webSocketController.sendMessage(msg);
+        webSocketController.sendMessage(msg);
+      } else {
+        print("Error: Offer is null");
+      }
+    } catch (e) {
+      print("Error while creating stream: $e");
+    }
   }
 
   Future<void> _createConnection() async {
@@ -496,10 +561,13 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
       }
     };
 
-    _peerConnection.onTrack = (event) {
-      if (event.track.kind == 'video') {
-        _remoteVideo.srcObject = event.streams[0];
-      }
+    _peerConnection.onAddStream = (stream) {
+      _remoteVideo.srcObject = stream;
     };
+    // _peerConnection.onTrack = (event) {
+    //   if (event.track.kind == 'video') {
+    //     _remoteVideo.srcObject = event.streams[0];
+    //   }
+    // };
   }
 }

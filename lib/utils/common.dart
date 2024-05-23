@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/utils/db.dart';
