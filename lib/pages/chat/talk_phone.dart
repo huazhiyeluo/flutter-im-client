@@ -475,26 +475,22 @@ class _TalkPhonePageState extends State<TalkPhonePage> {
       };
       // 创建 offer
       final offer = await _peerConnection.createOffer(offerOptions);
-      if (offer != null) {
-        // 设置本地描述
-        await _peerConnection.setLocalDescription(offer);
+      // 设置本地描述
+      await _peerConnection.setLocalDescription(offer);
 
-        Map<String, dynamic> offerMap = {
-          'sdp': offer.sdp,
-          'type': offer.type,
-        };
-        Map msg = {
-          'content': {'data': json.encode(offerMap)},
-          'fromId': uid,
-          'toId': talkObj['objId'],
-          'msgMedia': 4,
-          'msgType': 4
-        };
+      Map<String, dynamic> offerMap = {
+        'sdp': offer.sdp,
+        'type': offer.type,
+      };
+      Map msg = {
+        'content': {'data': json.encode(offerMap)},
+        'fromId': uid,
+        'toId': talkObj['objId'],
+        'msgMedia': 4,
+        'msgType': 4
+      };
 
-        webSocketController.sendMessage(msg);
-      } else {
-        print("Error: Offer is null");
-      }
+      webSocketController.sendMessage(msg);
     } catch (e) {
       print("Error while creating stream: $e");
     }

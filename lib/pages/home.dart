@@ -7,6 +7,7 @@ import 'package:qim/controller/websocket.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/db.dart';
+import 'package:qim/utils/savedata.dart';
 import 'tabs/chat.dart';
 import 'tabs/chat_bar.dart';
 import 'tabs/contact.dart';
@@ -42,7 +43,12 @@ class _HomeState extends State<Home> {
   void initOnReceive() {
     // 初始化 WebSocket 监听
     webSocketController.message.listen((msg) async {
-      processReceivedMessage(userInfo['uid'], msg, chatController);
+      if ([1, 2].contains(msg['msgType'])) {
+        saveMessage(msg);
+      }
+      if (!([4].contains(msg['msgType']) && [3, 4, 5].contains(msg['msgMedia']))) {
+        processReceivedMessage(userInfo['uid'], msg, chatController);
+      }
 
       if ([4].contains(msg['msgType'])) {
         Map objUser = (await DBHelper.getOne('users', [
@@ -61,12 +67,6 @@ class _HomeState extends State<Home> {
           //收到语音通话 - 请求
           Get.toNamed('/talk', arguments: {
             "type": 2,
-          });
-        }
-        if (msg['msgMedia'] == 2) {
-          //收到语音通话 - 接通
-          Get.toNamed('/talk', arguments: {
-            "type": 3,
           });
         }
       }

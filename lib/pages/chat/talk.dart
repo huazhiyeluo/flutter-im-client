@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/common.dart';
@@ -10,12 +12,13 @@ import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/permission.dart';
+import 'package:qim/utils/savedata.dart';
 import 'package:qim/utils/tips.dart';
-import 'package:qim/widget/chat_message.dart';
-import 'package:qim/widget/custom_chat_text_field.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
+import 'package:qim/widget/chat_message.dart';
+import 'package:qim/widget/custom_chat_text_field.dart';
 
 class Talk extends StatefulWidget {
   const Talk({super.key});
@@ -158,7 +161,6 @@ class _TalkPageState extends State<TalkPage> {
   late webrtc.MediaStream _localStream;
   late webrtc.MediaStream _remoteStream;
   late webrtc.RTCPeerConnection _localConnection;
-  late webrtc.RTCPeerConnection _remoteConnection;
   bool _isContact = false;
 
   int ttype = 0;
@@ -166,6 +168,9 @@ class _TalkPageState extends State<TalkPage> {
   @override
   void initState() {
     super.initState();
+
+    _initRenderer();
+
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
@@ -174,13 +179,13 @@ class _TalkPageState extends State<TalkPage> {
       String temp = i < 10 ? '0$i' : '$i';
       emojis.add('lib/assets/emojis/$temp.gif');
     }
-    onReceive();
     ttype = Get.arguments != null ? Get.arguments['type'] : 0;
     if (ttype == 2) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _dialogUI(2);
       });
     }
+    onReceive();
   }
 
   final ImagePicker _picker = ImagePicker();
@@ -194,7 +199,6 @@ class _TalkPageState extends State<TalkPage> {
 
     _remoteRenderer.dispose();
     _remoteStream.dispose();
-    _remoteConnection.dispose();
     super.dispose();
   }
 
@@ -204,75 +208,6 @@ class _TalkPageState extends State<TalkPage> {
       children: [
         const Expanded(
           child: ChatMessage(),
-        ),
-        Container(
-          child: Stack(
-            children: [
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.3,
-                  height: MediaQuery.of(context).size.height * 0.3,
-                  color: Colors.white,
-                  child: webrtc.RTCVideoView(_localRenderer, mirror: true),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  color: Colors.red,
-                  child: webrtc.RTCVideoView(_remoteRenderer, mirror: true),
-                ),
-              ),
-              Positioned(
-                bottom: 20,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          _quitPhone();
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                            Colors.red,
-                          ), // 按钮背景色
-                          foregroundColor: MaterialStateProperty.all<Color>(
-                            Colors.white,
-                          ), // 文字颜色
-                          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                            const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                          ), // 内边距
-                          textStyle: MaterialStateProperty.all<TextStyle>(
-                            const TextStyle(fontSize: 18),
-                          ), // 文字样式
-                          shape: MaterialStateProperty.all<OutlinedBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ), // 圆角边框
-                        ),
-                        child: const Text("挂断"),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
@@ -463,6 +398,7 @@ class _TalkPageState extends State<TalkPage> {
     msg['createTime'] = getTime();
     msg['avatar'] = userInfo['avatar'];
     messageController.addMessage(msg);
+    saveMessage(msg);
     processReceivedMessage(uid, msg, chatController);
   }
 
@@ -542,7 +478,76 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   Widget _phoneUI() {
-    return Center();
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        return Center(
+          child: Container(
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    color: Colors.yellow,
+                    child: webrtc.RTCVideoView(_localRenderer, mirror: true),
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    color: Colors.red,
+                    child: webrtc.RTCVideoView(_remoteRenderer, mirror: true),
+                  ),
+                ),
+                Positioned(
+                  bottom: 10,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 30),
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () {
+                            _quitPhone();
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.red,
+                            ), // 按钮背景色
+                            foregroundColor: MaterialStateProperty.all<Color>(
+                              Colors.white,
+                            ), // 文字颜色
+                            padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                              const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                            ), // 内边距
+                            textStyle: MaterialStateProperty.all<TextStyle>(
+                              const TextStyle(fontSize: 18),
+                            ), // 文字样式
+                            shape: MaterialStateProperty.all<OutlinedBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ), // 圆角边框
+                          ),
+                          child: const Text("挂断"),
+                        ),
+                      ),
+                      const SizedBox(width: 30),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _toUI() {
@@ -720,33 +725,176 @@ class _TalkPageState extends State<TalkPage> {
   void onReceive() {
     webSocketController.message.listen((msg) async {
       if ([4].contains(msg['msgType'])) {
-        if (msg['msgMedia'] == 0) {}
+        if (msg['msgMedia'] == 0) {
+          setState(() {
+            ttype = 2;
+          });
+          _dialogUI(2);
+        }
         if (msg['msgMedia'] == 1) {
           //收到语音通话 - 挂断
-          Navigator.of(context).pop(); // 关闭对话框
+          _close();
+          Navigator.of(context).pop(); // 关闭弹窗
         }
         if (msg['msgMedia'] == 2) {
-          _doPhone();
+          Navigator.of(context).pop(); // 关闭弹窗
+          _createConnection();
+          _createStream();
+          setState(() {
+            ttype = 3;
+            _isContact = true;
+          });
         }
-        if (msg['msgMedia'] == 3) {}
-        if (msg['msgMedia'] == 4) {}
-        if (msg['msgMedia'] == 5) {}
+        if (msg['msgMedia'] == 3) {
+          _handleIceCandidate(msg['content']['data']);
+        }
+        if (msg['msgMedia'] == 4) {
+          _handleOffer(msg['content']['data']);
+        }
+        if (msg['msgMedia'] == 5) {
+          _handleAnswer(msg['content']['data']);
+        }
       }
     });
+  }
+
+  Future<void> _handleIceCandidate(String candidatestr) async {
+    try {
+      if (_localConnection.signalingState != webrtc.RTCSignalingState) {
+        Map candidateMap = json.decode(candidatestr);
+        webrtc.RTCIceCandidate candidate =
+            webrtc.RTCIceCandidate(candidateMap['candidate'], candidateMap['sdpMid'], candidateMap['sdpMLineIndex']);
+        await _localConnection.addCandidate(candidate);
+      } else {
+        print("Error Remote description is null, unable to add ICE candidate");
+      }
+    } catch (e) {
+      print("Error while adding ICE candidate: $e");
+    }
+  }
+
+  Future<void> _handleOffer(String offerstr) async {
+    try {
+      Map offerMap = json.decode(offerstr);
+      webrtc.RTCSessionDescription offer = webrtc.RTCSessionDescription(offerMap['sdp'], offerMap['type']);
+
+      // 检查当前状态是否为 "stable"，确保不会在错误的状态下设置远程描述
+      if (_localConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateStable) {
+        await _localConnection.setRemoteDescription(offer);
+        await _sendAnswer();
+      } else {
+        print("Error: Called setRemoteDescription in wrong state: ${_localConnection.signalingState}");
+      }
+    } catch (e) {
+      print("Error while handling offer: $e");
+    }
+  }
+
+  Future<void> _handleAnswer(String answerstr) async {
+    Map answerMap = json.decode(answerstr);
+    webrtc.RTCSessionDescription answer = webrtc.RTCSessionDescription(answerMap['sdp'], answerMap['type']);
+    await _localConnection.setRemoteDescription(answer);
+  }
+
+  Future<void> _sendAnswer() async {
+    // 检查连接状态是否为 'have-remote-offer'
+    if (_localConnection.connectionState == webrtc.RTCIceConnectionState.RTCIceConnectionStateConnected) {
+      webrtc.RTCSessionDescription answer = await _localConnection.createAnswer();
+      await _localConnection.setLocalDescription(answer);
+
+      Map<String, dynamic> answerMap = {
+        'sdp': answer.sdp,
+        'type': answer.type,
+      };
+
+      Map msg = {
+        'content': {'data': json.encode(answerMap)},
+        'fromId': uid,
+        'toId': talkObj['objId'],
+        'msgMedia': 5,
+        'msgType': 4
+      };
+      webSocketController.sendMessage(msg);
+    } else {
+      print("Error: Unable to send answer, connection state is not suitable.");
+    }
+  }
+
+  _createConnection() async {
+    print("_createConnection");
+    try {
+      _localConnection = await webrtc.createPeerConnection(configuration, pcConstraints);
+      _localConnection.onIceCandidate = _onIceCandidate;
+      _localConnection.onIceConnectionState = _onIceConnectionState;
+      _localConnection.onTrack = _onTrack;
+    } catch (e) {
+      print("Error while creating stream: $e");
+    }
+  }
+
+  _createStream() async {
+    print("_createStream");
+    try {
+      _localStream = await webrtc.navigator.mediaDevices.getUserMedia(mediaConstraints);
+      _localRenderer.srcObject = _localStream;
+      _localStream.getTracks().forEach((track) {
+        _localConnection.addTrack(track, _localStream);
+      });
+
+      // 创建 RTCOfferOptions 对象
+      Map<String, dynamic> offerOptions = {
+        'offerToReceiveAudio': true,
+        'offerToReceiveVideo': true,
+      };
+      // 创建 offer
+      final offer = await _localConnection.createOffer(offerOptions);
+      // 设置本地描述
+      await _localConnection.setLocalDescription(offer);
+
+      Map<String, dynamic> offerMap = {
+        'sdp': offer.sdp,
+        'type': offer.type,
+      };
+      Map msg = {
+        'content': {'data': json.encode(offerMap)},
+        'fromId': uid,
+        'toId': talkObj['objId'],
+        'msgMedia': 4,
+        'msgType': 4
+      };
+      webSocketController.sendMessage(msg);
+    } catch (e) {
+      print("Error while creating stream: $e");
+    }
+    _dialogUI(3);
   }
 
   _initRenderer() async {
     try {
       await _localRenderer.initialize();
+      print("_initRendere");
+    } catch (e) {
+      print("_initRenderer:$e");
+    }
+    try {
       await _remoteRenderer.initialize();
       print("_initRendere");
     } catch (e) {
       print("_initRenderer:$e");
     }
+    setState(() {});
   }
 
   _onIceCandidate(webrtc.RTCIceCandidate candidate) {
-    _remoteConnection.addCandidate(candidate);
+    Map msg = {
+      'content': {'data': json.encode(candidate)},
+      'fromId': uid,
+      'toId': talkObj['objId'],
+      'msgMedia': 3,
+      'msgType': 4
+    };
+    webSocketController.sendMessage(msg);
+    _localConnection.addCandidate(candidate);
     print("LIAO:_onRemoteIceConnectionState: $candidate");
   }
 
@@ -754,58 +902,11 @@ class _TalkPageState extends State<TalkPage> {
     print("LIAO:_onRemoteIceConnectionState: $state");
   }
 
-  _onRemoteIceCandidate(webrtc.RTCIceCandidate candidate) {
-    _localConnection.addCandidate(candidate);
-    print("LIAO:_onRemoteIceConnectionState: $candidate");
-  }
-
-  _onRemoteIceConnectionState(webrtc.RTCIceConnectionState state) {
-    print("LIAO:_onRemoteIceConnectionState: $state");
-  }
-
   _onTrack(webrtc.RTCTrackEvent event) {
+    print("LIAO:_onTrack: ${event.track.kind}");
     if (event.track.kind == 'video') {
       _remoteRenderer.srcObject = event.streams[0];
     }
-  }
-
-  _open() async {
-    if (_isContact) return;
-    try {
-      print("_open");
-      _localStream = await webrtc.navigator.mediaDevices.getUserMedia(mediaConstraints);
-      setState(() {
-        _localRenderer.srcObject = _localStream;
-      });
-
-      _localConnection = await webrtc.createPeerConnection(configuration, pcConstraints);
-      _localConnection.onIceCandidate = _onIceCandidate;
-      _localConnection.onIceConnectionState = _onIceConnectionState;
-
-      _localStream.getTracks().forEach((track) {
-        _localConnection.addTrack(track, _localStream);
-      });
-      _localStream.getAudioTracks()[0].enableSpeakerphone(false);
-
-      _remoteConnection = await webrtc.createPeerConnection(configuration, pcConstraints);
-      _remoteConnection.onIceCandidate = _onRemoteIceCandidate;
-      _remoteConnection.onIceConnectionState = _onRemoteIceConnectionState;
-      _remoteConnection.onTrack = _onTrack;
-
-      webrtc.RTCSessionDescription offer = await _localConnection.createOffer(sdpConstraints);
-      _localConnection.setLocalDescription(offer);
-      _remoteConnection.setRemoteDescription(offer);
-
-      webrtc.RTCSessionDescription answer = await _remoteConnection.createAnswer(sdpConstraints);
-      _remoteConnection.setLocalDescription(answer);
-      _localConnection.setRemoteDescription(answer);
-    } catch (e) {
-      print('Error: $e');
-    }
-    if (!mounted) return;
-    setState(() {
-      _isContact = true;
-    });
   }
 
   _close() async {
@@ -816,7 +917,6 @@ class _TalkPageState extends State<TalkPage> {
 
       await _remoteStream.dispose();
       _remoteRenderer.srcObject = null;
-      await _remoteConnection.dispose();
     } catch (e) {
       print('Error: $e');
     }
@@ -838,17 +938,43 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   _quitPhone() {
+    Map msg = {
+      'content': {'data': ""},
+      'fromId': uid,
+      'toId': talkObj['objId'],
+      'msgMedia': 1,
+      'msgType': 4
+    };
+    webSocketController.sendMessage(msg);
+
+    Map msgshow = {
+      'content': {'data': "挂断电话"},
+      'fromId': uid,
+      'toId': talkObj['objId'],
+      'msgMedia': 13,
+      'msgType': 1
+    };
+    webSocketController.sendMessage(msgshow);
     _close();
-    Navigator.of(context).pop(); // 关闭对话框
+    Navigator.of(context).pop(); // 关闭弹窗
   }
 
   _doPhone() async {
-    Navigator.of(context).pop();
-    await _initRenderer();
-    // await _dialogUI(3);
+    print("_doPhone");
+    Navigator.of(context).pop(); // 关闭弹窗
+    _createConnection();
+    _createStream();
+    Map msg = {
+      'content': {'data': ""},
+      'fromId': uid,
+      'toId': talkObj['objId'],
+      'msgMedia': 2,
+      'msgType': 4
+    };
+    webSocketController.sendMessage(msg);
     setState(() {
       ttype = 3;
+      _isContact = true;
     });
-    _open();
   }
 }
