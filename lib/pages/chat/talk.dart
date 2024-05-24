@@ -191,7 +191,6 @@ class _TalkPageState extends State<TalkPage> {
   late webrtc.MediaStream _localStream;
   late webrtc.MediaStream _remoteStream;
   late webrtc.RTCPeerConnection _localConnection;
-  bool _isContact = false;
 
   int ttype = 0;
 
@@ -285,97 +284,111 @@ class _TalkPageState extends State<TalkPage> {
                       },
                     ),
                   ),
-                  isShowSend == 0
-                      ? SizedBox(
-                          width: 31,
-                          child: IconButton(
-                            icon: const Icon(Icons.add),
-                            iconSize: 35,
-                            padding: const EdgeInsets.all(2),
-                            onPressed: () {
-                              setState(() {
-                                isShowPlus = 1 - isShowPlus;
-                                isShowEmoji = 0;
-                              });
-                            },
-                          ),
-                        )
-                      : SizedBox(
-                          width: 31,
-                          child: IconButton(
-                            icon: const Icon(Icons.send),
-                            iconSize: 35,
-                            padding: const EdgeInsets.all(2),
-                            onPressed: () {
-                              _sendText();
-                            },
-                          ),
-                        ),
+                  isShowSend == 0 ? _showAdd() : _showSend(),
                 ],
               );
             },
           ),
         ),
-        isShowEmoji == 1
-            ? Container(
-                height: 350,
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
-                color: const Color.fromARGB(255, 237, 237, 237),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 8,
-                    crossAxisSpacing: 10.0, // 列之间的间距
-                    mainAxisSpacing: 0.0, // 行之间的间距
-                    childAspectRatio: 1.2, // 宽高比
-                  ),
-                  itemCount: emojis.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        _sendEmoji(emojis[index]);
-                        setState(() {
-                          isShowEmoji = 1 - isShowEmoji;
-                        });
-                      },
-                      child: Image.asset(
-                        emojis[index],
-                        scale: 0.75,
-                      ),
-                    );
-                  },
-                ),
-              )
-            : Container(),
-        isShowPlus == 1
-            ? Container(
-                height: 100,
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
-                color: const Color.fromARGB(255, 237, 237, 237),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 10.0, // 列之间的间距
-                    mainAxisSpacing: 0.0, // 行之间的间距
-                    childAspectRatio: 1.2, // 宽高比
-                  ),
-                  itemCount: icons.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () async {
-                        setState(() {
-                          _pick(index);
-                          isShowPlus = 1 - isShowPlus;
-                        });
-                      },
-                      child: Icon(icons[index], size: 56),
-                    );
-                  },
-                ),
-              )
-            : Container(),
+        isShowEmoji == 1 ? _buildEmoji() : Container(),
+        isShowPlus == 1 ? _buildPlus() : Container(),
       ],
+    );
+  }
+
+  //发送按钮
+  Widget _showSend() {
+    return SizedBox(
+      width: 31,
+      child: IconButton(
+        icon: const Icon(Icons.send),
+        iconSize: 35,
+        padding: const EdgeInsets.all(2),
+        onPressed: () {
+          _sendText();
+        },
+      ),
+    );
+  }
+
+  //发送添加按钮
+  Widget _showAdd() {
+    return SizedBox(
+      width: 31,
+      child: IconButton(
+        icon: const Icon(Icons.add),
+        iconSize: 35,
+        padding: const EdgeInsets.all(2),
+        onPressed: () {
+          setState(() {
+            isShowPlus = 1 - isShowPlus;
+            isShowEmoji = 0;
+          });
+        },
+      ),
+    );
+  }
+
+  //点击加号出来的操作按钮
+  Widget _buildPlus() {
+    return Container(
+      height: 100,
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
+      color: const Color.fromARGB(255, 237, 237, 237),
+      child: GridView.builder(
+        shrinkWrap: true,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          crossAxisSpacing: 10.0, // 列之间的间距
+          mainAxisSpacing: 0.0, // 行之间的间距
+          childAspectRatio: 1.2, // 宽高比
+        ),
+        itemCount: icons.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () async {
+              setState(() {
+                _pick(index);
+                isShowPlus = 1 - isShowPlus;
+              });
+            },
+            child: Icon(icons[index], size: 56),
+          );
+        },
+      ),
+    );
+  }
+
+  //表情列表
+  Widget _buildEmoji() {
+    return Container(
+      height: 350,
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
+      color: const Color.fromARGB(255, 237, 237, 237),
+      child: GridView.builder(
+        shrinkWrap: true,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 8,
+          crossAxisSpacing: 10.0, // 列之间的间距
+          mainAxisSpacing: 0.0, // 行之间的间距
+          childAspectRatio: 1.2, // 宽高比
+        ),
+        itemCount: emojis.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              _sendEmoji(emojis[index]);
+              setState(() {
+                isShowEmoji = 1 - isShowEmoji;
+              });
+            },
+            child: Image.asset(
+              emojis[index],
+              scale: 0.75,
+            ),
+          );
+        },
+      ),
     );
   }
 
