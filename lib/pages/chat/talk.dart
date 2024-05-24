@@ -127,8 +127,8 @@ class _TalkPageState extends State<TalkPage> {
     'audio': true,
     'video': {
       'mandatory': {
-        'minWidth': '480',
-        'minHeight': '320',
+        'minWidth': '1080',
+        'minHeight': '1920',
         'minFrameRate': '30',
       },
       'facingMode': 'user',
@@ -417,7 +417,9 @@ class _TalkPageState extends State<TalkPage> {
             children: [
               Positioned(
                 top: 0,
+                left: 0,
                 right: 0,
+                bottom: 0,
                 child: Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
