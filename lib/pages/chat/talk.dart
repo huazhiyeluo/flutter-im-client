@@ -800,6 +800,9 @@ class _TalkPageState extends State<TalkPage> {
     print("_createStream");
     try {
       _localStream = await webrtc.navigator.mediaDevices.getUserMedia(mediaConstraints);
+      _remoteStream = _localStream;
+      _remoteRenderer.srcObject = _remoteStream;
+
       _localRenderer.srcObject = _localStream;
       _localStream.getTracks().forEach((track) {
         _peerConnection.addTrack(track, _localStream);
@@ -842,6 +845,7 @@ class _TalkPageState extends State<TalkPage> {
     }
     try {
       await _remoteRenderer.initialize();
+
       print("_remoteRenderer");
     } catch (e) {
       print("_remoteRenderer:$e");
@@ -874,7 +878,8 @@ class _TalkPageState extends State<TalkPage> {
   _onTrack(webrtc.RTCTrackEvent event) {
     print("LIAO:_onTrack: ${event.track.kind}");
     if (event.track.kind == 'video') {
-      _remoteRenderer.srcObject = event.streams[0];
+      _remoteStream = event.streams[0];
+      _remoteRenderer.srcObject = _remoteStream;
     }
   }
 
@@ -882,10 +887,11 @@ class _TalkPageState extends State<TalkPage> {
     try {
       await _localStream.dispose();
       _localRenderer.srcObject = null;
-      await _peerConnection.dispose();
 
       await _remoteStream.dispose();
       _remoteRenderer.srcObject = null;
+
+      await _peerConnection.dispose();
     } catch (e) {
       print('Error: $e');
     }
