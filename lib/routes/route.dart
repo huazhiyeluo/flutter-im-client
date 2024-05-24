@@ -1,11 +1,13 @@
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/middleware/homeMiddleware.dart';
-import 'package:qim/pages/chat/group.dart';
-import 'package:qim/pages/chat/group_user.dart';
+import 'package:qim/pages/other/group.dart';
+import 'package:qim/pages/other/group_user.dart';
 import 'package:qim/pages/chat/talk_phone.dart';
 import 'package:qim/pages/chat/talk.dart';
-import 'package:qim/pages/chat/user.dart';
+import 'package:qim/pages/other/notice_group.dart';
+import 'package:qim/pages/other/notice_user.dart';
+import 'package:qim/pages/other/user.dart';
 import 'package:qim/pages/home.dart';
 import 'package:qim/pages/search.dart';
 import 'package:qim/pages/entry.dart';
@@ -32,6 +34,8 @@ class AppPage {
     GetPage(name: "/user", page: () => const User()),
     GetPage(name: "/group", page: () => const Group()),
     GetPage(name: "/group-user", page: () => const GroupUser()),
+    GetPage(name: "/notice-user", page: () => const NoticeUser()),
+    GetPage(name: "/notice-group", page: () => const NoticeGroup()),
     GetPage(name: "/test", page: () => const Test()),
   ];
 }

@@ -24,35 +24,8 @@ class _ChatState extends State<Chat> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(170),
+        preferredSize: const Size.fromHeight(60),
         child: Column(children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-            height: 90, // 固定高度，使得内容可以完全显示
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: 10,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        "lib/assets/images/photo.jpg",
-                        width: 55,
-                        height: 55,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text('Chat $index'),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          const Divider(),
           AppBar(
             title: CustomTextField(
               controller: inputController,

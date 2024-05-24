@@ -44,33 +44,67 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100),
+        preferredSize: const Size.fromHeight(200),
         child: AppBar(
-          title: CustomTextField(
-            controller: inputController,
-            hintText: '搜索',
-            expands: false,
-            maxHeight: 40,
-            minHeight: 40,
-            onTap: () {
-              // 处理点击事件的逻辑
-            },
-          ),
-          bottom: TabBar(
-            padding: const EdgeInsets.all(0),
-            indicatorColor: Colors.red,
-            labelColor: Colors.red,
-            unselectedLabelColor: Colors.black,
-            controller: _tabController,
-            tabs: const [
-              Tab(
-                child: Text("好友"),
+          flexibleSpace: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                height: 50,
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+                child: CustomTextField(
+                  controller: inputController,
+                  hintText: '搜索',
+                  expands: false,
+                  maxHeight: 40,
+                  minHeight: 40,
+                  onTap: () {
+                    // 处理点击事件的逻辑
+                  },
+                ),
               ),
-              Tab(
-                child: Text("分组"),
+              SizedBox(
+                height: 40,
+                child: ListTile(
+                  title: const Text('新朋友'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/notice-user',
+                    );
+                  },
+                ),
               ),
-              Tab(
-                child: Text("群聊"),
+              Container(
+                height: 50,
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: ListTile(
+                  title: const Text('群通知'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/notice-group',
+                    );
+                  },
+                ),
+              ),
+              Container(
+                height: 10,
+                color: const Color.fromARGB(255, 241, 240, 240),
+              ),
+              TabBar(
+                padding: const EdgeInsets.all(0),
+                indicatorColor: Colors.red,
+                labelColor: Colors.red,
+                unselectedLabelColor: Colors.black,
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: "好友"),
+                  Tab(text: "分组"),
+                  Tab(text: "群聊"),
+                ],
               ),
             ],
           ),
@@ -121,7 +155,7 @@ class _ContactPageState extends State<ContactPage> {
           return Column(
             children: [
               SizedBox(
-                height: 65,
+                height: 70,
                 child: ListTile(
                   leading: CircleAvatar(
                     // 聊天对象的头像

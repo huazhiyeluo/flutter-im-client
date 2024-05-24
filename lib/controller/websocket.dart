@@ -24,10 +24,6 @@ class WebSocketController extends GetxController {
 
   void sendMessage(Map msg) {
     channel.sendMessage(jsonEncode(msg));
-    if ([4].contains(msg['msgType'])) {
-      // print("sendMessage");
-      // print(msg);
-    }
   }
 
   Future<void> handleReceivedMessage(Map msg) async {
