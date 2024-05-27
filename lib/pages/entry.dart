@@ -37,7 +37,7 @@ class _EntryPageState extends State<EntryPage> {
 
   initData() async {
     CacheHelper.saveBoolData(Keys.entryPage, true);
-    String initialRouteData = initialRoute();
+    String initialRouteData = await initialRoute();
     setState(() {
       _initialRoute = initialRouteData;
     });

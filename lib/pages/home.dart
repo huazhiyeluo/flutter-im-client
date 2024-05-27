@@ -22,7 +22,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with WidgetsBindingObserver {
   final WebSocketController webSocketController = Get.put(WebSocketController());
   final ChatController chatController = Get.put(ChatController());
   final TalkobjController talkobjController = Get.put(TalkobjController());
@@ -33,12 +33,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    print("webSocketController-initState");
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+    WidgetsBinding.instance.addObserver(this); // 注册监听器
     webSocketController.onConnect(userInfo['uid']);
     initOnReceive();
   }
 
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       userInfo = CacheHelper.getMapData(Keys.userInfo)!;
@@ -50,6 +51,7 @@ class _HomeState extends State<Home> {
   @override
   void dispose() {
     print("webSocketController-dispose");
+    WidgetsBinding.instance.removeObserver(this); // 移除监听器
     webSocketController.onClose();
     // TODO: implement dispose
     super.dispose();

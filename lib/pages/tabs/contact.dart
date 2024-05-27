@@ -44,7 +44,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(200),
+        preferredSize: const Size.fromHeight(210),
         child: AppBar(
           flexibleSpace: Column(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -63,8 +63,10 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                   },
                 ),
               ),
-              SizedBox(
+              Container(
                 height: 40,
+                padding: EdgeInsets.zero,
+                margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                 child: ListTile(
                   title: const Text('新朋友'),
                   trailing: const Icon(Icons.chevron_right),
@@ -77,8 +79,9 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                 ),
               ),
               Container(
-                height: 50,
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                height: 40,
+                padding: EdgeInsets.zero,
+                margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                 child: ListTile(
                   title: const Text('群通知'),
                   trailing: const Icon(Icons.chevron_right),
@@ -345,6 +348,7 @@ class _ContactPageState extends State<ContactPage> {
       'fromId': uid,
     };
     ContactApi.getFriendList(params, onSuccess: (res) {
+      if (!mounted) return;
       setState(() {
         List friendArr = [];
         if (res['data'] != null) {
@@ -370,24 +374,22 @@ class _ContactPageState extends State<ContactPage> {
         SuspensionUtil.setShowSuspensionStatus(_firendArr);
 
         ContactApi.getFriendGroup({"ownUid": uid}, onSuccess: (res) {
-          if (mounted) {
-            setState(() {
-              if (res['data'] != null) {
-                _contactGroupArr = res['data'];
-              }
-              _contactGroupArr.insert(0, {"friendGroupId": 0, "name": "默认分组"});
-              for (var item in _contactGroupArr) {
-                for (var citem in friendArr) {
-                  if (citem['friendGroupId'] == item['friendGroupId']) {
-                    if (item['children'] == null) {
-                      item['children'] = [];
-                    }
-                    item['children'].add(citem);
+          setState(() {
+            if (res['data'] != null) {
+              _contactGroupArr = res['data'];
+            }
+            _contactGroupArr.insert(0, {"friendGroupId": 0, "name": "默认分组"});
+            for (var item in _contactGroupArr) {
+              for (var citem in friendArr) {
+                if (citem['friendGroupId'] == item['friendGroupId']) {
+                  if (item['children'] == null) {
+                    item['children'] = [];
                   }
+                  item['children'].add(citem);
                 }
               }
-            });
-          }
+            }
+          });
         }, onError: (err) {
           TipHelper.instance.showToast(res['msg']);
         });
@@ -402,6 +404,7 @@ class _ContactPageState extends State<ContactPage> {
       'fromId': uid,
     };
     ContactApi.getGroupList(params, onSuccess: (res) {
+      if (!mounted) return;
       setState(() {
         if (res['data'] != null) {
           _groupArr = res['data'];

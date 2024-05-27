@@ -192,9 +192,7 @@ class _TalkPageState extends State<TalkPage> {
   void dispose() {
     inputController.dispose();
     _localRenderer.dispose();
-    _localStream.dispose();
     _remoteRenderer.dispose();
-    _remoteStream.dispose();
     _peerConnection.dispose();
     super.dispose();
   }
@@ -852,9 +850,11 @@ class _TalkPageState extends State<TalkPage> {
     try {
       await _localStream.dispose();
       _localRenderer.srcObject = null;
+      await _localRenderer.dispose();
 
       await _remoteStream.dispose();
       _remoteRenderer.srcObject = null;
+      await _remoteRenderer.dispose();
 
       await _peerConnection.dispose();
     } catch (e) {

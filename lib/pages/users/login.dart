@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/user.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/routes/route.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
 
@@ -160,14 +161,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   loginAction() async {
-    var params = {
-      'username': usernameController.text,
-      'password': passwordController.text
-    };
-    UserApi.login(params, onSuccess: (res) {
+    var params = {'username': usernameController.text, 'password': passwordController.text};
+    UserApi.login(params, onSuccess: (res) async {
       CacheHelper.saveData(Keys.userInfo, res['data']);
       //Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
-      Get.offAndToNamed("/");
+      String initialRouteData = await initialRoute();
+      Get.offAndToNamed(initialRouteData);
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });

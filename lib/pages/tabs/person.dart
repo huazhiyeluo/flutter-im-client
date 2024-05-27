@@ -119,10 +119,10 @@ class _SettingState extends State<Setting> {
           const SizedBox(width: 20),
           Expanded(
             child: TextButton(
-              onPressed: () {
+              onPressed: () async {
                 CacheHelper.remove(Keys.userInfo);
                 CacheHelper.remove(Keys.entryPage);
-                String initialRouteData = initialRoute();
+                String initialRouteData = await initialRoute();
                 setState(() {
                   _initialRoute = initialRouteData;
                 });
