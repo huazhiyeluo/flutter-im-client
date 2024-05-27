@@ -370,22 +370,24 @@ class _ContactPageState extends State<ContactPage> {
         SuspensionUtil.setShowSuspensionStatus(_firendArr);
 
         ContactApi.getFriendGroup({"ownUid": uid}, onSuccess: (res) {
-          setState(() {
-            if (res['data'] != null) {
-              _contactGroupArr = res['data'];
-            }
-            _contactGroupArr.insert(0, {"friendGroupId": 0, "name": "默认分组"});
-            for (var item in _contactGroupArr) {
-              for (var citem in friendArr) {
-                if (citem['friendGroupId'] == item['friendGroupId']) {
-                  if (item['children'] == null) {
-                    item['children'] = [];
+          if (mounted) {
+            setState(() {
+              if (res['data'] != null) {
+                _contactGroupArr = res['data'];
+              }
+              _contactGroupArr.insert(0, {"friendGroupId": 0, "name": "默认分组"});
+              for (var item in _contactGroupArr) {
+                for (var citem in friendArr) {
+                  if (citem['friendGroupId'] == item['friendGroupId']) {
+                    if (item['children'] == null) {
+                      item['children'] = [];
+                    }
+                    item['children'].add(citem);
                   }
-                  item['children'].add(citem);
                 }
               }
-            }
-          });
+            });
+          }
         }, onError: (err) {
           TipHelper.instance.showToast(res['msg']);
         });

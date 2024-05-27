@@ -153,36 +153,7 @@ class _TalkPageState extends State<TalkPage> {
 
   final Map<String, dynamic> configuration = {
     'iceServers': [
-      {'urls': 'stun:stun01.sipphone.com'},
-      {'urls': 'stun:stun.ekiga.net'},
-      {'urls': 'stun:stun.fwdnet.net'},
-      {'urls': 'stun:stun.ideasip.com'},
-      {'urls': 'stun:stun.iptel.org'},
-      {'urls': 'stun:stun.rixtelecom.se'},
-      {'urls': 'stun:stun.schlund.de'},
-      {'urls': 'stun:stun.l.google.com:19302'},
-      {'urls': 'stun:stun1.l.google.com:19302'},
-      {'urls': 'stun:stun2.l.google.com:19302'},
-      {'urls': 'stun:stun3.l.google.com:19302'},
-      {'urls': 'stun:stun4.l.google.com:19302'},
-      {'urls': 'stun:stunserver.org'},
-      {'urls': 'stun:stun.softjoys.com'},
-      {'urls': 'stun:stun.voiparound.com'},
-      {'urls': 'stun:stun.voipbuster.com'},
-      {'urls': 'stun:stun.voipstunt.com'},
-      {'urls': 'stun:stun.voxgratia.org'},
-      {'urls': 'stun:stun.xten.com'},
-      {'urls': 'turn:numb.viagenie.ca', 'credential': 'muazkh', 'username': 'webrtc@live.com'},
-      {
-        'urls': 'turn:192.158.29.39:3478?transport=udp',
-        'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-        'username': '28224511:1379330808'
-      },
-      {
-        'urls': 'turn:192.158.29.39:3478?transport=tcp',
-        'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-        'username': '28224511:1379330808'
-      }
+      {'urls': 'turn:stun.l.simeiwen.com:3478', 'credential': 'liaoabc', 'username': 'liao'}
     ],
   };
 
@@ -390,6 +361,7 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   _dialogUI(int ttype) async {
+    if (!mounted) return;
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -415,26 +387,23 @@ class _TalkPageState extends State<TalkPage> {
         return Center(
           child: Stack(
             children: [
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  color: Colors.yellow,
-                  child: webrtc.RTCVideoView(_remoteRenderer, mirror: true),
+              Positioned.fill(
+                child: webrtc.RTCVideoView(
+                  _remoteRenderer,
+                  mirror: true,
+                  objectFit: webrtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                 ),
               ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.3,
-                  height: MediaQuery.of(context).size.height * 0.3,
-                  color: Colors.red,
-                  child: webrtc.RTCVideoView(_localRenderer, mirror: true),
+              Align(
+                alignment: Alignment.topRight,
+                child: SizedBox(
+                  width: 150,
+                  height: 200,
+                  child: webrtc.RTCVideoView(
+                    _localRenderer,
+                    mirror: true,
+                    objectFit: webrtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  ),
                 ),
               ),
               Positioned(
@@ -692,9 +661,6 @@ class _TalkPageState extends State<TalkPage> {
     webSocketController.message.listen((msg) async {
       if ([4].contains(msg['msgType'])) {
         if (msg['msgMedia'] == 0) {
-          setState(() {
-            ttype = 2;
-          });
           _dialogUI(2);
         }
         if (msg['msgMedia'] == 1) {
@@ -707,9 +673,6 @@ class _TalkPageState extends State<TalkPage> {
           _initRenderer();
           _createConnection();
           _createStream();
-          setState(() {
-            ttype = 3;
-          });
         }
         if (msg['msgMedia'] == 3) {
           _handleIceCandidate(msg['content']['data']);
@@ -946,8 +909,5 @@ class _TalkPageState extends State<TalkPage> {
       'msgType': 4
     };
     webSocketController.sendMessage(msg);
-    setState(() {
-      ttype = 3;
-    });
   }
 }

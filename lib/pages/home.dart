@@ -33,11 +33,26 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    print("webSocketController-initState");
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     webSocketController.onConnect(userInfo['uid']);
-    webSocketController.onReceive();
-    webSocketController.heart(userInfo['uid']);
     initOnReceive();
+  }
+
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+      webSocketController.onConnect(userInfo['uid']);
+      initOnReceive();
+    }
+  }
+
+  @override
+  void dispose() {
+    print("webSocketController-dispose");
+    webSocketController.onClose();
+    // TODO: implement dispose
+    super.dispose();
   }
 
   void initOnReceive() {
