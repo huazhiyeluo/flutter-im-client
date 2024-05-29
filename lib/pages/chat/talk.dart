@@ -114,6 +114,8 @@ class _TalkPageState extends State<TalkPage> {
   int isShowSend = 0;
   int isShowPlus = 0;
 
+  String remoteText = "remoteText";
+
   final List<String> emojis = [];
   final List<IconData> icons = [
     Icons.image,
@@ -155,6 +157,7 @@ class _TalkPageState extends State<TalkPage> {
     'iceServers': [
       {'urls': 'turn:stun.l.simeiwen.com:3478', 'credential': 'liaoabc', 'username': 'liao'}
     ],
+    'sdpSemantics': 'unified-plan'
   };
 
   final _localRenderer = webrtc.RTCVideoRenderer();
@@ -386,22 +389,26 @@ class _TalkPageState extends State<TalkPage> {
           child: Stack(
             children: [
               Positioned.fill(
-                child: webrtc.RTCVideoView(
-                  _remoteRenderer,
-                  mirror: true,
-                  objectFit: webrtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                ),
+                child: _remoteRenderer.srcObject != null
+                    ? webrtc.RTCVideoView(
+                        _remoteRenderer,
+                        mirror: true,
+                        objectFit: webrtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                      )
+                    : Text('r $remoteText'),
               ),
               Align(
                 alignment: Alignment.topRight,
                 child: SizedBox(
                   width: 150,
                   height: 200,
-                  child: webrtc.RTCVideoView(
-                    _localRenderer,
-                    mirror: true,
-                    objectFit: webrtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                  ),
+                  child: _localRenderer.srcObject != null
+                      ? webrtc.RTCVideoView(
+                          _localRenderer,
+                          mirror: true,
+                          objectFit: webrtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                        )
+                      : Text('Waiting for local video...'),
                 ),
               ),
               Positioned(
@@ -686,64 +693,80 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   Future<void> _handleIceCandidate(String candidatestr) async {
+    print("_handleIceCandidate");
     try {
-      if (_peerConnection.signalingState != webrtc.RTCSignalingState) {
+      if (_peerConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateStable ||
+          _peerConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
         Map candidateMap = json.decode(candidatestr);
         webrtc.RTCIceCandidate candidate =
             webrtc.RTCIceCandidate(candidateMap['candidate'], candidateMap['sdpMid'], candidateMap['sdpMLineIndex']);
         await _peerConnection.addCandidate(candidate);
       } else {
-        print("Error Remote description is null, unable to add ICE candidate");
+        print("_handleIceCandidate Error: ${_peerConnection.signalingState}");
       }
     } catch (e) {
-      print("Error while adding ICE candidate: $e");
+      print("_handleIceCandidate Error: $e");
     }
   }
 
   Future<void> _handleOffer(String offerstr) async {
+    print("_handleOffer");
     try {
       Map offerMap = json.decode(offerstr);
       webrtc.RTCSessionDescription offer = webrtc.RTCSessionDescription(offerMap['sdp'], offerMap['type']);
 
       // 检查当前状态是否为 "stable"，确保不会在错误的状态下设置远程描述
-      if (_peerConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateStable) {
+      if (_peerConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateStable ||
+          _peerConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
         await _peerConnection.setRemoteDescription(offer);
         await _sendAnswer();
       } else {
-        print("Error: Called setRemoteDescription in wrong state: ${_peerConnection.signalingState}");
+        print("_handleOffer Error: ${_peerConnection.signalingState}");
       }
     } catch (e) {
-      print("Error while handling offer: $e");
+      print("_handleOffer Error: $e");
     }
   }
 
   Future<void> _handleAnswer(String answerstr) async {
-    Map answerMap = json.decode(answerstr);
-    webrtc.RTCSessionDescription answer = webrtc.RTCSessionDescription(answerMap['sdp'], answerMap['type']);
-    await _peerConnection.setRemoteDescription(answer);
+    print("_handleAnswer");
+    try {
+      if (_peerConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateStable ||
+          _peerConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+        Map answerMap = json.decode(answerstr);
+        webrtc.RTCSessionDescription answer = webrtc.RTCSessionDescription(answerMap['sdp'], answerMap['type']);
+        await _peerConnection.setRemoteDescription(answer);
+      } else {
+        print("_handleAnswer Error: ${_peerConnection.signalingState}");
+      }
+    } catch (e) {
+      print("_handleAnswer Error: $e");
+    }
   }
 
   Future<void> _sendAnswer() async {
-    // 检查连接状态是否为 'have-remote-offer'
-    if (_peerConnection.connectionState == webrtc.RTCIceConnectionState.RTCIceConnectionStateConnected) {
-      webrtc.RTCSessionDescription answer = await _peerConnection.createAnswer();
-      await _peerConnection.setLocalDescription(answer);
-
-      Map<String, dynamic> answerMap = {
-        'sdp': answer.sdp,
-        'type': answer.type,
-      };
-
-      Map msg = {
-        'content': {'data': json.encode(answerMap)},
-        'fromId': uid,
-        'toId': talkObj['objId'],
-        'msgMedia': 5,
-        'msgType': 4
-      };
-      webSocketController.sendMessage(msg);
-    } else {
-      print("Error: Unable to send answer, connection state is not suitable.");
+    print("_sendAnswer");
+    try {
+      if (_peerConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateStable) {
+        webrtc.RTCSessionDescription answer = await _peerConnection.createAnswer();
+        await _peerConnection.setLocalDescription(answer);
+        Map<String, dynamic> answerMap = {
+          'sdp': answer.sdp,
+          'type': answer.type,
+        };
+        Map msg = {
+          'content': {'data': json.encode(answerMap)},
+          'fromId': uid,
+          'toId': talkObj['objId'],
+          'msgMedia': 5,
+          'msgType': 4
+        };
+        webSocketController.sendMessage(msg);
+      } else {
+        print("_sendAnswer Error: ${_peerConnection.signalingState}");
+      }
+    } catch (e) {
+      print("_sendAnswer Error: $e");
     }
   }
 
@@ -763,8 +786,6 @@ class _TalkPageState extends State<TalkPage> {
     print("_createStream");
     try {
       _localStream = await webrtc.navigator.mediaDevices.getUserMedia(mediaConstraints);
-      _remoteStream = _localStream;
-      _remoteRenderer.srcObject = _remoteStream;
 
       _localRenderer.srcObject = _localStream;
       _localStream.getTracks().forEach((track) {
@@ -831,18 +852,25 @@ class _TalkPageState extends State<TalkPage> {
     };
     webSocketController.sendMessage(msg);
     _peerConnection.addCandidate(candidate);
-    print("LIAO:_onRemoteIceConnectionState: $candidate");
+    print("LIAO:_onIceCandidate: $candidate");
   }
 
   _onIceConnectionState(webrtc.RTCIceConnectionState state) {
-    print("LIAO:_onRemoteIceConnectionState: $state");
+    print("LIAO:_onIceConnectionState: $state");
   }
 
   _onTrack(webrtc.RTCTrackEvent event) {
     print("LIAO:_onTrack: ${event.track.kind}");
     if (event.track.kind == 'video') {
-      _remoteStream = event.streams[0];
-      _remoteRenderer.srcObject = _remoteStream;
+      print("_onTrack:${event.streams[0]}");
+      setState(() {
+        _remoteStream = event.streams[0];
+        _remoteRenderer.srcObject = _remoteStream;
+        int times = getTime();
+        remoteText = "remoteTextChange $times";
+        print("_onTrack _${remoteText}");
+        print("_onTrack _remoteRenderer:${event.streams[0]}");
+      });
     }
   }
 
@@ -850,11 +878,9 @@ class _TalkPageState extends State<TalkPage> {
     try {
       await _localStream.dispose();
       _localRenderer.srcObject = null;
-      await _localRenderer.dispose();
 
       await _remoteStream.dispose();
       _remoteRenderer.srcObject = null;
-      await _remoteRenderer.dispose();
 
       await _peerConnection.dispose();
     } catch (e) {
