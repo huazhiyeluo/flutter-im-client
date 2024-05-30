@@ -5,40 +5,45 @@ import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 
-class NoticeGroup extends StatefulWidget {
-  const NoticeGroup({super.key});
+class NoticeUserDetail extends StatefulWidget {
+  const NoticeUserDetail({super.key});
 
   @override
-  State<NoticeGroup> createState() => _NoticeGroupState();
+  State<NoticeUserDetail> createState() => _NoticeUserDetailState();
 }
 
-class _NoticeGroupState extends State<NoticeGroup> {
+class _NoticeUserDetailState extends State<NoticeUserDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("群通知"),
+        title: const Text("好友通知"),
         backgroundColor: Colors.grey[100],
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/notice-user-detail',
+              );
+            },
             child: const Text("清空"),
           ),
         ],
       ),
-      body: const NoticeGroupPage(),
+      body: const NoticeUserDetailPage(),
     );
   }
 }
 
-class NoticeGroupPage extends StatefulWidget {
-  const NoticeGroupPage({super.key});
+class NoticeUserDetailPage extends StatefulWidget {
+  const NoticeUserDetailPage({super.key});
 
   @override
-  State<NoticeGroupPage> createState() => _NoticeGroupPageState();
+  State<NoticeUserDetailPage> createState() => _NoticeUserDetailPageState();
 }
 
-class _NoticeGroupPageState extends State<NoticeGroupPage> {
+class _NoticeUserDetailPageState extends State<NoticeUserDetailPage> {
   final TextEditingController inputController = TextEditingController();
 
   int uid = 0;
@@ -126,11 +131,8 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
             itemBuilder: (BuildContext context, int index) {
               bool isFrom = uid == _applys[index]['fromId'];
               return ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-                title: Text(_applys[index]['toName']),
-                subtitle: isFrom
-                    ? Text("请求加入群，附言：${_applys[index]['reason']}")
-                    : Text("${_applys[index]['fromName']} 请求加入群，附言：${_applys[index]['reason']}"),
+                title: Text(isFrom ? _applys[index]['toName'] : _applys[index]['fromName']),
+                subtitle: Text(_applys[index]['reason']),
                 leading: CircleAvatar(
                   // 聊天对象的头像
                   radius: 20,
@@ -148,7 +150,7 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
   Future<void> _getApplyList() async {
     var params = {
       'uid': uid,
-      'type': 2,
+      'type': 1,
     };
     ContactApi.getApplyList(params, onSuccess: (res) {
       setState(() {

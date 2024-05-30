@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/widget/custom_button.dart';
 
 class User extends StatefulWidget {
   const User({super.key});
@@ -37,6 +38,7 @@ class _UserPageState extends State<UserPage> {
     return ListView(
       children: [
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: Text(talkObj['name'] ?? ''),
           leading: CircleAvatar(
             backgroundImage: NetworkImage(talkObj['icon'] ?? ''),
@@ -69,7 +71,7 @@ class _UserPageState extends State<UserPage> {
               },
               icon: const Icon(Icons.chevron_right), // 图标
             ),
-            const SizedBox(width: 25), // 添加一些间距
+            const SizedBox(width: 12), // 添加一些间距
           ],
         ),
         Container(
@@ -77,6 +79,7 @@ class _UserPageState extends State<UserPage> {
           child: const Divider(),
         ),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("设为置顶"),
           trailing: Switch(
             value: true,
@@ -88,6 +91,7 @@ class _UserPageState extends State<UserPage> {
           child: const Divider(),
         ),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("隐藏会话"),
           trailing: Switch(
             value: true,
@@ -99,6 +103,7 @@ class _UserPageState extends State<UserPage> {
           child: const Divider(),
         ),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("消息免打扰"),
           trailing: Switch(
             value: true,
@@ -110,6 +115,7 @@ class _UserPageState extends State<UserPage> {
           child: const Divider(),
         ),
         const ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: Text("删除聊天记录"),
         ),
         Container(
@@ -120,34 +126,11 @@ class _UserPageState extends State<UserPage> {
           children: [
             const SizedBox(width: 20),
             Expanded(
-              child: TextButton(
-                onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    "/entry",
-                    (route) => false,
-                  );
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                    Colors.white,
-                  ), // 按钮背景色
-                  foregroundColor: MaterialStateProperty.all<Color>(
-                    Colors.red,
-                  ), // 文字颜色
-                  padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ), // 内边距
-                  textStyle: MaterialStateProperty.all<TextStyle>(
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ), // 文字样式
-                  shape: MaterialStateProperty.all<OutlinedBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ), // 圆角边框
-                ),
-                child: const Text("删除好友"),
+              child: CustomButton(
+                onPressed: () {},
+                text: "删除好友",
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.red,
               ),
             ),
             const SizedBox(width: 20),

@@ -5,6 +5,7 @@ import 'package:qim/common/keys.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
+import 'package:qim/widget/custom_button.dart';
 
 class Group extends StatefulWidget {
   const Group({super.key});
@@ -79,6 +80,7 @@ class _GroupPageState extends State<GroupPage> {
     return ListView(
       children: [
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: Text(_groupInfo['name'] ?? ''),
           subtitle: Text(_groupInfo['info'] ?? ''),
           leading: CircleAvatar(
@@ -115,7 +117,7 @@ class _GroupPageState extends State<GroupPage> {
                   },
                   icon: const Icon(Icons.chevron_right), // 图标
                 ),
-                const SizedBox(width: 25), // 添加一些间距
+                const SizedBox(width: 15), // 添加一些间距
               ],
             ),
             Container(
@@ -174,7 +176,7 @@ class _GroupPageState extends State<GroupPage> {
               },
               icon: const Icon(Icons.chevron_right), // 图标
             ),
-            const SizedBox(width: 25), // 添加一些间距
+            const SizedBox(width: 15), // 添加一些间距
           ],
         ),
         Container(
@@ -200,7 +202,7 @@ class _GroupPageState extends State<GroupPage> {
               },
               icon: const Icon(Icons.chevron_right), // 图标
             ),
-            const SizedBox(width: 25), // 添加一些间距
+            const SizedBox(width: 15), // 添加一些间距
           ],
         ),
         Container(
@@ -208,6 +210,7 @@ class _GroupPageState extends State<GroupPage> {
           child: const Divider(),
         ),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("群公告"),
           subtitle: Text(_groupInfo['info'] ?? ''),
           trailing: IconButton(
@@ -238,7 +241,7 @@ class _GroupPageState extends State<GroupPage> {
               },
               icon: const Icon(Icons.chevron_right), // 图标
             ),
-            const SizedBox(width: 25), // 添加一些间距
+            const SizedBox(width: 15), // 添加一些间距
           ],
         ),
         Container(
@@ -264,7 +267,7 @@ class _GroupPageState extends State<GroupPage> {
               },
               icon: const Icon(Icons.chevron_right), // 图标
             ),
-            const SizedBox(width: 25), // 添加一些间距
+            const SizedBox(width: 15), // 添加一些间距
           ],
         ),
         Container(
@@ -290,7 +293,7 @@ class _GroupPageState extends State<GroupPage> {
               },
               icon: const Icon(Icons.chevron_right), // 图标
             ),
-            const SizedBox(width: 25), // 添加一些间距
+            const SizedBox(width: 15), // 添加一些间距
           ],
         ),
         Container(
@@ -298,6 +301,7 @@ class _GroupPageState extends State<GroupPage> {
           child: const Divider(),
         ),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("设为置顶"),
           trailing: Switch(
             value: _groupInfo['isTop'] == 1 ? true : false,
@@ -309,6 +313,7 @@ class _GroupPageState extends State<GroupPage> {
           child: const Divider(),
         ),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("隐藏会话"),
           trailing: Switch(
             value: _groupInfo['isHidden'] == 1 ? true : false,
@@ -320,6 +325,7 @@ class _GroupPageState extends State<GroupPage> {
           child: const Divider(),
         ),
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("消息免打扰"),
           trailing: Switch(
             value: _groupInfo['isQuiet'] == 1 ? true : false,
@@ -331,6 +337,7 @@ class _GroupPageState extends State<GroupPage> {
           child: const Divider(),
         ),
         const ListTile(
+          contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: Text("删除聊天记录"),
         ),
         Container(
@@ -341,34 +348,11 @@ class _GroupPageState extends State<GroupPage> {
           children: [
             const SizedBox(width: 20),
             Expanded(
-              child: TextButton(
-                onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    "/entry",
-                    (route) => false,
-                  );
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                    Colors.white,
-                  ), // 按钮背景色
-                  foregroundColor: MaterialStateProperty.all<Color>(
-                    Colors.red,
-                  ), // 文字颜色
-                  padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  ), // 内边距
-                  textStyle: MaterialStateProperty.all<TextStyle>(
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ), // 文字样式
-                  shape: MaterialStateProperty.all<OutlinedBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ), // 圆角边框
-                ),
-                child: const Text("退出群聊"),
+              child: CustomButton(
+                onPressed: () {},
+                text: "退出群聊",
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.red,
               ),
             ),
             const SizedBox(width: 20),

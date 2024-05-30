@@ -44,7 +44,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(210),
+        preferredSize: const Size.fromHeight(220),
         child: AppBar(
           flexibleSpace: Column(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -70,6 +70,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                 child: ListTile(
                   title: const Text('新朋友'),
                   trailing: const Icon(Icons.chevron_right),
+                  contentPadding: const EdgeInsets.symmetric(vertical: -15.0, horizontal: 12),
                   onTap: () {
                     Navigator.pushNamed(
                       context,
@@ -81,10 +82,11 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
               Container(
                 height: 40,
                 padding: EdgeInsets.zero,
-                margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                margin: const EdgeInsets.fromLTRB(0, 5, 0, 15),
                 child: ListTile(
                   title: const Text('群通知'),
                   trailing: const Icon(Icons.chevron_right),
+                  contentPadding: const EdgeInsets.symmetric(vertical: -15.0, horizontal: 12),
                   onTap: () {
                     Navigator.pushNamed(
                       context,

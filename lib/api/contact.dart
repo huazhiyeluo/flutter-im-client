@@ -55,4 +55,13 @@ class ContactApi {
       onError: onError,
     );
   }
+
+  static void getApplyList(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.getApplyList,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
 }

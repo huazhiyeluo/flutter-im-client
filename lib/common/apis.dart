@@ -13,5 +13,7 @@ class Apis {
   static const String getGroupOne = '/user/getGroupOne';
   static const String getGroupUser = '/user/getGroupUser';
 
+  static const String getApplyList = '/user/getApplyList';
+
   static const String upload = '/attach/upload';
 }

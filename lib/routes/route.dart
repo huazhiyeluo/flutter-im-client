@@ -7,6 +7,7 @@ import 'package:qim/pages/chat/talk_phone.dart';
 import 'package:qim/pages/chat/talk.dart';
 import 'package:qim/pages/other/notice_group.dart';
 import 'package:qim/pages/other/notice_user.dart';
+import 'package:qim/pages/other/notice_user_detail.dart';
 import 'package:qim/pages/other/user.dart';
 import 'package:qim/pages/home.dart';
 import 'package:qim/pages/search.dart';
@@ -36,6 +37,7 @@ class AppPage {
     GetPage(name: "/group", page: () => const Group()),
     GetPage(name: "/group-user", page: () => const GroupUser()),
     GetPage(name: "/notice-user", page: () => const NoticeUser()),
+    GetPage(name: "/notice-user-detail", page: () => const NoticeUserDetail()),
     GetPage(name: "/notice-group", page: () => const NoticeGroup()),
     GetPage(name: "/test", page: () => const Test()),
   ];

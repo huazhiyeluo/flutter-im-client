@@ -1,21 +1,9 @@
-import 'package:azlistview/azlistview.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:lpinyin/lpinyin.dart';
-import 'package:qim/widget/custom_text_field.dart';
-
-class NoticeUserModel extends ISuspensionBean {
-  int? uid;
-  String? name;
-  String? icon;
-  String? info;
-  String? remark;
-  String? tagIndex; // 这个字段就是tag
-  String? namePinyin;
-
-  @override
-  String getSuspensionTag() => tagIndex!;
-}
+import 'package:qim/api/contact.dart';
+import 'package:qim/common/keys.dart';
+import 'package:qim/utils/cache.dart';
+import 'package:qim/utils/tips.dart';
+import 'package:qim/widget/custom_button.dart';
 
 class NoticeUser extends StatefulWidget {
   const NoticeUser({super.key});
@@ -53,124 +41,137 @@ class NoticeUserPage extends StatefulWidget {
 class _NoticeUserPageState extends State<NoticeUserPage> {
   final TextEditingController inputController = TextEditingController();
 
-  final List<NoticeUserModel> _NoticeUserArr = [];
+  int uid = 0;
+  Map userInfo = {};
+
+  List _applys = [];
 
   @override
   void initState() {
+    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+    uid = userInfo['uid'] ?? "";
+    _fetchData();
     super.initState();
+  }
 
-    for (var item in Get.arguments) {
-      NoticeUserModel chat = NoticeUserModel();
-      chat.uid = item['uid'];
-      chat.name = item['NoticeUsername'];
-      chat.icon = item['avatar'];
-      chat.info = item['info'];
-      chat.remark = item['remark'];
-      chat.namePinyin = PinyinHelper.getPinyin(item['NoticeUsername']);
-      String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
-      chat.tagIndex = firstLetter.toUpperCase();
-      _NoticeUserArr.add(chat);
+  void _fetchData() async {
+    await _getApplyList();
+  }
+
+  Widget _getStatusWidget(bool isFrom, int status) {
+    if (isFrom) {
+      if (status == 0) {
+        return const Text("等待验证");
+      }
+      if (status == 1) {
+        return const Text("已被同意");
+      }
+      if (status == 2) {
+        return const Text("已被拒绝");
+      }
+    } else {
+      if (status == 0) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomButton(
+              onPressed: () {},
+              text: "同意",
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.all(0),
+              textStyle: const TextStyle(fontSize: 14),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(10),
+              ),
+            ),
+            const SizedBox(width: 8), // Add some spacing between the buttons
+            CustomButton(
+              onPressed: () {},
+              text: "拒绝",
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              padding: const EdgeInsets.all(0),
+              textStyle: const TextStyle(fontSize: 14),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(10),
+              ),
+            ),
+          ],
+        );
+      }
+      if (status == 1) {
+        return const Text(
+          "已同意",
+          style: TextStyle(fontSize: 14),
+        );
+      }
+      if (status == 2) {
+        return const Text(
+          "已拒绝",
+          style: TextStyle(fontSize: 14),
+        );
+      }
     }
-
-    _NoticeUserArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
-    SuspensionUtil.setShowSuspensionStatus(_NoticeUserArr);
+    return Container();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          title: CustomTextField(
-            controller: inputController,
-            hintText: '搜索',
-            expands: false,
-            maxHeight: 40,
-            minHeight: 40,
-            onTap: () {
-              // 处理点击事件的逻辑
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _applys.length > 5 ? 5 : _applys.length,
+            itemBuilder: (BuildContext context, int index) {
+              bool isFrom = uid == _applys[index]['fromId'];
+              return ListTile(
+                title: Text(isFrom ? _applys[index]['toName'] : _applys[index]['fromName']),
+                subtitle: Text(_applys[index]['reason']),
+                leading: CircleAvatar(
+                  // 聊天对象的头像
+                  radius: 20,
+                  backgroundImage: NetworkImage(isFrom ? _applys[index]['toIcon'] : _applys[index]['fromIcon']),
+                ),
+                trailing: _getStatusWidget(isFrom, _applys[index]['status']),
+              );
             },
           ),
         ),
-      ),
-      body: AzListView(
-        data: _NoticeUserArr,
-        itemCount: _NoticeUserArr.length,
-        itemBuilder: (context, index) {
-          return Column(
+        ListTile(
+          title: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                height: 65,
-                child: ListTile(
-                  leading: CircleAvatar(
-                    // 聊天对象的头像
-                    radius: 20,
-                    backgroundImage: NetworkImage(_NoticeUserArr[index].icon!),
-                  ),
-                  title: Text(
-                      '${_NoticeUserArr[index].remark != "" ? _NoticeUserArr[index].remark : _NoticeUserArr[index].name}'),
-                  trailing: TextButton(
-                    onPressed: () {},
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<OutlinedBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(2.0), // 设置按钮的圆角
-                          side: const BorderSide(color: Colors.grey), // 设置按钮的边框颜色和宽度
-                        ),
-                      ),
-                    ),
-                    child: const Text(
-                      "添加",
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                  onTap: () {},
-                ),
-              ),
+              Text("查看更多"),
+              Icon(Icons.chevron_right),
             ],
-          );
-        },
-        susItemBuilder: (BuildContext context, int index) {
-          NoticeUserModel model = _NoticeUserArr[index];
-          String tag = model.getSuspensionTag();
-          if ('★' == model.getSuspensionTag()) {
-            return Container();
-          }
-          return Container(
-            height: 40,
-            width: MediaQuery.of(context).size.width,
-            padding: const EdgeInsets.only(left: 15.0),
-            color: const Color(0xfff3f4f5),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              tag,
-              softWrap: false,
-              style: const TextStyle(fontSize: 14.0, color: Color(0xff999999)),
-            ),
-          );
-        },
-        indexBarData: SuspensionUtil.getTagIndexList(_NoticeUserArr),
-        indexHintBuilder: (context, hint) {
-          return Container(
-            alignment: Alignment.center,
-            width: 80.0,
-            height: 80.0,
-            decoration: const BoxDecoration(
-              color: Colors.yellow,
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              hint,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 30.0,
-              ),
-            ),
-          );
-        },
-      ),
+          ),
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/notice-user-detail',
+            );
+          },
+        ),
+        Expanded(
+          child: Container(),
+        )
+      ],
     );
+  }
+
+  Future<void> _getApplyList() async {
+    var params = {
+      'uid': uid,
+      'type': 1,
+    };
+    ContactApi.getApplyList(params, onSuccess: (res) {
+      setState(() {
+        _applys = res['data'];
+      });
+    }, onError: (res) {
+      TipHelper.instance.showToast(res['msg']);
+    });
   }
 }

@@ -166,6 +166,7 @@ class _TalkPageState extends State<TalkPage> {
   late webrtc.MediaStream _remoteStream;
   late webrtc.RTCPeerConnection _peerConnection;
 
+  bool isInit = false;
   int ttype = 0;
 
   @override
@@ -676,8 +677,10 @@ class _TalkPageState extends State<TalkPage> {
         if (msg['msgMedia'] == 2) {
           Navigator.of(context).pop(); // 关闭弹窗
           _initRenderer();
-          _createConnection();
-          _createStream();
+          if (!isInit) {
+            _createConnection();
+            _createStream();
+          }
         }
         if (msg['msgMedia'] == 3) {
           _handleIceCandidate(msg['content']['data']);
@@ -693,6 +696,10 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   Future<void> _handleIceCandidate(String candidatestr) async {
+    if (!isInit) {
+      _createConnection();
+      _createStream();
+    }
     print("_handleIceCandidate");
     try {
       if (_peerConnection.signalingState == webrtc.RTCSignalingState.RTCSignalingStateStable ||
@@ -710,6 +717,10 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   Future<void> _handleOffer(String offerstr) async {
+    if (!isInit) {
+      _createConnection();
+      _createStream();
+    }
     print("_handleOffer");
     try {
       Map offerMap = json.decode(offerstr);
@@ -789,6 +800,7 @@ class _TalkPageState extends State<TalkPage> {
 
       _localRenderer.srcObject = _localStream;
       _localStream.getTracks().forEach((track) {
+        print("getTracks");
         _peerConnection.addTrack(track, _localStream);
       });
 
@@ -814,10 +826,11 @@ class _TalkPageState extends State<TalkPage> {
         'msgType': 4
       };
       webSocketController.sendMessage(msg);
+
+      isInit = true;
     } catch (e) {
       print("Error while creating stream: $e");
     }
-    _dialogUI(3);
   }
 
   _initRenderer() async {
@@ -871,11 +884,14 @@ class _TalkPageState extends State<TalkPage> {
         print("_onTrack _${remoteText}");
         print("_onTrack _remoteRenderer:${event.streams[0]}");
       });
+      _dialogUI(3);
     }
   }
 
   _close() async {
     try {
+      isInit = false;
+
       await _localStream.dispose();
       _localRenderer.srcObject = null;
 
@@ -925,8 +941,10 @@ class _TalkPageState extends State<TalkPage> {
     print("_doPhone");
     Navigator.of(context).pop(); // 关闭弹窗
     _initRenderer();
-    _createConnection();
-    _createStream();
+    if (!isInit) {
+      _createConnection();
+      _createStream();
+    }
     Map msg = {
       'content': {'data': ""},
       'fromId': uid,
