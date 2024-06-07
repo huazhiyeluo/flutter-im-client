@@ -75,7 +75,6 @@ class WebSocketController extends GetxController {
       msg['avatar'] = objUser['avatar'];
       messageController.addMessage(msg);
     }
-
     message.value = msg;
   }
 
