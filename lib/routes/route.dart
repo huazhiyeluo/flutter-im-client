@@ -3,7 +3,6 @@ import 'package:qim/common/keys.dart';
 import 'package:qim/middleware/homeMiddleware.dart';
 import 'package:qim/pages/other/group.dart';
 import 'package:qim/pages/other/group_user.dart';
-import 'package:qim/pages/chat/talk_phone.dart';
 import 'package:qim/pages/chat/talk.dart';
 import 'package:qim/pages/other/notice_group.dart';
 import 'package:qim/pages/other/notice_user.dart';
@@ -32,7 +31,6 @@ class AppPage {
     GetPage(name: "/repasswd", page: () => const Repasswd()),
     GetPage(name: "/search", page: () => const Search()),
     GetPage(name: "/talk", page: () => const Talk()),
-    GetPage(name: "/talk-phone", page: () => const TalkPhone()),
     GetPage(name: "/user", page: () => const User()),
     GetPage(name: "/group", page: () => const Group()),
     GetPage(name: "/group-user", page: () => const GroupUser()),

@@ -8,6 +8,7 @@ import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/websocket.dart';
+import 'package:qim/utils/Signaling.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
@@ -124,49 +125,11 @@ class _TalkPageState extends State<TalkPage> {
     Icons.folder,
   ];
 
-  //语音通话组件
-  final Map<String, dynamic> mediaConstraints = {
-    'audio': true,
-    'video': {
-      'mandatory': {
-        'minWidth': '1080',
-        'minHeight': '1920',
-        'minFrameRate': '30',
-      },
-      'facingMode': 'user',
-      'optional': [],
-    }
-  };
-
-  final Map<String, dynamic> sdpConstraints = {
-    'mandatory': {
-      'OfferToReceiveAudio': true,
-      'OfferToReceiveVideo': true,
-    },
-    'optional': [],
-  };
-
-  final Map<String, dynamic> pcConstraints = {
-    'mandatory': {},
-    'optional': [
-      {'DtlsSrtpKeyAgreement': false},
-    ]
-  };
-
-  final Map<String, dynamic> configuration = {
-    'iceServers': [
-      {'urls': 'turn:stun.l.simeiwen.com:3478', 'credential': 'liaoabc', 'username': 'liao'}
-    ],
-    'sdpSemantics': 'unified-plan'
-  };
-
   final _localRenderer = webrtc.RTCVideoRenderer();
   final _remoteRenderer = webrtc.RTCVideoRenderer();
-  late webrtc.MediaStream _localStream;
-  late webrtc.MediaStream _remoteStream;
-  late webrtc.RTCPeerConnection _peerConnection;
+  Signaling? _signaling;
+  Session? _session;
 
-  bool isInit = false;
   int ttype = 0;
 
   @override
@@ -187,7 +150,13 @@ class _TalkPageState extends State<TalkPage> {
         _dialogUI(2);
       });
     }
-    onReceive();
+    initRenderers();
+    _connect();
+  }
+
+  initRenderers() async {
+    await _localRenderer.initialize();
+    await _remoteRenderer.initialize();
   }
 
   final ImagePicker _picker = ImagePicker();
@@ -195,9 +164,9 @@ class _TalkPageState extends State<TalkPage> {
   @override
   void dispose() {
     inputController.dispose();
+    _signaling?.close();
     _localRenderer.dispose();
     _remoteRenderer.dispose();
-    _peerConnection.dispose();
     super.dispose();
   }
 
@@ -362,7 +331,7 @@ class _TalkPageState extends State<TalkPage> {
     );
   }
 
-  _dialogUI(int ttype) async {
+  Future<void> _dialogUI(int ttype) async {
     if (!mounted) return;
     showDialog(
         context: context,
@@ -475,9 +444,9 @@ class _TalkPageState extends State<TalkPage> {
               Expanded(
                 child: CustomButton(
                   onPressed: () {
-                    _quitPhone();
+                    _cancelPhone();
                   },
-                  text: "挂断",
+                  text: "取消",
                 ),
               ),
               const SizedBox(width: 30),
@@ -659,5 +628,102 @@ class _TalkPageState extends State<TalkPage> {
     } else {
       print('No image selected.');
     }
+  }
+
+  //----------------------------------------------------------------通话----------------------------------------------------------------
+
+  //邀请
+  _goPhone() async {
+    if (_signaling != null) {
+      _signaling?.invite(uid, talkObj['objId']);
+    }
+  }
+
+  //接通
+  _doPhone() async {
+    if (_session != null) {
+      await _signaling?.accept(_session!.fromId);
+      Navigator.of(context).pop(false);
+      await _dialogUI(3);
+    }
+  }
+
+  //拒接
+  _quitPhone() {
+    if (_session != null) {
+      _signaling?.reject(_session!.fromId);
+    }
+  }
+
+  //取消
+  _cancelPhone() {
+    Navigator.of(context).pop(false);
+    if (_session != null) {
+      _signaling?.bye(_session!.fromId);
+    }
+  }
+
+  void _connect() async {
+    _signaling ??= Signaling()..connect(webSocketController);
+    _signaling?.onSignalingStateChange = (SignalingState state) {
+      switch (state) {
+        case SignalingState.connectionClosed:
+        case SignalingState.connectionError:
+        case SignalingState.connectionOpen:
+          break;
+      }
+    };
+
+    _signaling?.onCallStateChange = (Session session, CallState state) async {
+      print("onCallStateChange $state");
+      switch (state) {
+        case CallState.callStateNew:
+          setState(() {
+            _session = session;
+          });
+          break;
+        case CallState.callStateRinging:
+          await _dialogUI(2);
+          break;
+        case CallState.callStateBye:
+          Navigator.of(context).pop(false);
+          setState(() {
+            _localRenderer.srcObject = null;
+            _remoteRenderer.srcObject = null;
+            _session = null;
+          });
+          break;
+        case CallState.callStateInvite:
+          await _dialogUI(1);
+          break;
+        case CallState.callStateConnected:
+          Navigator.of(context).pop(false);
+          await _dialogUI(3);
+          break;
+        case CallState.callStateRinging:
+      }
+    };
+
+    _signaling?.onLocalStream = ((stream) {
+      _localRenderer.srcObject = stream;
+      setState(() {});
+    });
+
+    _signaling?.onRemoteStream = ((stream) {
+      _remoteRenderer.srcObject = stream;
+      setState(() {});
+    });
+
+    _signaling?.onSendMsg = ((int fromId, int toId, int msgType, int msgMedia, String data) {
+      Map msg = {
+        'content': {'data': data},
+        'fromId': fromId,
+        'toId': toId,
+        'msgType': msgType,
+        'msgMedia': msgMedia,
+      };
+      print("LIAO MSG: $msg}");
+      webSocketController.sendMessage(msg);
+    });
   }
 }

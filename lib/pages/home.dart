@@ -23,7 +23,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with WidgetsBindingObserver {
-  final WebSocketController webSocketController = Get.put(WebSocketController());
+  late WebSocketController webSocketController;
   final ChatController chatController = Get.put(ChatController());
   final TalkobjController talkobjController = Get.put(TalkobjController());
   int _currentIndex = 0;
@@ -35,17 +35,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     super.initState();
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     WidgetsBinding.instance.addObserver(this); // 注册监听器
-    webSocketController.onConnect(userInfo['uid']);
+    webSocketController = Get.put(WebSocketController('wss://im.guiaihai.com/chat', userInfo['uid']));
     initOnReceive();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-      webSocketController.onConnect(userInfo['uid']);
-      initOnReceive();
-    }
   }
 
   @override
@@ -67,26 +58,26 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         processReceivedMessage(userInfo['uid'], msg, chatController);
       }
 
-      if ([4].contains(msg['msgType'])) {
-        Map objUser = (await DBHelper.getOne('users', [
-          ['uid', '=', msg['fromId']]
-        ]))!;
-        Map talkobj = {
-          "objId": msg['fromId'],
-          "type": 1,
-          "name": objUser['username'],
-          "icon": objUser['avatar'],
-          "info": objUser['info'],
-          "remark": objUser['remark'],
-        };
-        talkobjController.setTalkObj(talkobj);
-        if (msg['msgMedia'] == 0) {
-          //收到语音通话 - 请求
-          Get.toNamed('/talk', arguments: {
-            "type": 2,
-          });
-        }
-      }
+      // if ([4].contains(msg['msgType'])) {
+      //   Map objUser = (await DBHelper.getOne('users', [
+      //     ['uid', '=', msg['fromId']]
+      //   ]))!;
+      //   Map talkobj = {
+      //     "objId": msg['fromId'],
+      //     "type": 1,
+      //     "name": objUser['username'],
+      //     "icon": objUser['avatar'],
+      //     "info": objUser['info'],
+      //     "remark": objUser['remark'],
+      //   };
+      //   talkobjController.setTalkObj(talkobj);
+      //   if (msg['msgMedia'] == 0) {
+      //     //收到语音通话 - 请求
+      //     Get.toNamed('/talk', arguments: {
+      //       "type": 2,
+      //     });
+      //   }
+      // }
     });
   }
 
