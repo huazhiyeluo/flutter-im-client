@@ -151,7 +151,7 @@ class _TalkPageState extends State<TalkPage> {
       });
     }
     initRenderers();
-    _connect();
+    _connect(context);
   }
 
   initRenderers() async {
@@ -331,9 +331,8 @@ class _TalkPageState extends State<TalkPage> {
     );
   }
 
-  Future<void> _dialogUI(int ttype) async {
-    if (!mounted) return;
-    showDialog(
+  Future<bool?> _dialogUI(int ttype) async {
+    return showDialog(
         context: context,
         builder: (BuildContext context) {
           return Dialog(
@@ -391,7 +390,8 @@ class _TalkPageState extends State<TalkPage> {
                     Expanded(
                       child: CustomButton(
                         onPressed: () {
-                          _quitPhone();
+                          Navigator.of(context).pop(false);
+                          _cancel();
                         },
                         text: "挂断",
                       ),
@@ -444,7 +444,8 @@ class _TalkPageState extends State<TalkPage> {
               Expanded(
                 child: CustomButton(
                   onPressed: () {
-                    _cancelPhone();
+                    Navigator.of(context).pop(false);
+                    _cancel();
                   },
                   text: "取消",
                 ),
@@ -497,7 +498,7 @@ class _TalkPageState extends State<TalkPage> {
               Expanded(
                 child: CustomButton(
                   onPressed: () {
-                    _quitPhone();
+                    Navigator.of(context).pop(false);
                   },
                   text: "挂断",
                 ),
@@ -506,7 +507,7 @@ class _TalkPageState extends State<TalkPage> {
               Expanded(
                 child: CustomButton(
                   onPressed: () {
-                    _doPhone();
+                    Navigator.of(context).pop(true);
                   },
                   text: "接听",
                   backgroundColor: Colors.green,
@@ -586,7 +587,7 @@ class _TalkPageState extends State<TalkPage> {
       _pickCamera();
     }
     if (index == 2) {
-      _goPhone();
+      _invite();
     }
     if (index == 3) {
       _pickFile(5);
@@ -633,37 +634,34 @@ class _TalkPageState extends State<TalkPage> {
   //----------------------------------------------------------------通话----------------------------------------------------------------
 
   //邀请
-  _goPhone() async {
+  void _invite() async {
     if (_signaling != null) {
       _signaling?.invite(uid, talkObj['objId']);
     }
   }
 
   //接通
-  _doPhone() async {
+  void _accept() async {
     if (_session != null) {
       await _signaling?.accept(_session!.fromId);
-      Navigator.of(context).pop(false);
-      await _dialogUI(3);
     }
   }
 
   //拒接
-  _quitPhone() {
+  void _reject() {
     if (_session != null) {
       _signaling?.reject(_session!.fromId);
     }
   }
 
   //取消
-  _cancelPhone() {
-    Navigator.of(context).pop(false);
+  void _cancel() {
     if (_session != null) {
-      _signaling?.bye(_session!.fromId);
+      _signaling?.bye(_session!.fromId, uid, talkObj['objId']);
     }
   }
 
-  void _connect() async {
+  void _connect(BuildContext context) async {
     _signaling ??= Signaling()..connect(webSocketController);
     _signaling?.onSignalingStateChange = (SignalingState state) {
       switch (state) {
@@ -683,7 +681,13 @@ class _TalkPageState extends State<TalkPage> {
           });
           break;
         case CallState.callStateRinging:
-          await _dialogUI(2);
+          bool? accept = await _dialogUI(2);
+          if (accept!) {
+            _accept();
+            await _dialogUI(3);
+          } else {
+            _reject();
+          }
           break;
         case CallState.callStateBye:
           Navigator.of(context).pop(false);

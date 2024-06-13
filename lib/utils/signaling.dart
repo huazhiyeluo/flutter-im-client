@@ -206,7 +206,6 @@ class Signaling {
     if (session == null) {
       return;
     }
-    print("accept2");
     await createAnswer(session);
   }
 
@@ -216,14 +215,15 @@ class Signaling {
     if (session == null) {
       return;
     }
-    bye(fromId);
+    bye(fromId, session.toId, session.fromId);
   }
 
   //结束通话
-  void bye(int fromId) {
+  void bye(int fromId, int selfId, int otherId) {
+    onSendMsg?.call(selfId, otherId, 4, 1, "");
+
     var session = _sessions[fromId];
     if (session != null) {
-      onSendMsg?.call(session.fromId, session.toId, 4, 1, "");
       closeSession(session);
     }
   }
