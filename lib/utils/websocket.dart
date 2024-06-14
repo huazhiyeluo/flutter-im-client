@@ -12,7 +12,7 @@ class WebSocketClient {
   WebSocketClient(this._serverUrl);
 
   void connect() {
-    _channel = IOWebSocketChannel.connect(_serverUrl);
+    _channel = IOWebSocketChannel.connect(Uri.parse(_serverUrl));
     _isConnected = true;
     _channel.stream.listen((message) {
       print("onMessageReceived $message");

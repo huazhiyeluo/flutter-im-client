@@ -636,6 +636,7 @@ class _TalkPageState extends State<TalkPage> {
   //邀请
   void _invite() async {
     if (_signaling != null) {
+      _signaling?.onSendMsg!(uid, talkObj['objId'], 4, 0, "");
       _signaling?.invite(uid, talkObj['objId']);
     }
   }
@@ -643,21 +644,21 @@ class _TalkPageState extends State<TalkPage> {
   //接通
   void _accept() async {
     if (_session != null) {
-      await _signaling?.accept(_session!.fromId);
+      await _signaling?.accept(uid, talkObj['objId']);
     }
   }
 
   //拒接
   void _reject() {
     if (_session != null) {
-      _signaling?.reject(_session!.fromId);
+      _signaling?.reject(uid, talkObj['objId']);
     }
   }
 
   //取消
   void _cancel() {
     if (_session != null) {
-      _signaling?.bye(_session!.fromId, uid, talkObj['objId']);
+      _signaling?.bye(uid, talkObj['objId']);
     }
   }
 

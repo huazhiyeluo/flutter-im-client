@@ -1,6 +1,6 @@
 class Apis {
   /// url 前缀
-  static const String apiPrefix = 'https://im.guiaihai.com/api';
+  static const String apiPrefix = 'http://139.196.98.139:8081';
 
   static const String login = '/user/login';
   static const String register = '/user/register';
