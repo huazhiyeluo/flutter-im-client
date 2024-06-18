@@ -30,36 +30,7 @@ class Signaling {
 
   final Map<String, dynamic> configuration = {
     'iceServers': [
-      {'urls': 'stun:stun01.sipphone.com'},
-      {'urls': 'stun:stun.ekiga.net'},
-      {'urls': 'stun:stun.fwdnet.net'},
-      {'urls': 'stun:stun.ideasip.com'},
-      {'urls': 'stun:stun.iptel.org'},
-      {'urls': 'stun:stun.rixtelecom.se'},
-      {'urls': 'stun:stun.schlund.de'},
-      {'urls': 'stun:stun.l.google.com:19302'},
-      {'urls': 'stun:stun1.l.google.com:19302'},
-      {'urls': 'stun:stun2.l.google.com:19302'},
-      {'urls': 'stun:stun3.l.google.com:19302'},
-      {'urls': 'stun:stun4.l.google.com:19302'},
-      {'urls': 'stun:stunserver.org'},
-      {'urls': 'stun:stun.softjoys.com'},
-      {'urls': 'stun:stun.voiparound.com'},
-      {'urls': 'stun:stun.voipbuster.com'},
-      {'urls': 'stun:stun.voipstunt.com'},
-      {'urls': 'stun:stun.voxgratia.org'},
-      {'urls': 'stun:stun.xten.com'},
-      {'urls': 'turn:numb.viagenie.ca', 'credential': 'muazkh', 'username': 'webrtc@live.com'},
-      {
-        'urls': 'turn:192.158.29.39:3478?transport=udp',
-        'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-        'username': '28224511:1379330808'
-      },
-      {
-        'urls': 'turn:192.158.29.39:3478?transport=tcp',
-        'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-        'username': '28224511:1379330808'
-      }
+      {'urls': 'turn:139.196.98.139:3478?transport=tcp', 'credential': 'liaoabc', 'username': 'liao'},
     ],
     'sdpSemantics': 'unified-plan'
   };
@@ -142,9 +113,9 @@ class Signaling {
       'audio': true,
       'video': {
         'mandatory': {
-          'minWidth': '720', // Provide your own width, height and frame rate here
-          'minHeight': '1080',
-          'minFrameRate': '30',
+          'maxWidth': '640', // 设置最大值
+          'maxHeight': '480', // 设置最小值
+          'maxFrameRate': '15', // 设置最大值
         },
         'facingMode': 'user',
         'optional': [],
