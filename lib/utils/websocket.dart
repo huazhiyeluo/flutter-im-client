@@ -3,67 +3,78 @@ import 'dart:async';
 import 'dart:convert';
 
 class WebSocketClient {
-  late IOWebSocketChannel _channel; // Use 'late' modifier to defer initialization
-
-  final String _serverUrl;
+  final String _url;
+  IOWebSocketChannel? _channel; // Use 'late' modifier to defer initialization
+  Timer? _heartBeatTimer;
   bool _isConnected = false;
+  final List<String> _messageQueue = [];
+
   Function(String)? onMessageReceived;
 
-  WebSocketClient(this._serverUrl);
+  WebSocketClient(this._url);
 
   void connect() {
-    _channel = IOWebSocketChannel.connect(Uri.parse(_serverUrl));
+    _channel = IOWebSocketChannel.connect(Uri.parse(_url));
     _isConnected = true;
-    _channel.stream.listen((message) {
-      print("onMessageReceived $message");
-      onMessageReceived?.call(message);
+
+    _channel?.stream.listen((msg) {
+      print("Received $msg");
+      onMessageReceived?.call(msg);
     }, onDone: () {
-      _handleDisconnection('Connection closed');
+      print('Disconnected');
+      _isConnected = false;
+      _reconnect();
     }, onError: (error) {
-      _handleDisconnection('WebSocket error: $error');
+      print('Error: $error');
+      _isConnected = false;
+      _reconnect();
     });
+
+    _flushMessageQueue();
   }
 
-  void _handleDisconnection(String reason) {
-    _isConnected = false;
-    print(reason);
-    _reconnect();
-  }
-
-  void sendMessage(Map message) {
+  //消息队列
+  void _flushMessageQueue() {
     if (_isConnected) {
-      try {
-        print("LIAO sendMessage ${jsonEncode(message)}");
-        _channel.sink.add(jsonEncode(message));
-      } catch (e) {
-        print('Failed to send message: $e');
-        // Handle the error, attempt to reconnect
-        _handleDisconnection('Failed to send message: $e');
+      while (_messageQueue.isNotEmpty) {
+        String msg = _messageQueue.removeAt(0);
+        print("Received $msg");
+        _channel?.sink.add(msg);
       }
-    } else {
-      print('WebSocket is not connected, message not sent');
-      // Handle the error, attempt to reconnect
-      _handleDisconnection('WebSocket is not connected');
     }
   }
 
-  void close() {
-    _channel.sink.close();
-    _isConnected = false;
-  }
-
+  //重连接
   void _reconnect() {
     if (!_isConnected) {
-      Future.delayed(Duration(seconds: 5), () {
+      Future.delayed(const Duration(seconds: 5), () {
+        // ignore: avoid_print
         print('Attempting to reconnect to WebSocket');
         connect();
       });
     }
   }
 
+  void sendMessage(String message) {
+    if (_isConnected) {
+      _channel?.sink.add(message);
+    } else {
+      _messageQueue.add(message);
+      _reconnect();
+    }
+  }
+
+  //关闭连接
+  void disconnect() {
+    print("disconnect");
+    _heartBeatTimer?.cancel();
+    _channel?.sink.close();
+    _isConnected = false;
+  }
+
+  //心跳
   void startHeartbeat(int uid) {
-    const Duration interval = Duration(seconds: 10);
-    Timer.periodic(interval, (Timer t) {
+    _heartBeatTimer = Timer.periodic(const Duration(seconds: 10), (Timer t) {
       if (_isConnected) {
         Map msg = {
           'FromId': uid,
@@ -71,7 +82,7 @@ class WebSocketClient {
           'MsgMedia': 0,
           'MsgType': 0
         };
-        sendMessage(msg);
+        sendMessage(json.encode(msg));
       }
     });
   }

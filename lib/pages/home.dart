@@ -41,11 +41,23 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    print("webSocketController-dispose");
     WidgetsBinding.instance.removeObserver(this); // 移除监听器
     webSocketController.onClose();
-    // TODO: implement dispose
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        webSocketController = Get.put(WebSocketController('ws://139.196.98.139:8081/chat', userInfo['uid']));
+        break;
+      case AppLifecycleState.paused:
+        webSocketController.onClose();
+        break;
+      default:
+        break;
+    }
   }
 
   void initOnReceive() {
@@ -57,7 +69,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       if (!([4].contains(msg['msgType']) && [3, 4, 5].contains(msg['msgMedia']))) {
         processReceivedMessage(userInfo['uid'], msg, chatController);
       }
-
       if ([4].contains(msg['msgType'])) {
         Map objUser = (await DBHelper.getOne('users', [
           ['uid', '=', msg['fromId']]

@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,6 +21,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:qim/widget/chat_message.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:qim/widget/custom_chat_text_field.dart';
+import 'package:image/image.dart' as img;
 
 class Talk extends StatefulWidget {
   const Talk({super.key});
@@ -114,8 +115,6 @@ class _TalkPageState extends State<TalkPage> {
   int isShowEmoji = 0;
   int isShowSend = 0;
   int isShowPlus = 0;
-
-  String remoteText = "remoteText";
 
   final List<String> emojis = [];
   final List<IconData> icons = [
@@ -364,7 +363,7 @@ class _TalkPageState extends State<TalkPage> {
                         mirror: true,
                         objectFit: webrtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       )
-                    : Text('r $remoteText'),
+                    : const Text('Waiting for remote video...'),
               ),
               Align(
                 alignment: Alignment.topRight,
@@ -377,7 +376,7 @@ class _TalkPageState extends State<TalkPage> {
                           mirror: true,
                           objectFit: webrtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                         )
-                      : Text('Waiting for local video...'),
+                      : const Text('Waiting for local video...'),
                 ),
               ),
               Positioned(
@@ -553,12 +552,12 @@ class _TalkPageState extends State<TalkPage> {
     _send(msg);
   }
 
-  void _sendFile(String url, int msgMedia) async {
+  void _sendFile(String url, int msgMedia, String name) async {
     // 发送按钮的操作
     Map msg = {
       'fromId': uid,
       'toId': talkObj['objId'],
-      'content': {"data": "", "url": url, "name": ""},
+      'content': {"data": "", "url": url, "name": name},
       'msgMedia': msgMedia,
       'msgType': talkObj['type']
     };
@@ -581,10 +580,10 @@ class _TalkPageState extends State<TalkPage> {
 
   Future<void> _pick(int index) async {
     if (index == 0) {
-      _pickFile(2);
+      _pickFile(5);
     }
     if (index == 1) {
-      _pickCamera();
+      _pickCamera(5);
     }
     if (index == 2) {
       _invite();
@@ -594,7 +593,7 @@ class _TalkPageState extends State<TalkPage> {
     }
   }
 
-  Future<void> _pickCamera() async {
+  Future<void> _pickCamera(int msgMedia) async {
     var isGrantedCamera = await PermissionUtil.requestCameraPermission();
     if (!isGrantedCamera) {
       TipHelper.instance.showToast("未允许相机权限");
@@ -602,7 +601,16 @@ class _TalkPageState extends State<TalkPage> {
     }
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
-      print('Picked image path: ${pickedFile.path}');
+      File compressedFile = await _compressImage(File(pickedFile.path));
+      dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
+      CommonApi.upload({'file': file}, onSuccess: (res) {
+        print("pickedFile $res");
+        setState(() {
+          _sendFile(res['data'], msgMedia, pickedFile.name);
+        });
+      }, onError: (res) {
+        TipHelper.instance.showToast(res['msg']);
+      });
     } else {
       // User canceled the image picking
       print('No image selected.');
@@ -618,10 +626,12 @@ class _TalkPageState extends State<TalkPage> {
 
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      dio.MultipartFile file = await dio.MultipartFile.fromFile(pickedFile.path);
+      File compressedFile = await _compressImage(File(pickedFile.path));
+      dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) {
+        print("pickedFile $res");
         setState(() {
-          _sendFile(res['data'], msgMedia);
+          _sendFile(res['data'], msgMedia, pickedFile.name);
         });
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
@@ -629,6 +639,13 @@ class _TalkPageState extends State<TalkPage> {
     } else {
       print('No image selected.');
     }
+  }
+
+  Future<File> _compressImage(File file) async {
+    // 使用 image 包进行压缩
+    img.Image? image = img.decodeImage(await file.readAsBytes());
+    img.Image resizedImage = img.copyResize(image!, width: 800); // 调整尺寸为宽度800
+    return File(file.path)..writeAsBytesSync(img.encodeJpg(resizedImage, quality: 65)); // JPEG 格式，85% 质量
   }
 
   //----------------------------------------------------------------通话----------------------------------------------------------------

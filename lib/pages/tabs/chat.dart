@@ -196,6 +196,13 @@ class _ChatPageState extends State<ChatPage> {
     if (msgMedia == 1) {
       return content['data'];
     }
+    if (msgMedia == 6) {
+      return "[表情]";
+    }
+
+    if (msgMedia == 5) {
+      return "[文件]";
+    }
     return "";
   }
 

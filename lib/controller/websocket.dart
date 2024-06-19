@@ -18,12 +18,10 @@ class WebSocketController extends GetxController {
   void onInit() {
     super.onInit();
     String url = "$serverUrl?uid=$uid";
-    print(url);
     _webSocketClient = WebSocketClient(url);
     _webSocketClient.onMessageReceived = ((str) async {
       Map msg = json.decode(str);
       print("ReceivedMessage $msg");
-
       if ([1, 2, 4].contains(msg['msgType'])) {
         Map objUser = (await DBHelper.getOne('users', [
           ['uid', '=', msg['fromId']]
@@ -37,13 +35,13 @@ class WebSocketController extends GetxController {
     _webSocketClient.startHeartbeat(uid);
   }
 
-  void sendMessage(Map message) {
-    _webSocketClient.sendMessage(message);
+  void sendMessage(Map msg) {
+    _webSocketClient.sendMessage(json.encode(msg));
   }
 
   @override
   void onClose() {
-    _webSocketClient.close();
+    _webSocketClient.disconnect();
     super.onClose();
   }
 }

@@ -35,6 +35,19 @@ class Signaling {
     'sdpSemantics': 'unified-plan'
   };
 
+  final Map<String, dynamic> mediaConstraints = {
+    'audio': true,
+    'video': {
+      'mandatory': {
+        'minWidth': '480', // 设置最大值
+        'minHeight': '640', // 设置最小值
+        'minFrameRate': '15', // 设置最大值
+      },
+      'facingMode': 'user',
+      'optional': [],
+    }
+  };
+
   final Map<String, dynamic> pcConstraints = {
     'mandatory': {},
     'optional': [
@@ -109,18 +122,6 @@ class Signaling {
 
   //创建流
   Future<MediaStream> createStream() async {
-    final Map<String, dynamic> mediaConstraints = {
-      'audio': true,
-      'video': {
-        'mandatory': {
-          'maxWidth': '640', // 设置最大值
-          'maxHeight': '480', // 设置最小值
-          'maxFrameRate': '15', // 设置最大值
-        },
-        'facingMode': 'user',
-        'optional': [],
-      }
-    };
     MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     onLocalStream?.call(stream);
     return stream;

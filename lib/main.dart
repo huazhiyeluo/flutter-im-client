@@ -43,7 +43,9 @@ class _MyAppState extends State<MyApp> {
     } else {
       return GetMaterialApp(
         title: "QIM",
-        theme: ThemeData(primarySwatch: Colors.blue),
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
         debugShowCheckedModeBanner: false,
         initialRoute: _initialRoute,
         defaultTransition: Transition.rightToLeft,

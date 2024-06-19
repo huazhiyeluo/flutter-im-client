@@ -45,16 +45,17 @@ class _ChatMessageState extends State<ChatMessage> {
         }
       });
     });
+
+    // 初始化 WebSocket 监听
+    messageController.allUserMessages[key]?.listen((message) {
+      _scrollToBottom();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Obx(
       () {
-        // 初始化 WebSocket 监听
-        messageController.allUserMessages[key]?.listen((message) {
-          _scrollToBottom();
-        });
         return Container(
           color: Colors.grey[200], // 设置背景色
           child: ListView.builder(
@@ -71,16 +72,7 @@ class _ChatMessageState extends State<ChatMessage> {
                     mainAxisAlignment: isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      !isSentByMe
-                          ? Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: CircleAvatar(
-                                // 聊天对象的头像
-                                radius: 25,
-                                backgroundImage: NetworkImage(messageList[index]['avatar']),
-                              ),
-                            )
-                          : Container(),
+                      !isSentByMe ? _showRightPhoto(messageList, index) : Container(),
                       Flexible(
                         flex: 3,
                         child: Container(
@@ -109,16 +101,7 @@ class _ChatMessageState extends State<ChatMessage> {
                           ),
                         ),
                       ),
-                      isSentByMe
-                          ? Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: CircleAvatar(
-                                // 聊天对象的头像
-                                radius: 25,
-                                backgroundImage: NetworkImage(messageList[index]['avatar']),
-                              ),
-                            )
-                          : Container(),
+                      isSentByMe ? _showLeftPhoto(messageList, index) : Container(),
                     ],
                   ),
                 );
@@ -129,6 +112,28 @@ class _ChatMessageState extends State<ChatMessage> {
           ),
         );
       },
+    );
+  }
+
+  Padding _showLeftPhoto(RxList<Map<dynamic, dynamic>> messageList, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0),
+      child: CircleAvatar(
+        // 聊天对象的头像
+        radius: 25,
+        backgroundImage: NetworkImage(messageList[index]['avatar']),
+      ),
+    );
+  }
+
+  Padding _showRightPhoto(RxList<Map<dynamic, dynamic>> messageList, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: CircleAvatar(
+        // 聊天对象的头像
+        radius: 25,
+        backgroundImage: NetworkImage(messageList[index]['avatar']),
+      ),
     );
   }
 
@@ -145,12 +150,13 @@ class _ChatMessageState extends State<ChatMessage> {
         overflow: TextOverflow.visible,
       );
     }
-    if (data['msgMedia'] == 2) {
-      item = Image.network(data['content']['url']);
-    }
     if (data['msgMedia'] == 6) {
       item = Image.asset(data['content']['url']);
     }
+    if (data['msgMedia'] == 5) {
+      item = Image.network(data['content']['url']);
+    }
+
     return item;
   }
 
