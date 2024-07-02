@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/websocket.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
@@ -24,6 +25,7 @@ class _ChatMessageState extends State<ChatMessage> {
   final TalkobjController talkobjController = Get.find();
 
   final ScrollController _scrollController = ScrollController();
+  final WebSocketController webSocketController = Get.find();
 
   int uid = 0;
   Map userInfo = {};
@@ -41,14 +43,37 @@ class _ChatMessageState extends State<ChatMessage> {
     _getMessageList().then((result) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (messageController.allUserMessages[key] != null) {
+          print("list_1 ${context.size?.height}");
           _scrollToBottom();
         }
       });
     });
 
-    // 初始化 WebSocket 监听
-    messageController.allUserMessages[key]?.listen((message) {
-      _scrollToBottom();
+    initOnReceive();
+
+    // 延迟注册 WebSocket 监听器
+    Future.delayed(Duration.zero, () {});
+  }
+
+  @override
+  void dispose() {
+    // 取消监听或处理数据
+    _scrollController.dispose(); // 如果需要手动关闭流
+    super.dispose();
+  }
+
+  void initOnReceive() {
+// 使用 ever 方法监听 message 变化
+    ever(webSocketController.message, (msg) {
+      // 处理 message 变化的逻辑
+      print("list_2 ${context.size?.height}");
+      print(msg);
+      if (msg['msgType'] == 1) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToBottom();
+        });
+      }
+      // 进行其他操作，例如更新 UI
     });
   }
 

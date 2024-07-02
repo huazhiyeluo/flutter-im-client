@@ -171,66 +171,68 @@ class _TalkPageState extends State<TalkPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Expanded(
-          child: ChatMessage(),
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-          margin: EdgeInsets.fromLTRB(0, 0, 0, 10 - isShowEmoji * 10),
-          color: const Color.fromARGB(255, 248, 248, 248),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: CustomChatTextField(
-                        controller: inputController,
-                        hintText: '输入消息...',
-                        expands: true,
-                        maxHeight: 200,
-                        minHeight: 25,
-                        onTap: () {
-                          // 处理点击事件的逻辑
-                        },
-                        onChanged: (String text) {
-                          int flag = 0;
-                          if (text == '') {
-                            flag = 0;
-                          } else {
-                            flag = 1;
-                          }
-                          setState(() {
-                            isShowSend = flag;
-                          });
-                        }),
-                  ),
-                  SizedBox(
-                    width: 31,
-                    child: IconButton(
-                      icon: const Icon(Icons.emoji_emotions),
-                      iconSize: 35,
-                      padding: const EdgeInsets.all(2),
-                      onPressed: () {
-                        setState(() {
-                          isShowEmoji = 1 - isShowEmoji;
-                          isShowPlus = 0;
-                        });
-                      },
-                    ),
-                  ),
-                  isShowSend == 0 ? _showAdd() : _showSend(),
-                ],
-              );
-            },
+    return SafeArea(
+      child: Column(
+        children: [
+          const Expanded(
+            child: ChatMessage(),
           ),
-        ),
-        isShowEmoji == 1 ? _buildEmoji() : Container(),
-        isShowPlus == 1 ? _buildPlus() : Container(),
-      ],
+          Container(
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+            margin: EdgeInsets.fromLTRB(0, 0, 0, 10 - isShowEmoji * 10),
+            color: const Color.fromARGB(255, 248, 248, 248),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: CustomChatTextField(
+                          controller: inputController,
+                          hintText: '输入消息...',
+                          expands: true,
+                          maxHeight: 200,
+                          minHeight: 25,
+                          onTap: () {
+                            // 处理点击事件的逻辑
+                          },
+                          onChanged: (String text) {
+                            int flag = 0;
+                            if (text == '') {
+                              flag = 0;
+                            } else {
+                              flag = 1;
+                            }
+                            setState(() {
+                              isShowSend = flag;
+                            });
+                          }),
+                    ),
+                    SizedBox(
+                      width: 31,
+                      child: IconButton(
+                        icon: const Icon(Icons.emoji_emotions),
+                        iconSize: 35,
+                        padding: const EdgeInsets.all(2),
+                        onPressed: () {
+                          setState(() {
+                            isShowEmoji = 1 - isShowEmoji;
+                            isShowPlus = 0;
+                          });
+                        },
+                      ),
+                    ),
+                    isShowSend == 0 ? _showAdd() : _showSend(),
+                  ],
+                );
+              },
+            ),
+          ),
+          isShowEmoji == 1 ? _buildEmoji() : Container(),
+          isShowPlus == 1 ? _buildPlus() : Container(),
+        ],
+      ),
     );
   }
 

@@ -67,32 +67,52 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                 height: 40,
                 padding: EdgeInsets.zero,
                 margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child: ListTile(
-                  title: const Text('新朋友'),
-                  trailing: const Icon(Icons.chevron_right),
-                  contentPadding: const EdgeInsets.symmetric(vertical: -15.0, horizontal: 12),
+                child: InkWell(
                   onTap: () {
                     Navigator.pushNamed(
                       context,
                       '/notice-user',
                     );
                   },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '新朋友',
+                          style: TextStyle(fontSize: 16.0), // 根据需要设置字体大小
+                        ),
+                        Icon(Icons.chevron_right),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               Container(
                 height: 40,
                 padding: EdgeInsets.zero,
-                margin: const EdgeInsets.fromLTRB(0, 5, 0, 15),
-                child: ListTile(
-                  title: const Text('群通知'),
-                  trailing: const Icon(Icons.chevron_right),
-                  contentPadding: const EdgeInsets.symmetric(vertical: -15.0, horizontal: 12),
+                margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                child: InkWell(
                   onTap: () {
                     Navigator.pushNamed(
                       context,
                       '/notice-group',
                     );
                   },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '群通知',
+                          style: TextStyle(fontSize: 16.0), // 根据需要设置字体大小
+                        ),
+                        Icon(Icons.chevron_right),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               Container(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:qim/pages/test/test1.dart';
+import 'package:qim/pages/test/test2.dart';
 import 'routes/route.dart';
 import 'utils/cache.dart';
 import 'package:get/get.dart';
@@ -36,6 +38,11 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  // Map routes = {
+  //   "/test1": (context, {arguments}) => Test1(arguments: arguments),
+  //   "/test2": (context) => const Test2("liao"),
+  // };
+
   @override
   Widget build(BuildContext context) {
     if (_initialRoute == null) {
@@ -50,6 +57,27 @@ class _MyAppState extends State<MyApp> {
         initialRoute: _initialRoute,
         defaultTransition: Transition.rightToLeft,
         getPages: AppPage.routes,
+        // onGenerateRoute: (settings) {
+        //   // 获取路由名称
+        //   String? name = settings.name;
+
+        //   final Function? pageContentBuilder = routes[name];
+
+        //   if (pageContentBuilder != null) {
+        //     if (settings.arguments != null) {
+        //       final Route route = MaterialPageRoute(
+        //         builder: (context) => pageContentBuilder(context, arguments: settings.arguments),
+        //       );
+        //       return route;
+        //     } else {
+        //       final Route route = MaterialPageRoute(
+        //         builder: (context) => pageContentBuilder(context),
+        //       );
+        //       return route;
+        //     }
+        //   }
+        //   return null;
+        // },
       );
     }
   }
