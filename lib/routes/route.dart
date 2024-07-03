@@ -39,7 +39,6 @@ class AppPage {
     GetPage(name: "/notice-user", page: () => const NoticeUser()),
     GetPage(name: "/notice-user-detail", page: () => const NoticeUserDetail()),
     GetPage(name: "/notice-group", page: () => const NoticeGroup()),
-    GetPage(name: "/test", page: () => const Test3()),
   ];
 }
 
@@ -47,11 +46,11 @@ Future<String> initialRoute() async {
   Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
   if (userInfo != null) {
     await initialDb(userInfo['uid']);
-    return "/test";
+    return "/";
   } else {
     bool? entryPage = CacheHelper.getBoolData(Keys.entryPage);
     if (entryPage == true) {
-      return '/test';
+      return '/login';
     } else {
       return '/entry';
     }
