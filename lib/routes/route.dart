@@ -9,11 +9,9 @@ import 'package:qim/pages/other/notice_user.dart';
 import 'package:qim/pages/other/notice_user_detail.dart';
 import 'package:qim/pages/other/user.dart';
 import 'package:qim/pages/home.dart';
+import 'package:qim/pages/person/setting.dart';
 import 'package:qim/pages/search.dart';
 import 'package:qim/pages/entry.dart';
-import 'package:qim/pages/test/test1.dart';
-import 'package:qim/pages/test/test2.dart';
-import 'package:qim/pages/test/test3.dart';
 import 'package:qim/pages/users/login.dart';
 import 'package:qim/pages/users/register_one.dart';
 import 'package:qim/pages/users/register_two.dart';
@@ -39,6 +37,7 @@ class AppPage {
     GetPage(name: "/notice-user", page: () => const NoticeUser()),
     GetPage(name: "/notice-user-detail", page: () => const NoticeUserDetail()),
     GetPage(name: "/notice-group", page: () => const NoticeGroup()),
+    GetPage(name: "/person-setting", page: () => const Setting()),
   ];
 }
 

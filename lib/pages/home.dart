@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
@@ -94,11 +95,13 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [const Chat(), const Contact(), const Setting()];
+    final List<Widget> pages = [const Chat(), const Contact(), const Person()];
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: _pagesBar[_currentIndex](),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color.fromRGBO(237, 237, 237, 1),
         currentIndex: _currentIndex,
         items: [
           BottomNavigationBarItem(
@@ -148,8 +151,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               );
             }),
           ),
-          const BottomNavigationBarItem(label: '联系人', icon: Icon(Icons.person)),
-          const BottomNavigationBarItem(label: '个人中心', icon: Icon(Icons.settings)),
+          const BottomNavigationBarItem(label: '通讯录', icon: Icon(Icons.contacts)),
+          const BottomNavigationBarItem(label: '我', icon: Icon(Icons.person)),
         ],
         onTap: (value) {
           setState(() {

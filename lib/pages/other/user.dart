@@ -18,7 +18,7 @@ class _UserState extends State<User> {
         title: const Text("聊天设置"),
         backgroundColor: Colors.grey[100],
       ),
-      body: UserPage(),
+      body: const UserPage(),
     );
   }
 }
@@ -38,41 +38,29 @@ class _UserPageState extends State<UserPage> {
     return ListView(
       children: [
         ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: Text(talkObj['name'] ?? ''),
           leading: CircleAvatar(
             backgroundImage: NetworkImage(talkObj['icon'] ?? ''),
           ),
-          trailing: IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.chevron_right),
+          trailing: const Icon(
+            Icons.chevron_right,
           ),
+          onTap: () {},
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
-        Row(
-          children: [
-            const SizedBox(
-              width: 18,
-            ),
-            const Text(
-              "查找聊天记录",
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            Expanded(child: Container()),
-            const Text('图片、视频、文件'), // 文本
-            IconButton(
-              onPressed: () {
-                // 按钮点击事件处理
-              },
-              icon: const Icon(Icons.chevron_right), // 图标
-            ),
-            const SizedBox(width: 12), // 添加一些间距
-          ],
+        ListTile(
+          title: const Text('查找聊天记录'),
+          trailing: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('图片、视频、文件'),
+              Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {},
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),

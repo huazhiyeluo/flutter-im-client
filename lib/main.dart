@@ -44,7 +44,10 @@ class _MyAppState extends State<MyApp> {
       return GetMaterialApp(
         title: "QIM",
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: const Color.fromRGBO(240, 240, 245, 1.0),
+          hintColor: Colors.grey.withOpacity(0.3),
+          splashColor: Colors.transparent,
+          canvasColor: Colors.transparent,
         ),
         debugShowCheckedModeBanner: false,
         initialRoute: _initialRoute,

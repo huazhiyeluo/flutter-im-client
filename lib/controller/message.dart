@@ -6,7 +6,7 @@ class MessageController extends GetxController {
 
   void addMessage(Map msg) {
     final key = getKey(msgType: msg['msgType'], fromId: msg['fromId'], toId: msg['toId']);
-    allUserMessages.putIfAbsent(key, () => <Map>[].obs).add(msg);
+    allUserMessages.putIfAbsent(key, () => <Map>[].obs).insert(0, msg);
     update();
   }
 }

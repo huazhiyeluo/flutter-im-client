@@ -80,224 +80,153 @@ class _GroupPageState extends State<GroupPage> {
     return ListView(
       children: [
         ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: Text(_groupInfo['name'] ?? ''),
           subtitle: Text(_groupInfo['info'] ?? ''),
           leading: CircleAvatar(
             backgroundImage: NetworkImage(_groupInfo['icon'] ?? ''),
           ),
-          trailing: IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.chevron_right),
+          trailing: const Icon(
+            Icons.chevron_right,
           ),
+          onTap: () {},
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: const Divider(),
-        ),
-        Column(
-          children: [
-            Row(
-              children: [
-                const SizedBox(
-                  width: 18,
-                ),
-                const Text(
-                  "群聊成员",
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                Expanded(child: Container()),
-                Text('查看${_groupUsers.length}名群成员'), // 文本
-                IconButton(
-                  onPressed: () {
-                    // 按钮点击事件处理
-                    Navigator.pushNamed(context, '/group-user', arguments: _groupUsers);
-                  },
-                  icon: const Icon(Icons.chevron_right), // 图标
-                ),
-                const SizedBox(width: 15), // 添加一些间距
-              ],
-            ),
-            Container(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(), // 禁止滚动
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 5, // 设置每行显示的列数
-                  crossAxisSpacing: 10.0, // 列之间的间距
-                  mainAxisSpacing: 10.0, // 行之间的间距
-                  childAspectRatio: 1.0, // 宽高比
-                ),
-                itemCount: _groupUsers.length > 15 ? 15 : _groupUsers.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    height: 90, // 固定高度，使得内容可以完全显示
-                    alignment: Alignment.center,
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundImage: NetworkImage(_groupUsers[index]['avatar']),
-                        ),
-                        const SizedBox(
-                          height: 1,
-                        ), // 添加一个间距
-                        Text(
-                          _groupUsers[index]['username'],
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            const SizedBox(
-              width: 18,
-            ),
-            const Text(
-              "群聊名称",
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            Expanded(child: Container()),
-            Text(_groupInfo['name'] ?? ''), // 文本
-            IconButton(
-              onPressed: () {
-                // 按钮点击事件处理
-              },
-              icon: const Icon(Icons.chevron_right), // 图标
-            ),
-            const SizedBox(width: 15), // 添加一些间距
-          ],
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: const Divider(),
-        ),
-        Row(
-          children: [
-            const SizedBox(
-              width: 18,
-            ),
-            const Text(
-              "群号",
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            Expanded(child: Container()),
-            Text('${_groupInfo['groupId'] ?? ''}'), // 文本
-            IconButton(
-              onPressed: () {
-                // 按钮点击事件处理
-              },
-              icon: const Icon(Icons.chevron_right), // 图标
-            ),
-            const SizedBox(width: 15), // 添加一些间距
-          ],
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
         ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-          title: const Text("群公告"),
-          subtitle: Text(_groupInfo['info'] ?? ''),
-          trailing: IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.chevron_right),
+          title: const Text('群聊成员'),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('查看${_groupUsers.length}名群成员'),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {
+            Navigator.pushNamed(context, '/group-user', arguments: _groupUsers);
+          },
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(), // 禁止滚动
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 5, // 设置每行显示的列数
+              crossAxisSpacing: 10.0, // 列之间的间距
+              mainAxisSpacing: 10.0, // 行之间的间距
+              childAspectRatio: 1.0, // 宽高比
+            ),
+            itemCount: _groupUsers.length > 15 ? 15 : _groupUsers.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                height: 90, // 固定高度，使得内容可以完全显示
+                alignment: Alignment.center,
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundImage: NetworkImage(_groupUsers[index]['avatar']),
+                    ),
+                    const SizedBox(
+                      height: 1,
+                    ), // 添加一个间距
+                    Text(
+                      _groupUsers[index]['username'],
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
+        ListTile(
+          title: const Text('群聊名称'),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_groupInfo['name'] ?? ''),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {},
+        ),
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
-        Row(
-          children: [
-            const SizedBox(
-              width: 18,
-            ),
-            const Text(
-              "我在本群昵称",
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            Expanded(child: Container()),
-            Text(_groupInfo['nickname'] == null || _groupInfo['nickname'] == "" ? '未设置' : _groupInfo['nickname']), // 文本
-            IconButton(
-              onPressed: () {
-                // 按钮点击事件处理
-              },
-              icon: const Icon(Icons.chevron_right), // 图标
-            ),
-            const SizedBox(width: 15), // 添加一些间距
-          ],
+        ListTile(
+          title: const Text("群号"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('${_groupInfo['groupId']}'),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {},
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
-        Row(
-          children: [
-            const SizedBox(
-              width: 18,
-            ),
-            const Text(
-              "群聊备注",
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            Expanded(child: Container()),
-            Text(_groupInfo['remark'] == null || _groupInfo['remark'] == "" ? '未设置' : _groupInfo['remark']), // 文本
-            IconButton(
-              onPressed: () {
-                // 按钮点击事件处理
-              },
-              icon: const Icon(Icons.chevron_right), // 图标
-            ),
-            const SizedBox(width: 15), // 添加一些间距
-          ],
+        ListTile(
+          title: const Text("群公告"),
+          subtitle: Text(_groupInfo['info'] ?? ''),
+          trailing: const Icon(
+            Icons.chevron_right,
+          ),
+          onTap: () {},
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
-        Row(
-          children: [
-            const SizedBox(
-              width: 18,
-            ),
-            const Text(
-              "查找聊天记录",
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            Expanded(child: Container()),
-            const Text('图片、视频、文件'), // 文本
-            IconButton(
-              onPressed: () {
-                // 按钮点击事件处理
-              },
-              icon: const Icon(Icons.chevron_right), // 图标
-            ),
-            const SizedBox(width: 15), // 添加一些间距
-          ],
+        ListTile(
+          title: const Text("我在本群昵称"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_groupInfo['nickname'] == null || _groupInfo['nickname'] == "" ? '未设置' : _groupInfo['nickname']),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {},
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: const Divider(),
+        ),
+        ListTile(
+          title: const Text("群聊备注"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_groupInfo['remark'] == null || _groupInfo['remark'] == "" ? '未设置' : _groupInfo['remark']),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {},
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: const Divider(),
+        ),
+        ListTile(
+          title: const Text("查找聊天记录"),
+          trailing: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('图片、视频、文件'),
+              Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {},
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
         ListTile(
@@ -309,7 +238,7 @@ class _GroupPageState extends State<GroupPage> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
         ListTile(
@@ -321,7 +250,7 @@ class _GroupPageState extends State<GroupPage> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
         ListTile(
@@ -333,7 +262,7 @@ class _GroupPageState extends State<GroupPage> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
         const ListTile(
@@ -341,7 +270,7 @@ class _GroupPageState extends State<GroupPage> {
           title: Text("删除聊天记录"),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
         Row(

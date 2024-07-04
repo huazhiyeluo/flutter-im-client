@@ -26,10 +26,11 @@ class CustomTextField extends StatelessWidget {
         minHeight: minHeight,
       ),
       child: TextField(
+        style: TextStyle(textBaseline: TextBaseline.alphabetic),
         decoration: InputDecoration(
           hintText: hintText,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 13.0,
+            horizontal: 20.0,
             vertical: 5.0,
           ), // 调整内容的内边距
           prefixIcon: const Icon(

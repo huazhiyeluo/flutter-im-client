@@ -39,9 +39,9 @@ class Signaling {
     'audio': true,
     'video': {
       'mandatory': {
-        'minWidth': '480', // 设置最大值
-        'minHeight': '640', // 设置最小值
-        'minFrameRate': '15', // 设置最大值
+        'maxWidth': '480', // 设置最大值
+        'maxHeight': '640', // 设置最小值
+        'maxFrameRate': '15', // 设置最大值
       },
       'facingMode': 'user',
       'optional': [],
@@ -231,10 +231,9 @@ class Signaling {
   }
 
   void onReceive(WebSocketController webSocketController) {
-    print("LIAO onReceive");
     webSocketController.message.listen((msg) async {
-      print("LIAO onReceive $msg");
       if ([4].contains(msg['msgType'])) {
+        print("LIAO onReceive $msg");
         if (msg['msgMedia'] == 1) {
           Session? session = _sessions.remove(msg['toId']);
           if (session != null) {
@@ -242,7 +241,6 @@ class Signaling {
             closeSession(session);
           }
         }
-
         if (msg['msgMedia'] == 3) {
           _handleIceCandidate(msg);
         }

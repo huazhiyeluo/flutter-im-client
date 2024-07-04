@@ -8,6 +8,11 @@ import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/websocket.dart';
+import 'package:qim/pages/chat/talk/emoji_list.dart';
+import 'package:qim/pages/chat/talk/phone_from.dart';
+import 'package:qim/pages/chat/talk/phone_ing.dart';
+import 'package:qim/pages/chat/talk/phone_to.dart';
+import 'package:qim/pages/chat/talk/plus_list.dart';
 import 'package:qim/utils/Signaling.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
@@ -18,10 +23,9 @@ import 'package:qim/utils/tips.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
-import 'package:qim/widget/chat_message.dart';
-import 'package:qim/widget/custom_button.dart';
-import 'package:qim/widget/custom_chat_text_field.dart';
+import 'package:qim/pages/chat/talk/chat_message.dart';
 import 'package:image/image.dart' as img;
+import 'package:extended_text_field/extended_text_field.dart';
 
 class Talk extends StatefulWidget {
   const Talk({super.key});
@@ -106,23 +110,15 @@ class _TalkPageState extends State<TalkPage> {
   final WebSocketController webSocketController = Get.find();
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
-  final TextEditingController inputController = TextEditingController();
+  final TextEditingController _inputController = TextEditingController();
   final ChatController chatController = Get.put(ChatController());
 
+  double keyboardHeight = 270.0;
   int uid = 0;
   Map userInfo = {};
   Map talkObj = {};
   int isShowEmoji = 0;
-  int isShowSend = 0;
   int isShowPlus = 0;
-
-  final List<String> emojis = [];
-  final List<IconData> icons = [
-    Icons.image,
-    Icons.camera_alt,
-    Icons.call,
-    Icons.folder,
-  ];
 
   final _localRenderer = webrtc.RTCVideoRenderer();
   final _remoteRenderer = webrtc.RTCVideoRenderer();
@@ -130,6 +126,8 @@ class _TalkPageState extends State<TalkPage> {
   Session? _session;
 
   int ttype = 0;
+
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -139,16 +137,20 @@ class _TalkPageState extends State<TalkPage> {
     uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
 
-    for (var i = 0; i <= 124; i++) {
-      String temp = i < 10 ? '0$i' : '$i';
-      emojis.add('lib/assets/emojis/$temp.gif');
-    }
     ttype = Get.arguments != null ? Get.arguments['type'] : 0;
     if (ttype == 2) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _dialogUI(2);
       });
     }
+
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        isShowEmoji = 0;
+        isShowPlus = 0;
+      }
+    });
+
     initRenderers();
     _connect(context);
   }
@@ -162,7 +164,7 @@ class _TalkPageState extends State<TalkPage> {
 
   @override
   void dispose() {
-    inputController.dispose();
+    _inputController.dispose();
     _signaling?.close();
     _localRenderer.dispose();
     _remoteRenderer.dispose();
@@ -171,67 +173,135 @@ class _TalkPageState extends State<TalkPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          const Expanded(
-            child: ChatMessage(),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-            margin: EdgeInsets.fromLTRB(0, 0, 0, 10 - isShowEmoji * 10),
-            color: const Color.fromARGB(255, 248, 248, 248),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                      child: CustomChatTextField(
-                          controller: inputController,
-                          hintText: '输入消息...',
-                          expands: true,
-                          maxHeight: 200,
-                          minHeight: 25,
-                          onTap: () {
-                            // 处理点击事件的逻辑
-                          },
-                          onChanged: (String text) {
-                            int flag = 0;
-                            if (text == '') {
-                              flag = 0;
-                            } else {
-                              flag = 1;
-                            }
-                            setState(() {
-                              isShowSend = flag;
-                            });
-                          }),
-                    ),
-                    SizedBox(
-                      width: 31,
-                      child: IconButton(
-                        icon: const Icon(Icons.emoji_emotions),
-                        iconSize: 35,
-                        padding: const EdgeInsets.all(2),
-                        onPressed: () {
-                          setState(() {
-                            isShowEmoji = 1 - isShowEmoji;
-                            isShowPlus = 0;
-                          });
-                        },
-                      ),
-                    ),
-                    isShowSend == 0 ? _showAdd() : _showSend(),
-                  ],
-                );
-              },
+    if (keyboardHeight == 270.0 && MediaQuery.of(context).viewInsets.bottom != 0) {
+      keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    }
+    return Container(
+      decoration: const BoxDecoration(color: Color(0xffefefef)),
+      height: double.infinity,
+      width: double.infinity,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+          setState(() {
+            isShowEmoji = 0;
+            isShowPlus = 0;
+          });
+        },
+        child: Column(
+          children: [
+            const Expanded(
+              child: ChatMessage(),
             ),
-          ),
-          isShowEmoji == 1 ? _buildEmoji() : Container(),
-          isShowPlus == 1 ? _buildPlus() : Container(),
-        ],
+            Container(
+              height: 45.0,
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              decoration: const BoxDecoration(
+                color: Color(0xfff7f7f7),
+                border: Border(
+                  top: BorderSide(color: Colors.grey, width: 0.2),
+                  bottom: BorderSide(color: Colors.grey, width: 0.2),
+                ),
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: ExtendedTextField(
+                          onTap: () => setState(() {
+                            if (_focusNode.hasFocus) isShowEmoji = 0;
+                          }),
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(5.0),
+                          ),
+                          onChanged: (v) => setState(() {}),
+                          controller: _inputController,
+                          focusNode: _focusNode,
+                          maxLines: 99,
+                          cursorColor: const Color(0xff07c160),
+                          style: const TextStyle(
+                            textBaseline: TextBaseline.alphabetic,
+                            fontSize: 20,
+                            color: Color(0xff181818),
+                          ),
+                        ),
+                      ),
+                      _showEmoji(),
+                      _inputController.text == "" ? _showPlus() : _showSend(),
+                    ],
+                  );
+                },
+              ),
+            ),
+            Visibility(
+              visible: isShowEmoji == 1,
+              child: EmojiList(
+                  isShowEmoji: isShowEmoji,
+                  keyboardHeight: keyboardHeight,
+                  onEmoji: (String image) {
+                    _sendEmoji(image);
+                    setState(() {
+                      isShowEmoji = 1 - isShowEmoji;
+                    });
+                  }),
+            ),
+            Visibility(
+              visible: isShowPlus == 1,
+              child: PlusList(
+                isShowPlus: isShowPlus,
+                keyboardHeight: keyboardHeight,
+                onPlus: (int index) {
+                  setState(() {
+                    _pick(index);
+                    isShowPlus = 1 - isShowPlus;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  SizedBox _showEmoji() {
+    return SizedBox(
+      width: 31,
+      child: IconButton(
+        icon: const Icon(Icons.emoji_emotions),
+        iconSize: 35,
+        padding: const EdgeInsets.all(2),
+        onPressed: () {
+          setState(() {
+            _focusNode.unfocus();
+            isShowEmoji = 1 - isShowEmoji;
+            isShowPlus = 0;
+          });
+        },
+      ),
+    );
+  }
+
+  //发送添加按钮
+  Widget _showPlus() {
+    return SizedBox(
+      width: 31,
+      child: IconButton(
+        icon: const Icon(Icons.add),
+        iconSize: 35,
+        padding: const EdgeInsets.all(2),
+        onPressed: () {
+          setState(() {
+            _focusNode.unfocus();
+            isShowPlus = 1 - isShowPlus;
+            isShowEmoji = 0;
+          });
+        },
       ),
     );
   }
@@ -245,88 +315,8 @@ class _TalkPageState extends State<TalkPage> {
         iconSize: 35,
         padding: const EdgeInsets.all(2),
         onPressed: () {
+          _focusNode.unfocus();
           _sendText();
-        },
-      ),
-    );
-  }
-
-  //发送添加按钮
-  Widget _showAdd() {
-    return SizedBox(
-      width: 31,
-      child: IconButton(
-        icon: const Icon(Icons.add),
-        iconSize: 35,
-        padding: const EdgeInsets.all(2),
-        onPressed: () {
-          setState(() {
-            isShowPlus = 1 - isShowPlus;
-            isShowEmoji = 0;
-          });
-        },
-      ),
-    );
-  }
-
-  //点击加号出来的操作按钮
-  Widget _buildPlus() {
-    return Container(
-      height: 100,
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
-      color: const Color.fromARGB(255, 237, 237, 237),
-      child: GridView.builder(
-        shrinkWrap: true,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 10.0, // 列之间的间距
-          mainAxisSpacing: 0.0, // 行之间的间距
-          childAspectRatio: 1.2, // 宽高比
-        ),
-        itemCount: icons.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () async {
-              setState(() {
-                _pick(index);
-                isShowPlus = 1 - isShowPlus;
-              });
-            },
-            child: Icon(icons[index], size: 56),
-          );
-        },
-      ),
-    );
-  }
-
-  //表情列表
-  Widget _buildEmoji() {
-    return Container(
-      height: 350,
-      padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
-      color: const Color.fromARGB(255, 237, 237, 237),
-      child: GridView.builder(
-        shrinkWrap: true,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 8,
-          crossAxisSpacing: 10.0, // 列之间的间距
-          mainAxisSpacing: 0.0, // 行之间的间距
-          childAspectRatio: 1.2, // 宽高比
-        ),
-        itemCount: emojis.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              _sendEmoji(emojis[index]);
-              setState(() {
-                isShowEmoji = 1 - isShowEmoji;
-              });
-            },
-            child: Image.asset(
-              emojis[index],
-              scale: 0.75,
-            ),
-          );
         },
       ),
     );
@@ -343,185 +333,45 @@ class _TalkPageState extends State<TalkPage> {
               height: MediaQuery.of(context).size.height, // 使用屏幕高度作为内容高度
               color: const Color.fromARGB(125, 0, 0, 125), // 设置背景颜色
               child: ttype == 1
-                  ? _toUI()
+                  ? _phoneTo()
                   : ttype == 2
-                      ? _fromUI()
-                      : _phoneUI(),
+                      ? _phoneFrom()
+                      : _phoneIng(),
             ),
           );
         });
   }
 
-  Widget _phoneUI() {
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        return Center(
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: _remoteRenderer.srcObject != null
-                    ? webrtc.RTCVideoView(
-                        _remoteRenderer,
-                        mirror: true,
-                        objectFit: webrtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                      )
-                    : const Text('Waiting for remote video...'),
-              ),
-              Align(
-                alignment: Alignment.topRight,
-                child: SizedBox(
-                  width: 150,
-                  height: 200,
-                  child: _localRenderer.srcObject != null
-                      ? webrtc.RTCVideoView(
-                          _localRenderer,
-                          mirror: true,
-                          objectFit: webrtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                        )
-                      : const Text('Waiting for local video...'),
-                ),
-              ),
-              Positioned(
-                bottom: 10,
-                left: 0,
-                right: 0,
-                child: Row(
-                  children: [
-                    const SizedBox(width: 30),
-                    Expanded(
-                      child: CustomButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(false);
-                          _cancel();
-                        },
-                        text: "挂断",
-                      ),
-                    ),
-                    const SizedBox(width: 30),
-                  ],
-                ),
-              )
-            ],
-          ),
-        );
+  Widget _phoneIng() {
+    return PhoneIng(
+      remoteRenderer: _remoteRenderer,
+      localRenderer: _localRenderer,
+      onPhoneIng: () {
+        Navigator.of(context).pop(false);
+        _cancel();
       },
     );
   }
 
-  Widget _toUI() {
-    return Center(
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 80,
-          ),
-          CircleAvatar(
-            radius: 80,
-            backgroundImage: NetworkImage(
-              talkObj['icon'],
-              scale: 1,
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Text(
-            talkObj['name'],
-            style: const TextStyle(color: Colors.white),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          const Text(
-            "正在呼叫...",
-            style: TextStyle(color: Colors.white),
-          ),
-          Expanded(
-            child: Container(),
-          ),
-          Row(
-            children: [
-              const SizedBox(width: 30),
-              Expanded(
-                child: CustomButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                    _cancel();
-                  },
-                  text: "取消",
-                ),
-              ),
-              const SizedBox(width: 30),
-            ],
-          ),
-          const SizedBox(
-            height: 50,
-          ),
-        ],
-      ),
+  Widget _phoneTo() {
+    return PhoneTo(
+      talkObj: talkObj,
+      onPhoneTo: () {
+        Navigator.of(context).pop(false);
+        _cancel();
+      },
     );
   }
 
-  Widget _fromUI() {
-    return Center(
-      child: Column(
-        children: [
-          const SizedBox(
-            height: 80,
-          ),
-          CircleAvatar(
-            radius: 80,
-            backgroundImage: NetworkImage(
-              talkObj['icon'],
-              scale: 1,
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Text(
-            talkObj['name'],
-            style: const TextStyle(color: Colors.white),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          const Text(
-            "正在呼叫...",
-            style: TextStyle(color: Colors.white),
-          ),
-          Expanded(
-            child: Container(),
-          ),
-          Row(
-            children: [
-              const SizedBox(width: 40),
-              Expanded(
-                child: CustomButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  text: "挂断",
-                ),
-              ),
-              const SizedBox(width: 30),
-              Expanded(
-                child: CustomButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  text: "接听",
-                  backgroundColor: Colors.green,
-                ),
-              ),
-              const SizedBox(width: 40),
-            ],
-          ),
-          const SizedBox(
-            height: 50,
-          ),
-        ],
-      ),
+  Widget _phoneFrom() {
+    return PhoneFrom(
+      talkObj: talkObj,
+      onPhoneFromFalse: () {
+        Navigator.of(context).pop(false);
+      },
+      onPhoneFromTrue: () {
+        Navigator.of(context).pop(true);
+      },
     );
   }
 
@@ -530,16 +380,13 @@ class _TalkPageState extends State<TalkPage> {
     Map msg = {
       'fromId': uid,
       'toId': talkObj['objId'],
-      'content': {"data": inputController.text, "url": "", "name": ""},
+      'content': {"data": _inputController.text, "url": "", "name": ""},
       'msgMedia': 1,
       'msgType': talkObj['type']
     };
     _send(msg);
 
-    inputController.text = "";
-    setState(() {
-      isShowSend = 1 - isShowSend;
-    });
+    _inputController.text = "";
   }
 
   void _sendEmoji(String url) async {
@@ -691,7 +538,6 @@ class _TalkPageState extends State<TalkPage> {
           break;
       }
     };
-
     _signaling?.onCallStateChange = (Session session, CallState state) async {
       print("onCallStateChange $state");
       switch (state) {
