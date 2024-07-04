@@ -43,100 +43,106 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(220),
-        child: AppBar(
-          flexibleSpace: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                height: 50,
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
-                child: CustomTextField(
-                  controller: inputController,
-                  hintText: '搜索',
-                  expands: false,
-                  maxHeight: 40,
-                  minHeight: 40,
-                  onTap: () {
-                    // 处理点击事件的逻辑
-                  },
-                ),
-              ),
-              Container(
-                height: 40,
-                padding: EdgeInsets.zero,
-                margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/notice-user',
-                    );
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '新朋友',
-                          style: TextStyle(fontSize: 16.0), // 根据需要设置字体大小
-                        ),
-                        Icon(Icons.chevron_right),
-                      ],
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              pinned: false,
+              expandedHeight: 150,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      height: 50,
+                      padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+                      child: CustomTextField(
+                        controller: inputController,
+                        hintText: '搜索',
+                        expands: false,
+                        maxHeight: 40,
+                        minHeight: 40,
+                        onTap: () {
+                          // 处理点击事件的逻辑
+                        },
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              Container(
-                height: 40,
-                padding: EdgeInsets.zero,
-                margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/notice-group',
-                    );
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '群通知',
-                          style: TextStyle(fontSize: 16.0), // 根据需要设置字体大小
+                    Container(
+                      height: 40,
+                      padding: EdgeInsets.zero,
+                      margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/notice-user',
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '新朋友',
+                                style: TextStyle(fontSize: 16.0), // 根据需要设置字体大小
+                              ),
+                              Icon(Icons.chevron_right),
+                            ],
+                          ),
                         ),
-                        Icon(Icons.chevron_right),
-                      ],
+                      ),
                     ),
-                  ),
+                    Container(
+                      height: 40,
+                      padding: EdgeInsets.zero,
+                      margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/notice-group',
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '群通知',
+                                style: TextStyle(fontSize: 16.0), // 根据需要设置字体大小
+                              ),
+                              Icon(Icons.chevron_right),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Container(
-                height: 10,
-                color: const Color.fromARGB(255, 241, 240, 240),
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SliverAppBarDelegate(
+                TabBar(
+                  tabs: const [
+                    Tab(text: '好友'),
+                    Tab(text: '分组'),
+                    Tab(text: '群聊'),
+                  ],
+                  controller: _tabController,
+                  labelColor: Colors.red,
+                  unselectedLabelColor: Colors.grey,
+                ),
               ),
-              TabBar(
-                padding: const EdgeInsets.all(0),
-                indicatorColor: Colors.red,
-                labelColor: Colors.red,
-                unselectedLabelColor: Colors.black,
-                controller: _tabController,
-                tabs: const [
-                  Tab(text: "好友"),
-                  Tab(text: "分组"),
-                  Tab(text: "群聊"),
-                ],
-              ),
-            ],
-          ),
+            ),
+          ];
+        },
+        body: ContactPage(
+          tabController: _tabController,
         ),
-      ),
-      body: ContactPage(
-        tabController: _tabController,
       ),
     );
   }
@@ -173,84 +179,90 @@ class _ContactPageState extends State<ContactPage> {
   @override
   Widget build(BuildContext context) {
     return TabBarView(controller: widget.tabController, children: [
-      AzListView(
-        data: _firendArr,
-        itemCount: _firendArr.length,
-        itemBuilder: (context, index) {
-          return Column(
-            children: [
-              SizedBox(
-                height: 70,
-                child: ListTile(
-                  leading: CircleAvatar(
-                    // 聊天对象的头像
-                    radius: 20,
-                    backgroundImage: NetworkImage(_firendArr[index].icon!),
+      SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          child: AzListView(
+            data: _firendArr,
+            itemCount: _firendArr.length,
+            itemBuilder: (context, index) {
+              return Column(
+                children: [
+                  SizedBox(
+                    height: 70,
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        // 聊天对象的头像
+                        radius: 20,
+                        backgroundImage: NetworkImage(_firendArr[index].icon!),
+                      ),
+                      title:
+                          Text('${_firendArr[index].remark != "" ? _firendArr[index].remark : _firendArr[index].name}'),
+                      subtitle: Text(
+                        _firendArr[index].info ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      onTap: () {
+                        Map talkobj = {
+                          "objId": _firendArr[index].uid,
+                          "type": 1,
+                          "name": _firendArr[index].name,
+                          "icon": _firendArr[index].icon,
+                          "info": _firendArr[index].info,
+                          "remark": _firendArr[index].remark != "" ? _firendArr[index].remark : _firendArr[index].name,
+                        };
+                        talkobjController.setTalkObj(talkobj);
+                        Navigator.pushNamed(
+                          context,
+                          '/talk',
+                        );
+                      },
+                    ),
                   ),
-                  title: Text('${_firendArr[index].remark != "" ? _firendArr[index].remark : _firendArr[index].name}'),
-                  subtitle: Text(
-                    _firendArr[index].info ?? '',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  onTap: () {
-                    Map talkobj = {
-                      "objId": _firendArr[index].uid,
-                      "type": 1,
-                      "name": _firendArr[index].name,
-                      "icon": _firendArr[index].icon,
-                      "info": _firendArr[index].info,
-                      "remark": _firendArr[index].remark != "" ? _firendArr[index].remark : _firendArr[index].name,
-                    };
-                    talkobjController.setTalkObj(talkobj);
-                    Navigator.pushNamed(
-                      context,
-                      '/talk',
-                    );
-                  },
+                ],
+              );
+            },
+            susItemBuilder: (BuildContext context, int index) {
+              ChatModel model = _firendArr[index];
+              String tag = model.getSuspensionTag();
+              if ('★' == model.getSuspensionTag()) {
+                return Container();
+              }
+              return Container(
+                height: 40,
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.only(left: 15.0),
+                color: const Color(0xfff3f4f5),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  tag,
+                  softWrap: false,
+                  style: const TextStyle(fontSize: 14.0, color: Color(0xff999999)),
                 ),
-              ),
-            ],
-          );
-        },
-        susItemBuilder: (BuildContext context, int index) {
-          ChatModel model = _firendArr[index];
-          String tag = model.getSuspensionTag();
-          if ('★' == model.getSuspensionTag()) {
-            return Container();
-          }
-          return Container(
-            height: 40,
-            width: MediaQuery.of(context).size.width,
-            padding: const EdgeInsets.only(left: 15.0),
-            color: const Color(0xfff3f4f5),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              tag,
-              softWrap: false,
-              style: const TextStyle(fontSize: 14.0, color: Color(0xff999999)),
-            ),
-          );
-        },
-        indexBarData: SuspensionUtil.getTagIndexList(_firendArr),
-        indexHintBuilder: (context, hint) {
-          return Container(
-            alignment: Alignment.center,
-            width: 80.0,
-            height: 80.0,
-            decoration: const BoxDecoration(
-              color: Colors.yellow,
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              hint,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 30.0,
-              ),
-            ),
-          );
-        },
+              );
+            },
+            indexBarData: SuspensionUtil.getTagIndexList(_firendArr),
+            indexHintBuilder: (context, hint) {
+              return Container(
+                alignment: Alignment.center,
+                width: 80.0,
+                height: 80.0,
+                decoration: const BoxDecoration(
+                  color: Colors.yellow,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  hint,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 30.0,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
       ListView.builder(
         itemCount: _contactGroupArr.length, // Replace with actual count
@@ -438,5 +450,29 @@ class _ContactPageState extends State<ContactPage> {
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._tabBar);
+
+  final TabBar _tabBar;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Colors.white,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }

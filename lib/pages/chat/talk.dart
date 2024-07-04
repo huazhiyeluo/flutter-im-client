@@ -315,7 +315,9 @@ class _TalkPageState extends State<TalkPage> {
         iconSize: 35,
         padding: const EdgeInsets.all(2),
         onPressed: () {
-          _focusNode.unfocus();
+          setState(() {
+            _focusNode.unfocus();
+          });
           _sendText();
         },
       ),
