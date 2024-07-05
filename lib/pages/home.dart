@@ -37,7 +37,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     super.initState();
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     WidgetsBinding.instance.addObserver(this); // 注册监听器
-    webSocketController = Get.put(WebSocketController('ws://139.196.98.139:8081/chat', userInfo['uid']));
+    webSocketController = Get.put(WebSocketController(userInfo['uid'], 'ws://139.196.98.139:8081/chat'));
     initOnReceive();
   }
 
@@ -54,12 +54,12 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         logPrint("didChangeAppLifecycleState-resumed");
-        webSocketController = Get.put(WebSocketController('ws://139.196.98.139:8081/chat', userInfo['uid']));
+        webSocketController = Get.put(WebSocketController(userInfo['uid'], 'ws://139.196.98.139:8081/chat'));
         initOnReceive();
         break;
       case AppLifecycleState.paused:
         logPrint("didChangeAppLifecycleState-paused");
-        webSocketController.onClose();
+        webSocketController.disconnect();
         break;
       default:
         break;

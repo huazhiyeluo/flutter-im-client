@@ -41,6 +41,13 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(
@@ -408,6 +415,7 @@ class _ContactPageState extends State<ContactPage> {
         SuspensionUtil.setShowSuspensionStatus(_firendArr);
 
         ContactApi.getFriendGroup({"ownUid": uid}, onSuccess: (res) {
+          if (!mounted) return;
           setState(() {
             if (res['data'] != null) {
               _contactGroupArr = res['data'];
