@@ -54,8 +54,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         logPrint("didChangeAppLifecycleState-resumed");
-        webSocketController = Get.put(WebSocketController(userInfo['uid'], 'ws://139.196.98.139:8081/chat'));
-        initOnReceive();
+        webSocketController.connect();
         break;
       case AppLifecycleState.paused:
         logPrint("didChangeAppLifecycleState-paused");

@@ -13,6 +13,7 @@ class WebSocketController extends GetxController {
 
   IOWebSocketChannel? _channel;
   Timer? _heartBeatTimer;
+  Timer? _reconnectTimer;
   bool _isConnected = false;
   final List<String> _messageQueue = [];
 
@@ -28,6 +29,8 @@ class WebSocketController extends GetxController {
   }
 
   void connect() {
+    logPrint("WebSocketController connect");
+
     String url = "$serverUrl?uid=$uid";
 
     _channel = IOWebSocketChannel.connect(Uri.parse(url));
@@ -46,15 +49,14 @@ class WebSocketController extends GetxController {
       message.value = msg;
       // 在这里处理接收到的消息逻辑
     }, onDone: () {
-      _isConnected = false;
-      _reconnect();
+      // _isConnected = false;
+      // _reconnect();
     }, onError: (error) {
       _isConnected = false;
       _reconnect();
     });
     startHeartbeat(uid);
     _flushMessageQueue();
-    logPrint("WebSocketController connect");
   }
 
   void _flushMessageQueue() {
@@ -68,7 +70,7 @@ class WebSocketController extends GetxController {
 
   void _reconnect() {
     if (!_isConnected) {
-      Future.delayed(const Duration(seconds: 5), () {
+      _reconnectTimer = Timer(const Duration(seconds: 5), () {
         connect();
       });
     }
@@ -89,6 +91,7 @@ class WebSocketController extends GetxController {
   }
 
   void disconnect() {
+    _reconnectTimer?.cancel();
     _heartBeatTimer?.cancel();
     _channel?.sink.close();
     _isConnected = false;
