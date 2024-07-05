@@ -455,7 +455,6 @@ class _TalkPageState extends State<TalkPage> {
       File compressedFile = await _compressImage(File(pickedFile.path));
       dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) {
-        print("pickedFile $res");
         setState(() {
           _sendFile(res['data'], msgMedia, pickedFile.name);
         });
@@ -464,7 +463,6 @@ class _TalkPageState extends State<TalkPage> {
       });
     } else {
       // User canceled the image picking
-      print('No image selected.');
     }
   }
 
@@ -480,16 +478,13 @@ class _TalkPageState extends State<TalkPage> {
       File compressedFile = await _compressImage(File(pickedFile.path));
       dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) {
-        print("pickedFile $res");
         setState(() {
           _sendFile(res['data'], msgMedia, pickedFile.name);
         });
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
-    } else {
-      print('No image selected.');
-    }
+    } else {}
   }
 
   Future<File> _compressImage(File file) async {
@@ -541,7 +536,6 @@ class _TalkPageState extends State<TalkPage> {
       }
     };
     _signaling?.onCallStateChange = (Session session, CallState state) async {
-      print("onCallStateChange $state");
       switch (state) {
         case CallState.callStateNew:
           setState(() {
@@ -594,7 +588,6 @@ class _TalkPageState extends State<TalkPage> {
         'msgType': msgType,
         'msgMedia': msgMedia,
       };
-      print("LIAO MSG: $msg}");
       webSocketController.sendMessage(msg);
     });
   }

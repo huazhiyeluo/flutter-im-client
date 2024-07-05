@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
@@ -8,6 +7,7 @@ import 'package:qim/controller/websocket.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/db.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/savedata.dart';
 import 'tabs/chat.dart';
 import 'tabs/chat_bar.dart';
@@ -33,6 +33,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    logPrint("home-initState");
     super.initState();
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     WidgetsBinding.instance.addObserver(this); // 注册监听器
@@ -42,6 +43,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    logPrint("home-dispose");
     WidgetsBinding.instance.removeObserver(this); // 移除监听器
     webSocketController.onClose();
     super.dispose();
@@ -51,9 +53,12 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
+        logPrint("didChangeAppLifecycleState-resumed");
         webSocketController = Get.put(WebSocketController('ws://139.196.98.139:8081/chat', userInfo['uid']));
+        initOnReceive();
         break;
       case AppLifecycleState.paused:
+        logPrint("didChangeAppLifecycleState-paused");
         webSocketController.onClose();
         break;
       default:

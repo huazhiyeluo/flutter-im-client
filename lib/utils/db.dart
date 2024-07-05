@@ -6,7 +6,6 @@ class DBHelper {
 
   static Future<void> initDatabase(String dbName, List<String> tableSQLs) async {
     String path = await getDatabasesPath();
-    print(path);
     _database = await openDatabase(
       join(path, dbName),
       onCreate: (db, version) async {
@@ -153,7 +152,6 @@ class DBHelper {
       });
     } catch (e) {
       // 处理异常情况
-      print('Error in upsertData: $e');
       // 可以选择抛出异常或者进行其他处理
     }
   }

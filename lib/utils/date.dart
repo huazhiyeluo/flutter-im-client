@@ -1,7 +1,6 @@
 import 'package:intl/intl.dart';
 
-String formatDate(int timestampSeconds,
-    {String customFormat = "yyyy-MM-dd HH:mm:ss"}) {
+String formatDate(int timestampSeconds, {String customFormat = "yyyy-MM-dd HH:mm:ss"}) {
   if (timestampSeconds == 0) {
     return "";
   }
@@ -19,4 +18,11 @@ String formatDate(int timestampSeconds,
 int getTime() {
   int timestampSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
   return timestampSeconds;
+}
+
+String getDate({String customFormat = "yyyy-MM-dd HH:mm:ss"}) {
+  DateTime now = DateTime.now();
+  DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+  String formatted = formatter.format(now);
+  return formatted;
 }

@@ -11,7 +11,6 @@ class RegisterTwo extends StatefulWidget {
 class _RegisterTwoState extends State<RegisterTwo> {
   @override
   Widget build(BuildContext context) {
-    print(Get.arguments);
     return Scaffold(
       appBar: AppBar(
         title: const Text(''),
@@ -44,14 +43,12 @@ class _RegisterTwoPageState extends State<RegisterTwoPage> {
           Container(
             padding: const EdgeInsets.fromLTRB(40, 110, 40, 0),
             child: const Text('Enter Code',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(40, 10, 40, 0),
             child: Text('We have sent you an SMS with the code to +86 $phone',
-                style: const TextStyle(fontSize: 13),
-                textAlign: TextAlign.center),
+                style: const TextStyle(fontSize: 13), textAlign: TextAlign.center),
           ),
           const SizedBox(height: 40),
           SizedBox(
@@ -63,16 +60,13 @@ class _RegisterTwoPageState extends State<RegisterTwoPage> {
                 decoration: InputDecoration(
                   labelText: '验证码',
                   border: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
                       borderRadius: BorderRadius.circular(15)),
                   focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Colors.red, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.red, width: 1.0),
                       borderRadius: BorderRadius.circular(15)),
                   enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
                       borderRadius: BorderRadius.circular(15)),
                 ),
               )),
@@ -82,12 +76,9 @@ class _RegisterTwoPageState extends State<RegisterTwoPage> {
               Navigator.pushNamed(context, '/register-three');
             },
             style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all<Color>(Colors.blue), // 按钮背景色
-              foregroundColor:
-                  MaterialStateProperty.all<Color>(Colors.white), // 文字颜色
-              padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                  const EdgeInsets.fromLTRB(20, 15, 20, 15)), // 内边距
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), // 按钮背景色
+              foregroundColor: MaterialStateProperty.all<Color>(Colors.white), // 文字颜色
+              padding: MaterialStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.fromLTRB(20, 15, 20, 15)), // 内边距
             ),
             child: const Text('下一步'),
           ),

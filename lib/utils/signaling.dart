@@ -85,13 +85,11 @@ class Signaling {
 
   //创建session
   Future<Session> createSession(Session? session, int fromId, int toId) async {
-    print("LIAO _createSession");
     Session newSession = session ?? Session(fromId: fromId, toId: toId);
     _localStream = await createStream();
 
     RTCPeerConnection pc = await createPeerConnection(configuration, pcConstraints);
     pc.onTrack = (RTCTrackEvent event) {
-      print("LIAO onTrack: ${event.track.kind}");
       if (event.track.kind == 'video') {
         onRemoteStream?.call(event.streams[0]);
       }
@@ -101,7 +99,6 @@ class Signaling {
     });
 
     pc.onIceCandidate = (RTCIceCandidate candidate) async {
-      print("LIAO onIceCandidate $fromId: ${candidate.toString()}");
       await Future.delayed(const Duration(seconds: 1), () {
         Map<String, dynamic> candidateMap = {
           'sdpMLineIndex': candidate.sdpMLineIndex,
@@ -112,9 +109,7 @@ class Signaling {
       });
     };
 
-    pc.onIceConnectionState = (RTCIceConnectionState state) {
-      print("LIAO ICE Connection State: $state");
-    };
+    pc.onIceConnectionState = (RTCIceConnectionState state) {};
 
     newSession.pc = pc;
     return newSession;
@@ -129,7 +124,6 @@ class Signaling {
 
   //创建offer
   Future<void> createOffer(Session session) async {
-    print("createOffer1");
     try {
       RTCSessionDescription s = await session.pc!.createOffer(offerOptions);
       await session.pc!.setLocalDescription(_fixSdp(s));
@@ -138,15 +132,11 @@ class Signaling {
         'type': s.type,
       };
       onSendMsg?.call(session.fromId, session.toId, 4, 4, json.encode(offerMap));
-      print("createOffer2");
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 
   //创建answer
   Future<void> createAnswer(Session session) async {
-    print("createAnswer1");
     try {
       RTCSessionDescription s = await session.pc!.createAnswer();
       await session.pc!.setLocalDescription(_fixSdp(s));
@@ -155,10 +145,7 @@ class Signaling {
         'type': s.type,
       };
       onSendMsg?.call(session.fromId, session.toId, 4, 5, json.encode(answerMap));
-      print("createAnswer2");
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 
   //关闭所有的留
@@ -204,7 +191,6 @@ class Signaling {
 
   //接通通话
   Future<void> accept(int fromId, int toId) async {
-    print("accept1 $fromId");
     var session = _sessions[fromId];
     if (session == null) {
       return;
@@ -233,7 +219,6 @@ class Signaling {
   void onReceive(WebSocketController webSocketController) {
     webSocketController.message.listen((msg) async {
       if ([4].contains(msg['msgType'])) {
-        print("LIAO onReceive $msg");
         if (msg['msgMedia'] == 1) {
           Session? session = _sessions.remove(msg['toId']);
           if (session != null) {
@@ -259,15 +244,12 @@ class Signaling {
 
   //1-1、_handleIceCandidate
   void _handleIceCandidate(Map<dynamic, dynamic> msg) async {
-    print("LIAO _handleIceCandidate");
     try {
       Session? session = _sessions[msg['toId']];
 
       Map candidateMap = json.decode(msg['content']['data']);
       RTCIceCandidate candidate =
           RTCIceCandidate(candidateMap['candidate'], candidateMap['sdpMid'], candidateMap['sdpMLineIndex']);
-
-      print("Received ICE Candidate: ${candidate.toString()}");
 
       if (session != null) {
         if (session.pc != null) {
@@ -279,15 +261,11 @@ class Signaling {
         _sessions[msg['toId']] = Session(fromId: msg['toId'], toId: msg['fromId']);
         _sessions[msg['toId']]?.remoteCandidates.add(candidate);
       }
-    } catch (e) {
-      print("LIAO _handleIceCandidate Error: $e");
-    }
+    } catch (e) {}
   }
 
   //1-2、_handleOffer
   void _handleOffer(Map<dynamic, dynamic> msg) async {
-    print("LIAO _handleOffer");
-    print("LIAO _handleOffer ${msg['toId']}");
     try {
       Session? session = _sessions[msg['toId']];
       Session newSession = await createSession(session, msg['toId'], msg['fromId']);
@@ -295,7 +273,6 @@ class Signaling {
 
       Map offerMap = json.decode(msg['content']['data']);
       RTCSessionDescription offer = RTCSessionDescription(offerMap['sdp'], offerMap['type']);
-      print("Received SDP Offer: $offer");
 
       await newSession.pc?.setRemoteDescription(offer);
 
@@ -307,25 +284,19 @@ class Signaling {
       }
       onCallStateChange?.call(newSession, CallState.callStateNew);
       onCallStateChange?.call(newSession, CallState.callStateRinging);
-    } catch (e) {
-      print("LIAO _handleOffer Error:1 $e");
-    }
+    } catch (e) {}
   }
 
   //1-3 _handleAnswer
   void _handleAnswer(Map<dynamic, dynamic> msg) async {
-    print("LIAO _handleAnswer");
     try {
       Session? session = _sessions[msg['toId']];
       Map answerMap = json.decode(msg['content']['data']);
       RTCSessionDescription answer = RTCSessionDescription(answerMap['sdp'], answerMap['type']);
-      print("Received SDP Answer: $answer");
 
       await session?.pc?.setRemoteDescription(answer);
 
       onCallStateChange?.call(session!, CallState.callStateConnected);
-    } catch (e) {
-      print("LIAO _handleAnswer Error: $e");
-    }
+    } catch (e) {}
   }
 }
