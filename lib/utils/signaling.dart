@@ -174,6 +174,18 @@ class Signaling {
     await session.pc?.close();
   }
 
+  void switchCamera() async {
+    if (_localStream!.getVideoTracks().isNotEmpty) {
+      Helper.switchCamera(_localStream!.getVideoTracks()[0]);
+    }
+  }
+
+  void turnCamera(bool numted) async {
+    if (_localStream!.getVideoTracks().isNotEmpty) {
+      _localStream!.getVideoTracks()[0].enabled = numted;
+    }
+  }
+
   //关闭
   void close() async {
     await cleanSessions();

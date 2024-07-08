@@ -3,10 +3,10 @@ import 'package:qim/widget/custom_button.dart';
 
 class PhoneFrom extends StatefulWidget {
   final Map talkObj;
-  final Function onPhoneFromFalse;
-  final Function onPhoneFromTrue;
+  final Function onPhoneQuit;
+  final Function onPhoneAccept;
 
-  const PhoneFrom({super.key, required this.talkObj, required this.onPhoneFromFalse, required this.onPhoneFromTrue});
+  const PhoneFrom({super.key, required this.talkObj, required this.onPhoneQuit, required this.onPhoneAccept});
 
   @override
   State<PhoneFrom> createState() => _PhoneFromState();
@@ -39,7 +39,7 @@ class _PhoneFromState extends State<PhoneFrom> {
             height: 20,
           ),
           const Text(
-            "正在呼叫...",
+            "邀请您视频通话...",
             style: TextStyle(color: Colors.white),
           ),
           Expanded(
@@ -51,7 +51,7 @@ class _PhoneFromState extends State<PhoneFrom> {
               Expanded(
                 child: CustomButton(
                   onPressed: () {
-                    widget.onPhoneFromFalse();
+                    widget.onPhoneQuit();
                   },
                   text: "挂断",
                 ),
@@ -60,7 +60,7 @@ class _PhoneFromState extends State<PhoneFrom> {
               Expanded(
                 child: CustomButton(
                   onPressed: () {
-                    widget.onPhoneFromTrue();
+                    widget.onPhoneAccept();
                   },
                   text: "接听",
                   backgroundColor: Colors.green,

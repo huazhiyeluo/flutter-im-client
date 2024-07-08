@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
+import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/websocket.dart';
+import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/db.dart';
 import 'package:qim/utils/functions.dart';
-import 'package:qim/utils/savedata.dart';
 import 'tabs/chat.dart';
 import 'tabs/chat_bar.dart';
 import 'tabs/contact.dart';
@@ -68,29 +69,29 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void initOnReceive() {
     // 初始化 WebSocket 监听
     webSocketController.message.listen((msg) async {
-      if ([1, 2].contains(msg['msgType'])) {
-        saveMessage(msg);
+      // 1、私聊和群聊消息到数据库  2、加入chat列表|保存chat数据到  3、obj对象
+      if ([1, 2].contains(msg['msgType']) || ([4].contains(msg['msgType']) && [1].contains(msg['msgMedia']))) {
+        joinData(userInfo['uid'], msg);
       }
-      if (!([4].contains(msg['msgType']) && [3, 4, 5].contains(msg['msgMedia']))) {
-        processReceivedMessage(userInfo['uid'], msg, chatController);
-      }
-      if ([4].contains(msg['msgType'])) {
-        Map objUser = (await DBHelper.getOne('users', [
-          ['uid', '=', msg['fromId']]
-        ]))!;
+
+      //设置当前聊天Obj
+      if ([4].contains(msg['msgType']) && msg['msgMedia'] == 0) {
+        Map<String, dynamic>? objUser = await getDbOneUser(msg['fromId']);
+        if (objUser == null) {
+          return;
+        }
+
         Map talkobj = {
           "objId": msg['fromId'],
-          "type": 1,
+          "type": msg['msgType'],
           "name": objUser['username'],
           "icon": objUser['avatar'],
           "info": objUser['info'],
           "remark": objUser['remark'],
         };
         talkobjController.setTalkObj(talkobj);
-        if (msg['msgMedia'] == 0) {
-          //收到语音通话 - 请求
-          Get.toNamed('/talk');
-        }
+        //收到语音通话 - 请求
+        Get.toNamed('/talk');
       }
     });
   }

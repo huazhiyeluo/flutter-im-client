@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:qim/utils/db.dart';
 
-void saveUser(Map data) {
+//1、保存用户
+void saveDbUser(Map data) {
   Map<String, dynamic> user = {};
 
   // 需要保存的字段列表
@@ -18,20 +19,19 @@ void saveUser(Map data) {
     'joinTime',
     'isOnline'
   ];
-
   // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
   for (var field in fields) {
     if (data[field] != null) {
       user[field] = data[field];
     }
   }
-
   DBHelper.upsertData('users', user, [
     ["uid", "=", user['uid']]
   ]);
 }
 
-void saveGroup(Map data) {
+//2、保存群组
+void saveDbGroup(Map data) {
   Map<String, dynamic> group = {};
 
   // 需要保存的字段列表
@@ -61,7 +61,8 @@ void saveGroup(Map data) {
   ]);
 }
 
-void saveChat(Map data) {
+//3、保存chat
+void saveDbChat(Map data) {
   Map<String, dynamic> chat = {};
 
   // 需要保存的字段列表
@@ -96,11 +97,13 @@ void saveChat(Map data) {
   ]);
 }
 
-void saveMessage(Map data) {
+//4、保存message
+void saveDbMessage(Map data) {
   Map<String, dynamic> message = {};
 
   // 需要保存的字段列表
   List<String> fields = [
+    'belongFlag',
     'fromId',
     'toId',
     'avatar',

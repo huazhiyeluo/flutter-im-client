@@ -18,7 +18,6 @@ import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/permission.dart';
-import 'package:qim/utils/savedata.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart' as dio;
@@ -168,7 +167,15 @@ class _TalkPageState extends State<TalkPage> {
     _signaling?.close();
     _localRenderer.dispose();
     _remoteRenderer.dispose();
+    setTalkOjb();
     super.dispose();
+  }
+
+  void setTalkOjb() {
+    Map talkobj = {
+      "objId": 0,
+    };
+    talkobjController.setTalkObj(talkobj);
   }
 
   @override
@@ -348,9 +355,15 @@ class _TalkPageState extends State<TalkPage> {
     return PhoneIng(
       remoteRenderer: _remoteRenderer,
       localRenderer: _localRenderer,
-      onPhoneIng: () {
+      onPhoneQuit: (int num) {
         Navigator.of(context).pop(false);
-        _cancel();
+        _cancel(num);
+      },
+      switchCamera: () {
+        _switchCamera();
+      },
+      turnCamera: (bool numted) {
+        _turnCamera(numted);
       },
     );
   }
@@ -358,9 +371,9 @@ class _TalkPageState extends State<TalkPage> {
   Widget _phoneTo() {
     return PhoneTo(
       talkObj: talkObj,
-      onPhoneTo: () {
+      onPhoneCancel: () {
         Navigator.of(context).pop(false);
-        _cancel();
+        _reject();
       },
     );
   }
@@ -368,10 +381,10 @@ class _TalkPageState extends State<TalkPage> {
   Widget _phoneFrom() {
     return PhoneFrom(
       talkObj: talkObj,
-      onPhoneFromFalse: () {
+      onPhoneQuit: () {
         Navigator.of(context).pop(false);
       },
-      onPhoneFromTrue: () {
+      onPhoneAccept: () {
         Navigator.of(context).pop(true);
       },
     );
@@ -421,10 +434,7 @@ class _TalkPageState extends State<TalkPage> {
       return;
     }
     msg['createTime'] = getTime();
-    msg['avatar'] = userInfo['avatar'];
-    messageController.addMessage(msg);
-    saveMessage(msg);
-    processReceivedMessage(uid, msg, chatController);
+    joinData(uid, msg);
   }
 
   //----------------------------------------------------------------文件处理----------------------------------------------------------------
@@ -499,7 +509,7 @@ class _TalkPageState extends State<TalkPage> {
   //邀请
   void _invite() async {
     if (_signaling != null) {
-      _signaling?.onSendMsg!(uid, talkObj['objId'], 4, 0, "");
+      await _signaling?.onSendMsg!(uid, talkObj['objId'], 4, 0, "");
       _signaling?.invite(uid, talkObj['objId']);
     }
   }
@@ -507,22 +517,35 @@ class _TalkPageState extends State<TalkPage> {
   //接通
   void _accept() async {
     if (_session != null) {
+      _signaling?.onSendMsg!(uid, talkObj['objId'], 4, 2, "");
       await _signaling?.accept(uid, talkObj['objId']);
     }
   }
 
-  //拒接
+  //取消
   void _reject() {
     if (_session != null) {
+      _signaling?.onSendMsg!(uid, talkObj['objId'], 1, 13, "挂断电话");
       _signaling?.reject(uid, talkObj['objId']);
     }
   }
 
-  //取消
-  void _cancel() {
+  //接通后取消
+  void _cancel(int num) {
     if (_session != null) {
+      _signaling?.onSendMsg!(uid, talkObj['objId'], 1, 12, "$num");
       _signaling?.bye(uid, talkObj['objId']);
     }
+  }
+
+  //翻转镜头
+  void _switchCamera() {
+    _signaling?.switchCamera();
+  }
+
+  //关闭开启镜头
+  void _turnCamera(bool tnumted) {
+    _signaling?.turnCamera(tnumted);
   }
 
   void _connect(BuildContext context) async {

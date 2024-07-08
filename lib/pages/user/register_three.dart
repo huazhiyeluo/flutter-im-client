@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qim/widget/custom_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterThree extends StatefulWidget {
@@ -48,9 +49,7 @@ class _RegisterThreePageState extends State<RegisterThreePage> {
                 height: 100.0,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  image: DecorationImage(
-                      fit: BoxFit.contain,
-                      image: AssetImage("lib/assets/images/upload.jpg")),
+                  image: DecorationImage(fit: BoxFit.contain, image: AssetImage("lib/assets/images/upload.jpg")),
                 ),
               )),
           const SizedBox(height: 40),
@@ -62,16 +61,13 @@ class _RegisterThreePageState extends State<RegisterThreePage> {
                 decoration: InputDecoration(
                   labelText: '用户名',
                   border: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
                       borderRadius: BorderRadius.circular(15)),
                   focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Colors.red, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.red, width: 1.0),
                       borderRadius: BorderRadius.circular(15)),
                   enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
                       borderRadius: BorderRadius.circular(15)),
                 ),
               )),
@@ -84,36 +80,27 @@ class _RegisterThreePageState extends State<RegisterThreePage> {
                 decoration: InputDecoration(
                   labelText: '密码',
                   border: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
                       borderRadius: BorderRadius.circular(15)),
                   focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Colors.red, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.red, width: 1.0),
                       borderRadius: BorderRadius.circular(15)),
                   enabledBorder: OutlineInputBorder(
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
                       borderRadius: BorderRadius.circular(15)),
                 ),
                 obscureText: true,
               )),
           const SizedBox(height: 60),
-          ElevatedButton(
+          CustomButton(
             onPressed: () {
               // 处理登录逻辑
               setCacheData();
               Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
             },
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all<Color>(Colors.blue), // 按钮背景色
-              foregroundColor:
-                  MaterialStateProperty.all<Color>(Colors.white), // 文字颜色
-              padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                  const EdgeInsets.fromLTRB(20, 15, 20, 15)), // 内边距
-            ),
-            child: const Text('保存'),
+            text: "保存",
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
           ),
           Expanded(child: Container())
         ],

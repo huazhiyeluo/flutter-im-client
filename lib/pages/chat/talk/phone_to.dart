@@ -3,9 +3,9 @@ import 'package:qim/widget/custom_button.dart';
 
 class PhoneTo extends StatefulWidget {
   final Map talkObj;
-  final Function onPhoneTo;
+  final Function onPhoneCancel;
 
-  const PhoneTo({super.key, required this.talkObj, required this.onPhoneTo});
+  const PhoneTo({super.key, required this.talkObj, required this.onPhoneCancel});
 
   @override
   State<PhoneTo> createState() => _PhoneToState();
@@ -50,7 +50,7 @@ class _PhoneToState extends State<PhoneTo> {
               Expanded(
                 child: CustomButton(
                   onPressed: () {
-                    widget.onPhoneTo();
+                    widget.onPhoneCancel();
                   },
                   text: "取消",
                 ),

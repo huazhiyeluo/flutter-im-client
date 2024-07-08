@@ -1,7 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
-import 'package:qim/utils/db.dart';
-import 'package:qim/utils/savedata.dart';
+import 'package:qim/controller/message.dart';
+import 'package:qim/controller/talkobj.dart';
+import 'package:qim/dbdata/getdbdata.dart';
+import 'package:qim/dbdata/savedata.dart';
+import 'package:qim/utils/cache.dart';
+import 'package:qim/utils/functions.dart';
 
 String getKey({int msgType = 1, int fromId = 1, int toId = 1}) {
   String key = '';
@@ -13,65 +18,79 @@ String getKey({int msgType = 1, int fromId = 1, int toId = 1}) {
   return key;
 }
 
-String currentRouteName(BuildContext context) {
-  // 通过 ModalRoute.of(context) 获取当前页面对应的路由对象
-  ModalRoute<Object>? route = ModalRoute.of(context);
-  // 如果路由对象不为空，则返回路由的名称，否则返回空字符串
-  return route?.settings.name ?? '';
+Future<void> joinData(int uid, Map msg) async {
+  joinChat(uid, msg);
+  if ([1, 2].contains(msg['msgType'])) {
+    joinMessage(uid, msg);
+  }
 }
 
-Future<void> processReceivedMessage(int uid, Map temp, ChatController chatController) async {
-  if (![1, 2].contains(temp['msgType'])) {
-    return;
+Future<void> joinChat(int uid, Map msg) async {
+  final ChatController chatController = Get.put(ChatController());
+  int objId = 0;
+  if (msg['msgType'] == 1) {
+    objId = uid == msg['fromId'] ? msg['toId'] : msg['fromId'];
+  } else if (msg['msgType'] == 2) {
+    objId = msg['toId'];
   }
-  bool isSelf = uid == temp['fromId'] ? true : false;
 
   Map chatData = {};
-  if (temp['msgType'] == 1) {
-    Map<String, dynamic> objUser = {};
-    if (isSelf) {
-      objUser = (await DBHelper.getOne('users', [
-        ['uid', '=', temp['toId']]
-      ]))!;
-    } else {
-      objUser = (await DBHelper.getOne('users', [
-        ['uid', '=', temp['fromId']]
-      ]))!;
+  chatData['objId'] = objId;
+  chatData['type'] = msg['msgType'];
+  chatData['msgMedia'] = msg['msgMedia'];
+  chatData['operateTime'] = msg['createTime'];
+  chatData['content'] = msg['content'];
+
+  Map? lastChat = chatController.getOneChat(objId, msg['msgType']);
+  if (lastChat == null) {
+    if (msg['msgType'] == 1) {
+      Map<String, dynamic>? objUser = await getDbOneUser(objId);
+      if (objUser == null) {
+        return;
+      }
+      chatData['name'] = objUser['username'];
+      chatData['info'] = objUser['info'];
+      chatData['remark'] = objUser['remark'];
+      chatData['icon'] = objUser['avatar'];
     }
 
-    chatData['objId'] = objUser['uid'];
-    chatData['name'] = objUser['username'];
-    chatData['info'] = objUser['info'];
-    chatData['remark'] = objUser['remark'];
-    chatData['icon'] = objUser['avatar'];
-    chatData['weight'] = objUser['fromId'];
-  }
-
-  if (temp['msgType'] == 2) {
-    Map<String, dynamic>? toGroup = await DBHelper.getOne('groups', [
-      ['groupId', '=', temp['toId']]
-    ]);
-
-    chatData['objId'] = temp['toId'];
-    chatData['name'] = toGroup?['name'];
-    chatData['info'] = toGroup?['info'];
-    chatData['remark'] = toGroup?['remark'];
-    chatData['icon'] = toGroup?['icon'];
-    chatData['weight'] = toGroup?['fromId'];
-  }
-  chatData['type'] = temp['msgType'];
-
-  Map? lastChat = chatController.getOneChat(chatData['objId'], chatData['type']);
-
-  if (!isSelf) {
-    chatData['tips'] = lastChat?['tips'] ?? 0 + 1;
+    if (msg['msgType'] == 2) {
+      Map<String, dynamic>? objGroup = await getDbOneGroup(msg['toId']);
+      if (objGroup == null) {
+        return;
+      }
+      chatData['name'] = objGroup['name'];
+      chatData['info'] = objGroup['info'];
+      chatData['remark'] = objGroup['remark'];
+      chatData['icon'] = objGroup['icon'];
+    }
   } else {
-    chatData['tips'] = lastChat?['tips'] ?? 0 + 1;
+    chatData['name'] = lastChat['name'];
+    chatData['info'] = lastChat['info'];
+    chatData['remark'] = lastChat['remark'];
+    chatData['icon'] = lastChat['icon'];
   }
-  chatData['operateTime'] = temp['createTime'];
-  chatData['msgMedia'] = temp['msgMedia'];
-  chatData['content'] = temp['content'];
 
+  final TalkobjController talkobjController = Get.put(TalkobjController());
+  if (talkobjController.talkObj['objId'] == msg['fromId'] || talkobjController.talkObj['objId'] == msg['toId']) {
+    chatData['tips'] = 0;
+  } else {
+    chatData['tips'] = (lastChat?['tips'] ?? 0) + 1;
+  }
   chatController.upsetChat(chatData);
-  saveChat(chatData);
+  saveDbChat(chatData);
+}
+
+Future<void> joinMessage(int uid, Map msg) async {
+  final MessageController messageController = Get.put(MessageController());
+  bool isSelf = uid == msg['fromId'] ? true : false;
+  if (isSelf) {
+    Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
+    msg['avatar'] = userInfo?['avatar'];
+  } else {
+    Map<String, dynamic>? objUser = await getDbOneUser(msg['fromId']);
+    msg['avatar'] = objUser?['avatar'];
+  }
+  messageController.addMessage(msg);
+  saveDbMessage(msg);
 }

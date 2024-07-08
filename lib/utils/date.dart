@@ -26,3 +26,15 @@ String getDate({String customFormat = "yyyy-MM-dd HH:mm:ss"}) {
   String formatted = formatter.format(now);
   return formatted;
 }
+
+String formatSecondsToHMS(int totalSeconds) {
+  Duration duration = Duration(seconds: totalSeconds);
+
+  String formattedTime = [
+    duration.inHours.toString().padLeft(2, '0'),
+    duration.inMinutes.remainder(60).toString().padLeft(2, '0'),
+    duration.inSeconds.remainder(60).toString().padLeft(2, '0')
+  ].join(':');
+
+  return formattedTime;
+}

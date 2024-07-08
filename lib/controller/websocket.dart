@@ -37,7 +37,7 @@ class WebSocketController extends GetxController {
     _isConnected = true;
 
     _channel?.stream.listen((str) async {
-      logPrint("WebSocketController revicedMessage: $str");
+      logPrint("WebSocketController receivedMessage: $str");
       Map msg = json.decode(str);
       if ([1, 2, 4].contains(msg['msgType'])) {
         Map objUser = (await DBHelper.getOne('users', [
@@ -49,8 +49,8 @@ class WebSocketController extends GetxController {
       message.value = msg;
       // 在这里处理接收到的消息逻辑
     }, onDone: () {
-      // _isConnected = false;
-      // _reconnect();
+      _isConnected = false;
+      _reconnect();
     }, onError: (error) {
       _isConnected = false;
       _reconnect();
@@ -70,6 +70,7 @@ class WebSocketController extends GetxController {
 
   void _reconnect() {
     if (!_isConnected) {
+      _reconnectTimer?.cancel();
       _reconnectTimer = Timer(const Duration(seconds: 5), () {
         connect();
       });
@@ -100,6 +101,7 @@ class WebSocketController extends GetxController {
   }
 
   void startHeartbeat(int uid) {
+    _heartBeatTimer?.cancel();
     _heartBeatTimer = Timer.periodic(const Duration(seconds: 10), (Timer t) {
       if (_isConnected) {
         Map msg = {
@@ -109,6 +111,8 @@ class WebSocketController extends GetxController {
           'MsgType': 0
         };
         _sendMessage(json.encode(msg));
+      } else {
+        _reconnect();
       }
     });
   }

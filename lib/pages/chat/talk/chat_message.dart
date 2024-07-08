@@ -10,6 +10,7 @@ import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/db.dart';
+import 'package:qim/utils/functions.dart';
 
 class ChatMessage extends StatefulWidget {
   const ChatMessage({
@@ -37,7 +38,8 @@ class _ChatMessageState extends State<ChatMessage> {
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
-    key = getKey(msgType: talkObj['type'], fromId: talkObj['objId'], toId: uid);
+    key = getKey(msgType: talkObj['type'], fromId: uid, toId: talkObj['objId']);
+    logPrint(key);
     _initData();
   }
 

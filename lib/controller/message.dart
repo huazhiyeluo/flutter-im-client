@@ -9,4 +9,9 @@ class MessageController extends GetxController {
     allUserMessages.putIfAbsent(key, () => <Map>[].obs).insert(0, msg);
     update();
   }
+
+  // 获取指定用户的消息列表
+  RxList<Map> getMessages(String key) {
+    return allUserMessages[key] ?? <Map>[].obs;
+  }
 }

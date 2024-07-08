@@ -4,8 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:synchronized/synchronized.dart';
 
 class CacheHelper {
-
-  static CacheHelper ? _singleton;
+  static CacheHelper? _singleton;
 
   static final Lock _lock = Lock();
 
@@ -25,11 +24,12 @@ class CacheHelper {
     }
     return _singleton;
   }
+
   // 私有构造函数，禁止外部实例化
   CacheHelper._();
 
   // 初始化 SharedPreferences
-  Future _init()  async {
+  Future _init() async {
     _prefs = await SharedPreferences.getInstance();
   }
 
@@ -61,17 +61,17 @@ class CacheHelper {
     return _prefs?.getString(key) ?? defValue;
   }
 
-    /// get bool.
+  /// get bool.
   static bool? getBoolData(String key, {bool? defValue = false}) {
     return _prefs?.getBool(key) ?? defValue;
   }
 
   static Map? getMapData(String key) {
-    String? _data = _prefs?.getString(key);
-    return (_data == null || _data.isEmpty) ? null : json.decode(_data);
+    String? data = _prefs?.getString(key);
+    return (data == null || data.isEmpty) ? null : json.decode(data);
   }
 
-    /// remove.
+  /// remove.
   static Future<bool>? remove(String key) {
     return _prefs?.remove(key);
   }

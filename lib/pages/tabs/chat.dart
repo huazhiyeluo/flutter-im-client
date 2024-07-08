@@ -7,7 +7,7 @@ import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/db.dart';
-import 'package:qim/utils/savedata.dart';
+import 'package:qim/dbdata/savedata.dart';
 import 'package:qim/widget/custom_text_field.dart';
 
 class Chat extends StatefulWidget {
@@ -164,9 +164,8 @@ class _ChatPageState extends State<ChatPage> {
                 chatData['objId'] = talkobj['objId'];
                 chatData['type'] = talkobj['type'];
                 chatData['tips'] = 0;
-
                 chatController.upsetChat(chatData);
-                saveChat(chatData);
+                saveDbChat(chatData);
 
                 Navigator.pushNamed(
                   context,

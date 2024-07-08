@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/widget/custom_button.dart';
 
 class RegisterTwo extends StatefulWidget {
   const RegisterTwo({super.key});
@@ -71,16 +72,13 @@ class _RegisterTwoPageState extends State<RegisterTwoPage> {
                 ),
               )),
           const SizedBox(height: 60),
-          ElevatedButton(
+          CustomButton(
             onPressed: () {
               Navigator.pushNamed(context, '/register-three');
             },
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.blue), // 按钮背景色
-              foregroundColor: MaterialStateProperty.all<Color>(Colors.white), // 文字颜色
-              padding: MaterialStateProperty.all<EdgeInsetsGeometry>(const EdgeInsets.fromLTRB(20, 15, 20, 15)), // 内边距
-            ),
-            child: const Text('下一步'),
+            text: "下一步",
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
           ),
           TextButton(
             onPressed: () {

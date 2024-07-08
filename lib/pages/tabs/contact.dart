@@ -4,7 +4,7 @@ import 'package:qim/api/contact.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/utils/cache.dart';
-import 'package:qim/utils/savedata.dart';
+import 'package:qim/dbdata/savedata.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:azlistview/azlistview.dart';
 import 'package:lpinyin/lpinyin.dart';
@@ -408,7 +408,7 @@ class _ContactPageState extends State<ContactPage> {
           chat.tagIndex = firstLetter.toUpperCase();
           _firendArr.add(chat);
 
-          saveUser(item); //数据库存贮
+          saveDbUser(item); //数据库存贮
         }
 
         _firendArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
@@ -452,7 +452,7 @@ class _ContactPageState extends State<ContactPage> {
           _groupArr = res['data'];
         }
         for (var item in _groupArr) {
-          saveGroup(item); //数据库存贮
+          saveDbGroup(item); //数据库存贮
         }
       });
     }, onError: (res) {

@@ -5,6 +5,7 @@ import 'package:qim/common/keys.dart';
 import 'package:qim/routes/route.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
+import 'package:qim/widget/custom_button.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -108,23 +109,13 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: true,
               )),
           const SizedBox(height: 20),
-          ElevatedButton(
+          CustomButton(
             onPressed: () {
-              // 处理登录逻辑
               loginAction();
             },
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(
-                Colors.blue,
-              ), // 按钮背景色
-              foregroundColor: MaterialStateProperty.all<Color>(
-                Colors.white,
-              ), // 文字颜色
-              padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                const EdgeInsets.fromLTRB(20, 15, 20, 15),
-              ), // 内边距
-            ),
-            child: const Text('登录'),
+            text: "登录",
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
           ),
           const SizedBox(height: 10),
           Row(
@@ -164,7 +155,6 @@ class _LoginPageState extends State<LoginPage> {
     var params = {'username': usernameController.text, 'password': passwordController.text};
     UserApi.login(params, onSuccess: (res) async {
       CacheHelper.saveData(Keys.userInfo, res['data']);
-      //Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
       String initialRouteData = await initialRoute();
       Get.offAndToNamed(initialRouteData);
     }, onError: (res) {
