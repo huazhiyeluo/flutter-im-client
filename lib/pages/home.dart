@@ -69,6 +69,19 @@ class _HomeState extends State<Home> {
         joinData(userInfo['uid'], msg);
       }
 
+      if ([3].contains(msg['msgType'])) {
+        if (msg['msgMedia'] == 11) {
+          Map item = {"uid": msg['fromId'], "isOnline": 1};
+          userController.upsetUser(item);
+          saveDbUser(item);
+        }
+        if (msg['msgMedia'] == 12) {
+          Map item = {"uid": msg['fromId'], "isOnline": 0};
+          userController.upsetUser(item);
+          saveDbUser(item);
+        }
+      }
+
       //设置当前聊天Obj
       if ([4].contains(msg['msgType']) && msg['msgMedia'] == 0) {
         Map<String, dynamic>? objUser = await getDbOneUser(msg['fromId']);

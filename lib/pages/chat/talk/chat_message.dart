@@ -10,7 +10,6 @@ import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/db.dart';
-import 'package:qim/utils/functions.dart';
 
 class ChatMessage extends StatefulWidget {
   const ChatMessage({

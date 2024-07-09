@@ -8,6 +8,7 @@ import 'package:qim/controller/user.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:azlistview/azlistview.dart';
 import 'package:lpinyin/lpinyin.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/widget/custom_text_field.dart';
 
 class ChatModel extends ISuspensionBean {
@@ -15,6 +16,7 @@ class ChatModel extends ISuspensionBean {
   String? name;
   String? icon;
   String? info;
+  int? isOnline;
   String? remark;
   String? tagIndex; // 这个字段就是tag
   String? namePinyin;
@@ -182,10 +184,17 @@ class _ContactPageState extends State<ContactPage> {
     uid = userInfo == null ? "" : userInfo['uid'];
 
     _groupArr = groupController.allGroups;
+
+    // 监听 userController 和 contactGroupController 的数据变化
+    ever(userController.allUsers, (_) => _formatData());
+    ever(contactGroupController.allContactGroups, (_) => _formatData());
+
     _formatData();
   }
 
   void _formatData() {
+    logPrint("_formatData");
+    _firendArr.clear();
     for (var item in userController.allUsers) {
       ChatModel chat = ChatModel();
       chat.uid = item['uid'];
@@ -193,17 +202,25 @@ class _ContactPageState extends State<ContactPage> {
       chat.icon = item['avatar'];
       chat.info = item['info'];
       chat.remark = item['remark'];
+      chat.isOnline = item['isOnline'];
       chat.namePinyin = PinyinHelper.getPinyin(item['username']);
       String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
       chat.tagIndex = firstLetter.toUpperCase();
       _firendArr.add(chat);
     }
+    setState(() {
+      _firendArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
+      SuspensionUtil.setShowSuspensionStatus(_firendArr);
+    });
 
-    _firendArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
-    SuspensionUtil.setShowSuspensionStatus(_firendArr);
+    for (var item in _firendArr) {
+      logPrint("${item.uid} ${item.name} ${item.isOnline}");
+    }
 
+    _contactGroupArr.clear();
     _contactGroupArr = List.from(contactGroupController.allContactGroups);
     for (var item in _contactGroupArr) {
+      item['children'] = [];
       for (var citem in userController.allUsers) {
         if (citem['friendGroupId'] == item['friendGroupId']) {
           if (item['children'] == null) {
@@ -213,13 +230,16 @@ class _ContactPageState extends State<ContactPage> {
         }
       }
     }
+    setState(() {
+      _contactGroupArr = _contactGroupArr;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return TabBarView(controller: widget.tabController, children: [
       SingleChildScrollView(
-        child: Container(
+        child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: AzListView(
             data: _firendArr,
@@ -238,7 +258,7 @@ class _ContactPageState extends State<ContactPage> {
                       title:
                           Text('${_firendArr[index].remark != "" ? _firendArr[index].remark : _firendArr[index].name}'),
                       subtitle: Text(
-                        _firendArr[index].info ?? '',
+                        "[${_firendArr[index].isOnline == 1 ? '在线' : '离线'}] ${_firendArr[index].info}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -343,7 +363,7 @@ class _ContactPageState extends State<ContactPage> {
                             ),
                             title: Text(ctemp['remark'] != "" ? ctemp['remark'] : ctemp['username']),
                             subtitle: Text(
-                              ctemp['info'],
+                              "[${ctemp['isOnline'] == 1 ? '在线' : '离线'}] ${ctemp['info']}",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
