@@ -19,21 +19,25 @@ String getKey({int msgType = 1, int fromId = 1, int toId = 1}) {
 }
 
 Future<void> joinData(int uid, Map msg) async {
-  joinChat(uid, msg);
   if ([1, 2].contains(msg['msgType'])) {
     joinMessage(uid, msg);
   }
+  joinChat(uid, msg);
 }
 
-Future<void> joinChat(int uid, Map msg) async {
+Future<void> joinChat(int uid, Map temp) async {
+  Map msg = Map.from(temp);
   final ChatController chatController = Get.put(ChatController());
   int objId = 0;
-  if (msg['msgType'] == 1) {
+  if ([1, 4].contains(msg['msgType'])) {
     objId = uid == msg['fromId'] ? msg['toId'] : msg['fromId'];
   } else if (msg['msgType'] == 2) {
     objId = msg['toId'];
   }
 
+  if (msg['msgType'] == 4) {
+    msg['msgType'] = 1;
+  }
   Map chatData = {};
   chatData['objId'] = objId;
   chatData['type'] = msg['msgType'];
@@ -43,7 +47,7 @@ Future<void> joinChat(int uid, Map msg) async {
 
   Map? lastChat = chatController.getOneChat(objId, msg['msgType']);
   if (lastChat == null) {
-    if (msg['msgType'] == 1) {
+    if ([1].contains(msg['msgType'])) {
       Map<String, dynamic>? objUser = await getDbOneUser(objId);
       if (objUser == null) {
         return;
@@ -81,7 +85,8 @@ Future<void> joinChat(int uid, Map msg) async {
   saveDbChat(chatData);
 }
 
-Future<void> joinMessage(int uid, Map msg) async {
+Future<void> joinMessage(int uid, Map temp) async {
+  Map msg = Map.from(temp);
   final MessageController messageController = Get.put(MessageController());
   bool isSelf = uid == msg['fromId'] ? true : false;
   if (isSelf) {

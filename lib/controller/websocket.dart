@@ -1,12 +1,12 @@
 import 'package:get/get.dart';
 import 'package:qim/controller/message.dart';
-import 'package:qim/utils/db.dart';
 import 'package:qim/utils/functions.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/widgets.dart';
 
-class WebSocketController extends GetxController {
+class WebSocketController extends GetxController with WidgetsBindingObserver {
   final MessageController messageController = Get.put(MessageController());
   final String serverUrl;
   final int uid;
@@ -16,6 +16,7 @@ class WebSocketController extends GetxController {
   Timer? _reconnectTimer;
   bool _isConnected = false;
   final List<String> _messageQueue = [];
+  bool _shouldReconnect = true;
 
   // 响应式变量
   RxMap message = {}.obs;
@@ -25,7 +26,27 @@ class WebSocketController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     connect(); // 在控制器初始化时连接 WebSocket
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      logPrint("didChangeAppLifecycleState-paused");
+      _shouldReconnect = false;
+      disconnect();
+    } else if (state == AppLifecycleState.resumed) {
+      logPrint("didChangeAppLifecycleState-resumed");
+      _shouldReconnect = true;
+      connect();
+    }
   }
 
   void connect() {
@@ -39,21 +60,18 @@ class WebSocketController extends GetxController {
     _channel?.stream.listen((str) async {
       logPrint("WebSocketController receivedMessage: $str");
       Map msg = json.decode(str);
-      if ([1, 2, 4].contains(msg['msgType'])) {
-        Map objUser = (await DBHelper.getOne('users', [
-          ['uid', '=', msg['fromId']]
-        ]))!;
-        msg['avatar'] = objUser['avatar'];
-        messageController.addMessage(msg);
-      }
       message.value = msg;
       // 在这里处理接收到的消息逻辑
     }, onDone: () {
       _isConnected = false;
-      _reconnect();
+      if (_shouldReconnect) {
+        _reconnect();
+      }
     }, onError: (error) {
       _isConnected = false;
-      _reconnect();
+      if (_shouldReconnect) {
+        _reconnect();
+      }
     });
     startHeartbeat(uid);
     _flushMessageQueue();
@@ -69,7 +87,7 @@ class WebSocketController extends GetxController {
   }
 
   void _reconnect() {
-    if (!_isConnected) {
+    if (!_isConnected && _shouldReconnect) {
       _reconnectTimer?.cancel();
       _reconnectTimer = Timer(const Duration(seconds: 5), () {
         connect();
@@ -87,7 +105,9 @@ class WebSocketController extends GetxController {
       logPrint("WebSocketController sendMessage: $msg");
     } else {
       _messageQueue.add(msg);
-      _reconnect();
+      if (_shouldReconnect) {
+        _reconnect();
+      }
     }
   }
 
@@ -111,7 +131,7 @@ class WebSocketController extends GetxController {
           'MsgType': 0
         };
         _sendMessage(json.encode(msg));
-      } else {
+      } else if (_shouldReconnect) {
         _reconnect();
       }
     });

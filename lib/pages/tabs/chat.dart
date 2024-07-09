@@ -192,7 +192,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   String _getContent(int msgMedia, Map content) {
-    if (msgMedia == 1) {
+    if ([1, 10, 11, 13].contains(msgMedia)) {
       return content['data'];
     }
     if (msgMedia == 6) {
@@ -201,6 +201,10 @@ class _ChatPageState extends State<ChatPage> {
 
     if (msgMedia == 5) {
       return "[文件]";
+    }
+
+    if (msgMedia == 12) {
+      return "通话时长: ${formatSecondsToHMS(int.parse(content['data']))}";
     }
     return "";
   }

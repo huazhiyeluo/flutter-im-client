@@ -1,3 +1,4 @@
+import 'package:qim/utils/functions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -6,6 +7,7 @@ class DBHelper {
 
   static Future<void> initDatabase(String dbName, List<String> tableSQLs) async {
     String path = await getDatabasesPath();
+    logPrint(path);
     _database = await openDatabase(
       join(path, dbName),
       onCreate: (db, version) async {

@@ -30,11 +30,11 @@ String getDate({String customFormat = "yyyy-MM-dd HH:mm:ss"}) {
 String formatSecondsToHMS(int totalSeconds) {
   Duration duration = Duration(seconds: totalSeconds);
 
-  String formattedTime = [
-    duration.inHours.toString().padLeft(2, '0'),
-    duration.inMinutes.remainder(60).toString().padLeft(2, '0'),
-    duration.inSeconds.remainder(60).toString().padLeft(2, '0')
-  ].join(':');
+  String hours = duration.inHours > 0 ? '${duration.inHours}:' : '';
+  String minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+  String seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+
+  String formattedTime = '$hours$minutes:$seconds';
 
   return formattedTime;
 }

@@ -17,6 +17,7 @@ import 'package:qim/utils/Signaling.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/permission.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:image_picker/image_picker.dart';
@@ -342,16 +343,16 @@ class _TalkPageState extends State<TalkPage> {
               height: MediaQuery.of(context).size.height, // 使用屏幕高度作为内容高度
               color: const Color.fromARGB(125, 0, 0, 125), // 设置背景颜色
               child: ttype == 1
-                  ? _phoneTo()
+                  ? _phoneTo(context)
                   : ttype == 2
-                      ? _phoneFrom()
-                      : _phoneIng(),
+                      ? _phoneFrom(context)
+                      : _phoneIng(context),
             ),
           );
         });
   }
 
-  Widget _phoneIng() {
+  Widget _phoneIng(BuildContext context) {
     return PhoneIng(
       remoteRenderer: _remoteRenderer,
       localRenderer: _localRenderer,
@@ -368,7 +369,7 @@ class _TalkPageState extends State<TalkPage> {
     );
   }
 
-  Widget _phoneTo() {
+  Widget _phoneTo(BuildContext context) {
     return PhoneTo(
       talkObj: talkObj,
       onPhoneCancel: () {
@@ -378,7 +379,7 @@ class _TalkPageState extends State<TalkPage> {
     );
   }
 
-  Widget _phoneFrom() {
+  Widget _phoneFrom(BuildContext context) {
     return PhoneFrom(
       talkObj: talkObj,
       onPhoneQuit: () {
@@ -559,6 +560,7 @@ class _TalkPageState extends State<TalkPage> {
       }
     };
     _signaling?.onCallStateChange = (Session session, CallState state) async {
+      logPrint("$state");
       switch (state) {
         case CallState.callStateNew:
           setState(() {
@@ -612,6 +614,11 @@ class _TalkPageState extends State<TalkPage> {
         'msgMedia': msgMedia,
       };
       webSocketController.sendMessage(msg);
+
+      if (msgType == 1) {
+        msg['createTime'] = getTime();
+        joinData(fromId, msg);
+      }
     });
   }
 }

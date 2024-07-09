@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
-import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
-import 'package:qim/utils/db.dart';
 import 'package:qim/utils/functions.dart';
 import 'tabs/chat.dart';
 import 'tabs/chat_bar.dart';
@@ -24,7 +22,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with WidgetsBindingObserver {
+class _HomeState extends State<Home> {
   late WebSocketController webSocketController;
   final ChatController chatController = Get.put(ChatController());
   final TalkobjController talkobjController = Get.put(TalkobjController());
@@ -37,7 +35,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     logPrint("home-initState");
     super.initState();
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    WidgetsBinding.instance.addObserver(this); // 注册监听器
     webSocketController = Get.put(WebSocketController(userInfo['uid'], 'ws://139.196.98.139:8081/chat'));
     initOnReceive();
   }
@@ -45,32 +42,15 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   @override
   void dispose() {
     logPrint("home-dispose");
-    WidgetsBinding.instance.removeObserver(this); // 移除监听器
     webSocketController.onClose();
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        logPrint("didChangeAppLifecycleState-resumed");
-        webSocketController.connect();
-        break;
-      case AppLifecycleState.paused:
-        logPrint("didChangeAppLifecycleState-paused");
-        webSocketController.disconnect();
-        break;
-      default:
-        break;
-    }
   }
 
   void initOnReceive() {
     // 初始化 WebSocket 监听
     webSocketController.message.listen((msg) async {
       // 1、私聊和群聊消息到数据库  2、加入chat列表|保存chat数据到  3、obj对象
-      if ([1, 2].contains(msg['msgType']) || ([4].contains(msg['msgType']) && [1].contains(msg['msgMedia']))) {
+      if ([1, 2].contains(msg['msgType']) || ([4].contains(msg['msgType']) && [0].contains(msg['msgMedia']))) {
         joinData(userInfo['uid'], msg);
       }
 
@@ -83,7 +63,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
         Map talkobj = {
           "objId": msg['fromId'],
-          "type": msg['msgType'],
+          "type": 1,
           "name": objUser['username'],
           "icon": objUser['avatar'],
           "info": objUser['info'],
@@ -91,7 +71,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         };
         talkobjController.setTalkObj(talkobj);
         //收到语音通话 - 请求
-        Get.toNamed('/talk');
+        Get.toNamed('/talk', parameters: {'ttype': "2"});
       }
     });
   }

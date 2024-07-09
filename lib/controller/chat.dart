@@ -24,7 +24,6 @@ class ChatController extends GetxController {
       // 否则，将数据添加到列表中
       allChats.add(chat);
     }
-    logPrint(allChats);
     update();
   }
 

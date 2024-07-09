@@ -39,7 +39,6 @@ class _ChatMessageState extends State<ChatMessage> {
     uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
     key = getKey(msgType: talkObj['type'], fromId: uid, toId: talkObj['objId']);
-    logPrint(key);
     _initData();
   }
 
@@ -146,6 +145,17 @@ class _ChatMessageState extends State<ChatMessage> {
     if ([1, 10, 11, 12, 13].contains(data['msgMedia'])) {
       item = Text(
         '${data['content']['data'] ?? ''}',
+        style: TextStyle(
+          fontSize: 16,
+          color: isSentByMe ? Colors.black54 : Colors.black54,
+        ),
+        softWrap: true,
+        overflow: TextOverflow.visible,
+      );
+    }
+    if ([12].contains(data['msgMedia'])) {
+      item = Text(
+        formatSecondsToHMS(int.parse(data['content']['data'])),
         style: TextStyle(
           fontSize: 16,
           color: isSentByMe ? Colors.black54 : Colors.black54,
