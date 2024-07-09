@@ -6,7 +6,6 @@ import 'package:qim/controller/talkobj.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedata.dart';
 import 'package:qim/utils/cache.dart';
-import 'package:qim/utils/functions.dart';
 
 String getKey({int msgType = 1, int fromId = 1, int toId = 1}) {
   String key = '';

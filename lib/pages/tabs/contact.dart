@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/contact.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/utils/cache.dart';
-import 'package:qim/dbdata/savedata.dart';
-import 'package:qim/utils/tips.dart';
 import 'package:azlistview/azlistview.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:qim/widget/custom_text_field.dart';
