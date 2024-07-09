@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:qim/utils/functions.dart';
 
 class ChatController extends GetxController {
   final RxList<Map> allChats = <Map>[].obs;

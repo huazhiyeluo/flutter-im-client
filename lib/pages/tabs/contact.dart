@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/contact_group.dart';
+import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/user.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/dbdata/savedata.dart';
 import 'package:qim/utils/tips.dart';
@@ -42,7 +45,6 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _tabController.dispose();
     super.dispose();
   }
@@ -164,7 +166,10 @@ class ContactPage extends StatefulWidget {
 }
 
 class _ContactPageState extends State<ContactPage> {
-  final TalkobjController talkobjController = Get.put(TalkobjController());
+  final TalkobjController talkobjController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
+  final UserController userController = Get.find();
+  final GroupController groupController = Get.find();
 
   final List<ChatModel> _firendArr = [];
   List _groupArr = [];
@@ -179,8 +184,38 @@ class _ContactPageState extends State<ContactPage> {
     Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
     uid = userInfo == null ? "" : userInfo['uid'];
 
-    _getFriendList();
-    _getGroupList();
+    _groupArr = groupController.allGroups;
+    _formatData();
+  }
+
+  void _formatData() {
+    for (var item in userController.allUsers) {
+      ChatModel chat = ChatModel();
+      chat.uid = item['uid'];
+      chat.name = item['username'];
+      chat.icon = item['avatar'];
+      chat.info = item['info'];
+      chat.remark = item['remark'];
+      chat.namePinyin = PinyinHelper.getPinyin(item['username']);
+      String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
+      chat.tagIndex = firstLetter.toUpperCase();
+      _firendArr.add(chat);
+    }
+
+    _firendArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
+    SuspensionUtil.setShowSuspensionStatus(_firendArr);
+
+    _contactGroupArr = List.from(contactGroupController.allContactGroups);
+    for (var item in _contactGroupArr) {
+      for (var citem in userController.allUsers) {
+        if (citem['friendGroupId'] == item['friendGroupId']) {
+          if (item['children'] == null) {
+            item['children'] = [];
+          }
+          item['children'].add(citem);
+        }
+      }
+    }
   }
 
   @override
@@ -381,83 +416,6 @@ class _ContactPageState extends State<ContactPage> {
         },
       ),
     ]);
-  }
-
-  // 内部方法
-  void _getFriendList() async {
-    var params = {
-      'fromId': uid,
-    };
-    ContactApi.getFriendList(params, onSuccess: (res) {
-      if (!mounted) return;
-      setState(() {
-        List friendArr = [];
-        if (res['data'] != null) {
-          friendArr = res['data'];
-        }
-        // 遍历friendArr
-        for (var item in friendArr) {
-          ChatModel chat = ChatModel();
-          chat.uid = item['uid'];
-          chat.name = item['username'];
-          chat.icon = item['avatar'];
-          chat.info = item['info'];
-          chat.remark = item['remark'];
-          chat.namePinyin = PinyinHelper.getPinyin(item['username']);
-          String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
-          chat.tagIndex = firstLetter.toUpperCase();
-          _firendArr.add(chat);
-
-          saveDbUser(item); //数据库存贮
-        }
-
-        _firendArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
-        SuspensionUtil.setShowSuspensionStatus(_firendArr);
-
-        ContactApi.getFriendGroup({"ownUid": uid}, onSuccess: (res) {
-          if (!mounted) return;
-          setState(() {
-            if (res['data'] != null) {
-              _contactGroupArr = res['data'];
-            }
-            _contactGroupArr.insert(0, {"friendGroupId": 0, "name": "默认分组"});
-            for (var item in _contactGroupArr) {
-              for (var citem in friendArr) {
-                if (citem['friendGroupId'] == item['friendGroupId']) {
-                  if (item['children'] == null) {
-                    item['children'] = [];
-                  }
-                  item['children'].add(citem);
-                }
-              }
-            }
-          });
-        }, onError: (err) {
-          TipHelper.instance.showToast(res['msg']);
-        });
-      });
-    }, onError: (res) {
-      TipHelper.instance.showToast(res['msg']);
-    });
-  }
-
-  void _getGroupList() async {
-    var params = {
-      'fromId': uid,
-    };
-    ContactApi.getGroupList(params, onSuccess: (res) {
-      if (!mounted) return;
-      setState(() {
-        if (res['data'] != null) {
-          _groupArr = res['data'];
-        }
-        for (var item in _groupArr) {
-          saveDbGroup(item); //数据库存贮
-        }
-      });
-    }, onError: (res) {
-      TipHelper.instance.showToast(res['msg']);
-    });
   }
 }
 

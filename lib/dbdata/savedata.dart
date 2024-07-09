@@ -2,6 +2,27 @@ import 'dart:convert';
 
 import 'package:qim/utils/db.dart';
 
+//0、保存用户组
+void saveDbContactGroup(Map data) {
+  Map<String, dynamic> contactGroup = {};
+
+  // 需要保存的字段列表
+  List<String> fields = [
+    'friendGroupId',
+    'ownerUid',
+    'name',
+  ];
+  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
+  for (var field in fields) {
+    if (data[field] != null) {
+      contactGroup[field] = data[field];
+    }
+  }
+  DBHelper.upsertData('contact_groups', contactGroup, [
+    ["friendGroupId", "=", contactGroup['friendGroupId']]
+  ]);
+}
+
 //1、保存用户
 void saveDbUser(Map data) {
   Map<String, dynamic> user = {};
@@ -10,12 +31,20 @@ void saveDbUser(Map data) {
   List<String> fields = [
     'uid',
     'username',
+    'email',
+    'phone',
     'avatar',
+    'sex',
+    'birthday',
     'info',
     'exp',
     'createTime',
+    'friendGroupId',
     'level',
     'remark',
+    'isTop',
+    'isHidden',
+    'isQuiet',
     'joinTime',
     'isOnline'
   ];
@@ -44,8 +73,13 @@ void saveDbGroup(Map data) {
     'num',
     'exp',
     'createTime',
+    'groupPower',
     'level',
     'remark',
+    'nickname',
+    'isTop',
+    'isHidden',
+    'isQuiet',
     'joinTime',
   ];
 
