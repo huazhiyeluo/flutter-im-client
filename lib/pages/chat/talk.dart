@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/common.dart';
 import 'package:qim/common/keys.dart';
-import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/websocket.dart';
@@ -39,7 +38,6 @@ class _TalkState extends State<Talk> {
   Map talkObj = {};
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     talkObj = talkobjController.talkObj;
   }
@@ -111,7 +109,6 @@ class _TalkPageState extends State<TalkPage> {
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
   final TextEditingController _inputController = TextEditingController();
-  final ChatController chatController = Get.put(ChatController());
 
   double keyboardHeight = 270.0;
   int uid = 0;
@@ -392,6 +389,10 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   void _sendText() async {
+    if (_inputController.text == "") {
+      TipHelper.instance.showToast("bu'd");
+      return;
+    }
     // 发送按钮的操作
     Map msg = {
       'fromId': uid,
@@ -401,7 +402,6 @@ class _TalkPageState extends State<TalkPage> {
       'msgType': talkObj['type']
     };
     _send(msg);
-
     _inputController.text = "";
   }
 

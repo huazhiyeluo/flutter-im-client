@@ -10,6 +10,7 @@ import 'package:qim/controller/user.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedata.dart';
+import 'package:qim/utils/asset.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/functions.dart';
@@ -37,6 +38,8 @@ class _HomeState extends State<Home> {
   final TalkobjController talkobjController = Get.put(TalkobjController());
   int _currentIndex = 0;
 
+  late AudioPlayerManager _audioPlayerManager;
+
   Map userInfo = {};
   int uid = 0;
 
@@ -44,6 +47,9 @@ class _HomeState extends State<Home> {
   void initState() {
     logPrint("home-initState");
     super.initState();
+
+    _audioPlayerManager = AudioPlayerManager();
+
     Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
     uid = userInfo == null ? "" : userInfo['uid'];
     webSocketController = Get.put(WebSocketController(uid, 'ws://139.196.98.139:8081/chat'));
@@ -58,15 +64,16 @@ class _HomeState extends State<Home> {
   void dispose() {
     logPrint("home-dispose");
     webSocketController.onClose();
+    _audioPlayerManager.dispose();
     super.dispose();
   }
 
-  void _initOnReceive() {
+  Future<void> _initOnReceive() async {
     // 初始化 WebSocket 监听
     webSocketController.message.listen((msg) async {
       // 1、私聊和群聊消息到数据库  2、加入chat列表|保存chat数据到  3、obj对象
       if ([1, 2].contains(msg['msgType']) || ([4].contains(msg['msgType']) && [0].contains(msg['msgMedia']))) {
-        joinData(userInfo['uid'], msg);
+        joinData(uid, msg, audioPlayerManager: _audioPlayerManager);
       }
 
       if ([3].contains(msg['msgType'])) {
@@ -74,6 +81,7 @@ class _HomeState extends State<Home> {
           Map item = {"uid": msg['fromId'], "isOnline": 1};
           userController.upsetUser(item);
           saveDbUser(item);
+          await _audioPlayerManager.playSound("1.mp3");
         }
         if (msg['msgMedia'] == 12) {
           Map item = {"uid": msg['fromId'], "isOnline": 0};

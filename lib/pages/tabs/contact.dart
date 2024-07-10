@@ -193,7 +193,6 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   void _formatData() {
-    logPrint("_formatData");
     _firendArr.clear();
     for (var item in userController.allUsers) {
       ChatModel chat = ChatModel();
@@ -212,11 +211,6 @@ class _ContactPageState extends State<ContactPage> {
       _firendArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
       SuspensionUtil.setShowSuspensionStatus(_firendArr);
     });
-
-    for (var item in _firendArr) {
-      logPrint("${item.uid} ${item.name} ${item.isOnline}");
-    }
-
     _contactGroupArr.clear();
     _contactGroupArr = List.from(contactGroupController.allContactGroups);
     for (var item in _contactGroupArr) {

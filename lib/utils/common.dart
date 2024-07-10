@@ -5,6 +5,7 @@ import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedata.dart';
+import 'package:qim/utils/asset.dart';
 import 'package:qim/utils/cache.dart';
 
 String getKey({int msgType = 1, int fromId = 1, int toId = 1}) {
@@ -17,14 +18,14 @@ String getKey({int msgType = 1, int fromId = 1, int toId = 1}) {
   return key;
 }
 
-Future<void> joinData(int uid, Map msg) async {
+Future<void> joinData(int uid, Map msg, {AudioPlayerManager? audioPlayerManager}) async {
   if ([1, 2].contains(msg['msgType'])) {
     joinMessage(uid, msg);
   }
-  joinChat(uid, msg);
+  joinChat(uid, msg, audioPlayerManager);
 }
 
-Future<void> joinChat(int uid, Map temp) async {
+Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager) async {
   Map msg = Map.from(temp);
   final ChatController chatController = Get.put(ChatController());
   int objId = 0;
@@ -79,7 +80,9 @@ Future<void> joinChat(int uid, Map temp) async {
     chatData['tips'] = 0;
   } else {
     chatData['tips'] = (lastChat?['tips'] ?? 0) + 1;
+    await audioPlayerManager?.playSound("2.mp3");
   }
+
   chatController.upsetChat(chatData);
   saveDbChat(chatData);
 }
