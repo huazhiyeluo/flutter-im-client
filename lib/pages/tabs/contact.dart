@@ -170,7 +170,7 @@ class _ContactPageState extends State<ContactPage> {
   final UserController userController = Get.find();
   final GroupController groupController = Get.find();
 
-  final List<ChatModel> _firendArr = [];
+  List<ChatModel> _firendArr = [];
   List _groupArr = [];
   List _contactGroupArr = [];
 
@@ -192,6 +192,12 @@ class _ContactPageState extends State<ContactPage> {
     _formatData();
   }
 
+  @override
+  void dispose() {
+    // 取消订阅
+    super.dispose();
+  }
+
   void _formatData() {
     _firendArr.clear();
     for (var item in userController.allUsers) {
@@ -207,10 +213,8 @@ class _ContactPageState extends State<ContactPage> {
       chat.tagIndex = firstLetter.toUpperCase();
       _firendArr.add(chat);
     }
-    setState(() {
-      _firendArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
-      SuspensionUtil.setShowSuspensionStatus(_firendArr);
-    });
+    _firendArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
+    SuspensionUtil.setShowSuspensionStatus(_firendArr);
     _contactGroupArr.clear();
     _contactGroupArr = List.from(contactGroupController.allContactGroups);
     for (var item in _contactGroupArr) {
@@ -224,9 +228,12 @@ class _ContactPageState extends State<ContactPage> {
         }
       }
     }
-    setState(() {
-      _contactGroupArr = _contactGroupArr;
-    });
+    if (mounted) {
+      setState(() {
+        _contactGroupArr = _contactGroupArr;
+        _firendArr = _firendArr;
+      });
+    }
   }
 
   @override

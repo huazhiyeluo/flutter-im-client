@@ -33,6 +33,7 @@ class WebSocketController extends GetxController with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    disconnect(); // 断开 WebSocket 连接并释放资源
     super.dispose();
   }
 
@@ -122,7 +123,7 @@ class WebSocketController extends GetxController with WidgetsBindingObserver {
 
   void startHeartbeat(int uid) {
     _heartBeatTimer?.cancel();
-    _heartBeatTimer = Timer.periodic(const Duration(seconds: 10), (Timer t) {
+    _heartBeatTimer = Timer.periodic(const Duration(seconds: 20), (Timer t) {
       if (_isConnected) {
         Map msg = {
           'FromId': uid,
