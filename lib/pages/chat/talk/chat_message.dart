@@ -10,6 +10,7 @@ import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/db.dart';
+import 'package:qim/utils/functions.dart';
 
 class ChatMessage extends StatefulWidget {
   const ChatMessage({
@@ -54,70 +55,64 @@ class _ChatMessageState extends State<ChatMessage> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () {
-        return Container(
-          color: Colors.grey[200], // 设置背景色
-          child: ListView.builder(
-            key: UniqueKey(),
-            controller: _scrollController,
-            itemBuilder: (BuildContext context, int index) {
-              final messageList = messageController.allUserMessages[key];
-              if (messageList != null && index < messageList.length) {
-                bool isSentByMe = uid == messageList[index]['fromId'];
-                return Container(
-                  margin: const EdgeInsets.all(8),
-                  child: Row(
-                    mainAxisAlignment: isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      !isSentByMe ? _showRightPhoto(messageList, index) : Container(),
-                      Flexible(
-                        flex: 3,
-                        child: Container(
-                          padding: const EdgeInsets.all(5),
-                          constraints: BoxConstraints(
-                            minWidth: MediaQuery.of(context).size.width * 0.1,
-                            maxWidth: MediaQuery.of(context).size.width * 0.6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSentByMe ? const Color.fromARGB(255, 169, 234, 122) : Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _getContent(isSentByMe, messageList[index]),
-                              const SizedBox(height: 4),
-                              Text(
-                                formatDate(messageList[index]['createTime'], customFormat: "MM-dd HH:mm"),
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: isSentByMe ? Colors.black54 : Colors.black54,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+    return Obx(() {
+      final List<Map<dynamic, dynamic>> messageList = messageController.allUserMessages[key]!;
+      return Container(
+        color: Colors.grey[200], // 设置背景色
+        child: ListView.builder(
+          key: UniqueKey(),
+          controller: _scrollController,
+          itemBuilder: (BuildContext context, int index) {
+            bool isSentByMe = uid == messageList[index]['fromId'];
+            return Container(
+              margin: const EdgeInsets.all(8),
+              child: Row(
+                mainAxisAlignment: isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  !isSentByMe ? _showRightPhoto(messageList, index) : Container(),
+                  Flexible(
+                    flex: 3,
+                    child: Container(
+                      padding: const EdgeInsets.all(5),
+                      constraints: BoxConstraints(
+                        minWidth: MediaQuery.of(context).size.width * 0.1,
+                        maxWidth: MediaQuery.of(context).size.width * 0.6,
                       ),
-                      isSentByMe ? _showLeftPhoto(messageList, index) : Container(),
-                    ],
+                      decoration: BoxDecoration(
+                        color: isSentByMe ? const Color.fromARGB(255, 169, 234, 122) : Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _getContent(isSentByMe, messageList[index]),
+                          const SizedBox(height: 4),
+                          Text(
+                            formatDate(messageList[index]['createTime'], customFormat: "MM-dd HH:mm"),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isSentByMe ? Colors.black54 : Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                );
-              } else {
-                return const Text(""); // 返回一个空的SizedBox ,会有问题
-              }
-            },
-            reverse: true,
-            itemCount: messageController.allUserMessages[key]?.length,
-            dragStartBehavior: DragStartBehavior.start,
-          ),
-        );
-      },
-    );
+                  isSentByMe ? _showLeftPhoto(messageList, index) : Container(),
+                ],
+              ),
+            );
+          },
+          reverse: true,
+          itemCount: messageList.length,
+          dragStartBehavior: DragStartBehavior.start,
+        ),
+      );
+    });
   }
 
-  Padding _showLeftPhoto(RxList<Map<dynamic, dynamic>> messageList, int index) {
+  Padding _showLeftPhoto(List<Map<dynamic, dynamic>> messageList, int index) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
       child: CircleAvatar(
@@ -128,7 +123,7 @@ class _ChatMessageState extends State<ChatMessage> {
     );
   }
 
-  Padding _showRightPhoto(RxList<Map<dynamic, dynamic>> messageList, int index) {
+  Padding _showRightPhoto(List<Map<dynamic, dynamic>> messageList, int index) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: CircleAvatar(
@@ -174,8 +169,12 @@ class _ChatMessageState extends State<ChatMessage> {
   }
 
   Future<void> _getMessageList() async {
-    if (messageController.allUserMessages.isEmpty) {
-      List messages = await DBHelper.getData('message', []);
+    final messagesList = messageController.allUserMessages[key];
+    if (messagesList == null || messagesList.isEmpty) {
+      List messages = await DBHelper.getData('message', [
+        ['toId', '=', uid]
+      ]);
+      logPrint(messages);
       for (var item in messages) {
         Map<String, dynamic> modifiedItem = Map.from(item); // 复制到新的Map
         modifiedItem['content'] = jsonDecode(item['content']); // 修改新的Map中的内容
