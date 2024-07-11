@@ -4,6 +4,8 @@ PODS:
   - connectivity_plus (0.0.1):
     - Flutter
     - FlutterMacOS
+  - device_info_plus (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
   - flutter_webrtc (0.9.36):
     - Flutter
@@ -30,6 +32,7 @@ PODS:
 DEPENDENCIES:
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/darwin`)
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_webrtc (from `.symlinks/plugins/flutter_webrtc/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
@@ -49,6 +52,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/audioplayers_darwin/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/darwin"
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
   Flutter:
     :path: Flutter
   flutter_webrtc:
@@ -69,6 +74,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   audioplayers_darwin: 877d9a4d06331c5c374595e46e16453ac7eafa40
   connectivity_plus: ddd7f30999e1faaef5967c23d5b6d503d10434db
+  device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_webrtc: b33475c3a57d59ff05bf87b4f5d3feceac63f291
   fluttertoast: e9a18c7be5413da53898f660530c56f35edfba9c

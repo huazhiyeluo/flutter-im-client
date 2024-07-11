@@ -10,7 +10,7 @@ class AudioPlayerManager {
 
   Future<void> playSound(String mp3) async {
     try {
-      await _audioPlayer.play(AssetSource('lib/assets/voices/${mp3}'), mode: PlayerMode.mediaPlayer);
+      await _audioPlayer.play(AssetSource('lib/assets/voices/$mp3'), mode: PlayerMode.mediaPlayer);
     } catch (e) {
       throw Exception('Failed to play sound: $e');
     }

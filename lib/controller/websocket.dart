@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:qim/controller/message.dart';
+import 'package:qim/utils/device_info.dart';
 import 'package:qim/utils/functions.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:async';
@@ -50,12 +53,13 @@ class WebSocketController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  void connect() {
+  Future<void> connect() async {
     logPrint("WebSocketController connect");
+    DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
 
     String url = "$serverUrl?uid=$uid";
-
-    _channel = IOWebSocketChannel.connect(Uri.parse(url));
+    Map<String, dynamic> headers = {HttpHeaders.cookieHeader: 'sessionKey=${deviceInfo.deviceId};'};
+    _channel = IOWebSocketChannel.connect(Uri.parse(url), headers: headers);
     _isConnected = true;
 
     _channel?.stream.listen((str) async {

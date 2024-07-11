@@ -10,7 +10,9 @@ import 'package:qim/controller/user.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedata.dart';
-import 'package:qim/utils/asset.dart';
+import 'package:qim/routes/route.dart';
+import 'package:qim/utils/device_info.dart';
+import 'package:qim/utils/play.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/functions.dart';
@@ -21,6 +23,7 @@ import 'tabs/contact.dart';
 import 'tabs/contact_bar.dart';
 import 'tabs/person.dart';
 import 'tabs/person_bar.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -75,8 +78,18 @@ class _HomeState extends State<Home> {
       if ([1, 2].contains(msg['msgType']) || ([4].contains(msg['msgType']) && [0].contains(msg['msgMedia']))) {
         joinData(uid, msg, audioPlayerManager: _audioPlayerManager);
       }
-
       if ([3].contains(msg['msgType'])) {
+        if (msg['msgMedia'] == 10) {
+          TipHelper.instance.showToast("你的账号在另外一台设备上登录，请检查");
+          CacheHelper.remove(Keys.userInfo);
+          CacheHelper.remove(Keys.entryPage);
+          String initialRouteData = await initialRoute();
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            initialRouteData,
+            (route) => false,
+          );
+        }
         if (msg['msgMedia'] == 11) {
           Map item = {"uid": msg['fromId'], "isOnline": 1};
           userController.upsetUser(item);
