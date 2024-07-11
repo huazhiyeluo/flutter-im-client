@@ -174,7 +174,6 @@ class _ChatMessageState extends State<ChatMessage> {
       List messages = await DBHelper.getData('message', [
         ['toId', '=', uid]
       ]);
-      logPrint(messages);
       for (var item in messages) {
         Map<String, dynamic> modifiedItem = Map.from(item); // 复制到新的Map
         modifiedItem['content'] = jsonDecode(item['content']); // 修改新的Map中的内容
