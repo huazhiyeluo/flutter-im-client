@@ -6,6 +6,7 @@ import 'package:qim/api/common.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/user.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/pages/chat/talk/emoji_list.dart';
 import 'package:qim/pages/chat/talk/phone_from.dart';
@@ -35,6 +36,7 @@ class Talk extends StatefulWidget {
 
 class _TalkState extends State<Talk> {
   final TalkobjController talkobjController = Get.find();
+
   Map talkObj = {};
   @override
   void initState() {
@@ -108,6 +110,7 @@ class _TalkPageState extends State<TalkPage> {
   final WebSocketController webSocketController = Get.find();
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
+  final UserController userController = Get.find();
   final TextEditingController _inputController = TextEditingController();
 
   double keyboardHeight = 270.0;
@@ -510,7 +513,6 @@ class _TalkPageState extends State<TalkPage> {
   //邀请
   void _invite() async {
     if (_signaling != null) {
-      await _signaling?.onSendMsg!(uid, talkObj['objId'], 4, 0, "");
       _signaling?.invite(uid, talkObj['objId']);
     }
   }

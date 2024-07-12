@@ -8,7 +8,6 @@ import 'package:qim/controller/user.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:azlistview/azlistview.dart';
 import 'package:lpinyin/lpinyin.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/widget/custom_text_field.dart';
 
 class ChatModel extends ISuspensionBean {

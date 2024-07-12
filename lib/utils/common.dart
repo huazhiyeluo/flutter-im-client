@@ -37,6 +37,7 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
 
   if (msg['msgType'] == 4) {
     msg['msgType'] = 1;
+    msg['content'] = '{"data": "", "url": "", "name": ""}';
   }
   Map chatData = {};
   chatData['objId'] = objId;

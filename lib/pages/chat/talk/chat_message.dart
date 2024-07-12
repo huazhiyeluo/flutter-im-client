@@ -10,7 +10,6 @@ import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/db.dart';
-import 'package:qim/utils/functions.dart';
 
 class ChatMessage extends StatefulWidget {
   const ChatMessage({
@@ -56,7 +55,10 @@ class _ChatMessageState extends State<ChatMessage> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final List<Map<dynamic, dynamic>> messageList = messageController.allUserMessages[key]!;
+      final RxList<Map>? messageList = messageController.allUserMessages[key];
+      if (messageList == null) {
+        return const Text("");
+      }
       return Container(
         color: Colors.grey[200], // 设置背景色
         child: ListView.builder(
@@ -164,7 +166,6 @@ class _ChatMessageState extends State<ChatMessage> {
     if (data['msgMedia'] == 5) {
       item = Image.network(data['content']['url']);
     }
-
     return item;
   }
 
