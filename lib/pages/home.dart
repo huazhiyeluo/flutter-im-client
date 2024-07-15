@@ -9,7 +9,7 @@ import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/getdbdata.dart';
-import 'package:qim/dbdata/savedata.dart';
+import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/routes/route.dart';
 import 'package:qim/utils/device_info.dart';
 import 'package:qim/utils/play.dart';
@@ -75,7 +75,7 @@ class _HomeState extends State<Home> {
     // 初始化 WebSocket 监听
     webSocketController.message.listen((msg) async {
       // 1、私聊和群聊消息到数据库  2、加入chat列表|保存chat数据到  3、obj对象
-      if ([1, 2].contains(msg['msgType']) || ([4].contains(msg['msgType']) && [4].contains(msg['msgMedia']))) {
+      if ([1, 2].contains(msg['msgType']) || ([4].contains(msg['msgType']) && [0].contains(msg['msgMedia']))) {
         joinData(uid, msg, audioPlayerManager: _audioPlayerManager);
       }
       if ([3].contains(msg['msgType'])) {
@@ -104,7 +104,7 @@ class _HomeState extends State<Home> {
       }
 
       //设置当前聊天Obj
-      if ([4].contains(msg['msgType']) && msg['msgMedia'] == 4) {
+      if ([4].contains(msg['msgType']) && msg['msgMedia'] == 0) {
         Map<String, dynamic>? objUser = await getDbOneUser(msg['fromId']);
         if (objUser == null) {
           return;
@@ -120,7 +120,7 @@ class _HomeState extends State<Home> {
         };
         talkobjController.setTalkObj(talkobj);
         //收到语音通话 - 请求
-        Get.toNamed('/talk', parameters: {'ttype': "2"});
+        Get.toNamed('/talk');
       }
     });
   }

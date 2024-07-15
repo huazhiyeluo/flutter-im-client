@@ -5,9 +5,10 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/dbdata/deldbdata.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/db.dart';
-import 'package:qim/dbdata/savedata.dart';
+import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/widget/custom_text_field.dart';
 
 class Chat extends StatefulWidget {
@@ -69,23 +70,39 @@ class _ChatPageState extends State<ChatPage> {
         itemCount: chatController.allChats.length,
         itemBuilder: (BuildContext context, int index) {
           var temp = chatController.allChats[index];
+          double extentRatioTop = 2.0;
+          String textTop = "置顶";
+          int flexTop = 3;
+          if (temp['weight'] == 1) {
+            extentRatioTop = 2.2;
+            textTop = '取消置顶';
+            flexTop = 4;
+          }
+
           return Slidable(
             key: const ValueKey(0),
             useTextDirection: false,
             endActionPane: ActionPane(
               motion: const ScrollMotion(),
-              extentRatio: 2 / 3,
+              extentRatio: extentRatioTop / 3,
               children: [
                 CustomSlidableAction(
-                  flex: 3,
-                  onPressed: (slidCtx) {},
+                  flex: flexTop,
+                  onPressed: (slidCtx) {
+                    Map chatData = {};
+                    chatData['objId'] = temp['objId'];
+                    chatData['type'] = temp['type'];
+                    chatData['weight'] = 1 - temp['weight'];
+                    chatController.upsetChat(chatData);
+                    saveDbChat(chatData);
+                  },
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center, // 水平居中对齐
                     children: [
                       Text(
-                        '置顶',
+                        textTop,
                         textDirection: TextDirection.ltr,
                         textAlign: TextAlign.center,
                       )
@@ -94,7 +111,14 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 CustomSlidableAction(
                   flex: 4,
-                  onPressed: (slidCtx) {},
+                  onPressed: (slidCtx) {
+                    Map chatData = {};
+                    chatData['objId'] = temp['objId'];
+                    chatData['type'] = temp['type'];
+                    chatData['tips'] = 0;
+                    chatController.upsetChat(chatData);
+                    saveDbChat(chatData);
+                  },
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
                   child: const Row(
@@ -110,7 +134,10 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 CustomSlidableAction(
                   flex: 3,
-                  onPressed: (slidCtx) {},
+                  onPressed: (slidCtx) {
+                    chatController.delChat(temp['objId'], temp['type']);
+                    delDbChat(temp['objId'], temp['type']);
+                  },
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
                   child: const Row(

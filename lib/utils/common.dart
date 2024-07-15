@@ -4,9 +4,10 @@ import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/dbdata/getdbdata.dart';
-import 'package:qim/dbdata/savedata.dart';
+import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/play.dart';
 import 'package:qim/utils/cache.dart';
+import 'package:mime/mime.dart';
 
 String getKey({int msgType = 1, int fromId = 1, int toId = 1}) {
   String key = '';
@@ -37,7 +38,6 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
 
   if (msg['msgType'] == 4) {
     msg['msgType'] = 1;
-    msg['content'] = '{"data": "", "url": "", "name": ""}';
   }
   Map chatData = {};
   chatData['objId'] = objId;
@@ -69,11 +69,13 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
       chatData['remark'] = objGroup['remark'];
       chatData['icon'] = objGroup['icon'];
     }
+    chatData['weight'] = 0;
   } else {
     chatData['name'] = lastChat['name'];
     chatData['info'] = lastChat['info'];
     chatData['remark'] = lastChat['remark'];
     chatData['icon'] = lastChat['icon'];
+    chatData['weight'] = lastChat['weight'];
   }
 
   final TalkobjController talkobjController = Get.put(TalkobjController());
@@ -101,4 +103,9 @@ Future<void> joinMessage(int uid, Map temp) async {
   }
   messageController.addMessage(msg);
   saveDbMessage(msg);
+}
+
+bool isImageFile(String path) {
+  final mimeType = lookupMimeType(path);
+  return mimeType != null && mimeType.startsWith('image/');
 }

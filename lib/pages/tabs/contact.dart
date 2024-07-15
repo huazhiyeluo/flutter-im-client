@@ -55,7 +55,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
           return [
             SliverAppBar(
               pinned: false,
-              expandedHeight: 150,
+              expandedHeight: 160,
               flexibleSpace: FlexibleSpaceBar(
                 background: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -75,7 +75,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     Container(
-                      height: 40,
+                      height: 45,
                       padding: EdgeInsets.zero,
                       margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                       child: InkWell(
@@ -101,7 +101,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     Container(
-                      height: 40,
+                      height: 45,
                       padding: EdgeInsets.zero,
                       margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                       child: InkWell(

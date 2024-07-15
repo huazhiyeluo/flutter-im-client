@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qim/api/common.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/message.dart';
@@ -21,11 +22,12 @@ import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/permission.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:qim/pages/chat/talk/chat_message.dart';
-import 'package:image/image.dart' as img;
 import 'package:extended_text_field/extended_text_field.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart' as imgcompress;
 
 class Talk extends StatefulWidget {
   const Talk({super.key});
@@ -136,13 +138,6 @@ class _TalkPageState extends State<TalkPage> {
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
-
-    ttype = Get.arguments != null ? Get.arguments['type'] : 0;
-    if (ttype == 2) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _dialogUI(2);
-      });
-    }
 
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
@@ -466,7 +461,7 @@ class _TalkPageState extends State<TalkPage> {
     }
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
-      File compressedFile = await _compressImage(File(pickedFile.path));
+      XFile compressedFile = await _compressImage(pickedFile);
       dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) {
         setState(() {
@@ -489,7 +484,7 @@ class _TalkPageState extends State<TalkPage> {
 
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      File compressedFile = await _compressImage(File(pickedFile.path));
+      XFile compressedFile = await _compressImage(pickedFile);
       dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) {
         setState(() {
@@ -501,11 +496,20 @@ class _TalkPageState extends State<TalkPage> {
     } else {}
   }
 
-  Future<File> _compressImage(File file) async {
-    // 使用 image 包进行压缩
-    img.Image? image = img.decodeImage(await file.readAsBytes());
-    img.Image resizedImage = img.copyResize(image!, width: 800); // 调整尺寸为宽度800
-    return File(file.path)..writeAsBytesSync(img.encodeJpg(resizedImage, quality: 65)); // JPEG 格式，85% 质量
+  Future<XFile> _compressImage(XFile pickedFile) async {
+    final dir = await getTemporaryDirectory();
+
+    String fileName = pickedFile.name;
+    String fileExtension = fileName.split('.').last;
+
+    final targetPath = '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+
+    final result = await imgcompress.FlutterImageCompress.compressAndGetFile(
+      File(pickedFile.path).absolute.path,
+      targetPath,
+      quality: 70,
+    );
+    return result ?? pickedFile;
   }
 
   //----------------------------------------------------------------通话----------------------------------------------------------------

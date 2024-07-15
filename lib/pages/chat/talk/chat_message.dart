@@ -10,6 +10,9 @@ import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/db.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:qim/utils/functions.dart';
 
 class ChatMessage extends StatefulWidget {
   const ChatMessage({
@@ -82,7 +85,9 @@ class _ChatMessageState extends State<ChatMessage> {
                         maxWidth: MediaQuery.of(context).size.width * 0.6,
                       ),
                       decoration: BoxDecoration(
-                        color: isSentByMe ? const Color.fromARGB(255, 169, 234, 122) : Colors.white,
+                        color: isSentByMe
+                            ? const Color.fromARGB(20, 169, 234, 122)
+                            : const Color.fromARGB(20, 255, 255, 255),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
@@ -151,7 +156,7 @@ class _ChatMessageState extends State<ChatMessage> {
     }
     if ([12].contains(data['msgMedia'])) {
       item = Text(
-        formatSecondsToHMS(int.parse(data['content']['data'])),
+        "通话时长：${formatSecondsToHMS(int.parse(data['content']['data']))}",
         style: TextStyle(
           fontSize: 16,
           color: isSentByMe ? Colors.black54 : Colors.black54,
@@ -164,7 +169,43 @@ class _ChatMessageState extends State<ChatMessage> {
       item = Image.asset(data['content']['url']);
     }
     if (data['msgMedia'] == 5) {
-      item = Image.network(data['content']['url']);
+      if (isImageFile(data['content']['url'])) {
+        item = GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (BuildContext context) {
+                return Scaffold(
+                  body: SizedBox.expand(
+                    child: PhotoView(
+                      imageProvider: CachedNetworkImageProvider(
+                        data['content']['url'],
+                      ),
+                      minScale: PhotoViewComputedScale.contained,
+                      maxScale: 3.0,
+                      initialScale: PhotoViewComputedScale.contained,
+                      enableRotation: true,
+                      onTapUp: (c, f, s) => Navigator.of(context).pop(),
+                      loadingBuilder: (context, event) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorBuilder: (context, error, stackTrace) => const Center(
+                        child: Icon(Icons.error),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ));
+          },
+          child: CachedNetworkImage(
+            imageUrl: data['content']['url'],
+            placeholder: (context, url) => const CircularProgressIndicator(),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          ),
+        );
+      } else {
+        // item = Image.network(data['content']['url']);
+      }
     }
     return item;
   }
@@ -172,9 +213,31 @@ class _ChatMessageState extends State<ChatMessage> {
   Future<void> _getMessageList() async {
     final messagesList = messageController.allUserMessages[key];
     if (messagesList == null || messagesList.isEmpty) {
-      List messages = await DBHelper.getData('message', [
-        ['toId', '=', uid]
-      ]);
+      List messages = [];
+
+      if (talkObj['type'] == 1) {
+        List messages1 = await DBHelper.getData('message', [
+          ['msgType', '=', talkObj['type']],
+          ['toId', '=', talkObj['objId']],
+          ['fromId', '=', uid]
+        ]);
+        List messages2 = await DBHelper.getData('message', [
+          ['msgType', '=', talkObj['type']],
+          ['toId', '=', uid],
+          ['fromId', '=', talkObj['objId']]
+        ]);
+
+        messages = [...messages1, ...messages2];
+        messages.sort((a, b) => a['createTime'].compareTo(b['createTime']));
+      }
+
+      if (talkObj['type'] == 2) {
+        messages = await DBHelper.getData('message', [
+          ['msgType', '=', talkObj['type']],
+          ['toId', '=', talkObj['objId']]
+        ]);
+      }
+
       for (var item in messages) {
         Map<String, dynamic> modifiedItem = Map.from(item); // 复制到新的Map
         modifiedItem['content'] = jsonDecode(item['content']); // 修改新的Map中的内容

@@ -23,47 +23,26 @@ class ChatController extends GetxController {
       // 否则，将数据添加到列表中
       allChats.add(chat);
     }
+
+    allChats.sort((a, b) {
+      int compareWeight = b['weight'].compareTo(a['weight']);
+      if (compareWeight != 0) {
+        return compareWeight;
+      } else {
+        return b['operateTime'].compareTo(a['operateTime']);
+      }
+    });
+
     update();
   }
 
-  // [{"field":'', value:"1", opt:0}]
-  void upsetOptChat(int objId, int type, List<Map<String, dynamic>> chatList) {
-    // 查找是否已经存在相同的数据
+  void delChat(int objId, int type) {
     final existingChatIndex = allChats.indexWhere((c) => c['objId'] == objId && c['type'] == type);
 
     if (existingChatIndex != -1) {
-      // 如果已经存在相同的数据，则更新对应字段的值
-      final existingChat = allChats[existingChatIndex];
-      for (var chat in chatList) {
-        final field = chat['field'];
-        final value = chat['value'];
-        final opt = chat['opt'];
-
-        if (existingChat.containsKey(field)) {
-          if (opt == 0 && value is num && existingChat[field] is num) {
-            existingChat[field] += value;
-          } else if (opt == 1 && value is num && existingChat[field] is num) {
-            existingChat[field] -= value;
-          } else {
-            existingChat[field] = value;
-          }
-        } else {
-          existingChat[field] = value;
-        }
-      }
-      allChats[existingChatIndex] = existingChat;
-    } else {
-      // 否则，将数据添加到列表中
-      final newChat = {
-        'objId': objId,
-        'type': type,
-      };
-      for (var chat in chatList) {
-        newChat[chat['field']] = chat['value'];
-      }
-      allChats.add(newChat);
+      allChats.removeAt(existingChatIndex);
+      update();
     }
-    update();
   }
 
   Map? getOneChat(int objId, int type) {
