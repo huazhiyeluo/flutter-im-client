@@ -12,7 +12,9 @@ import 'package:qim/utils/date.dart';
 import 'package:qim/utils/db.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:qim/utils/functions.dart';
+import 'package:qim/widget/play_audio.dart';
+import 'package:qim/widget/play_video.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatMessage extends StatefulWidget {
   const ChatMessage({
@@ -143,7 +145,7 @@ class _ChatMessageState extends State<ChatMessage> {
 
   Widget _getContent(bool isSentByMe, Map data) {
     Widget item = const Text("");
-    if ([1, 10, 11, 12, 13].contains(data['msgMedia'])) {
+    if ([1, 10, 11, 13].contains(data['msgMedia'])) {
       item = Text(
         '${data['content']['data'] ?? ''}',
         style: TextStyle(
@@ -168,7 +170,7 @@ class _ChatMessageState extends State<ChatMessage> {
     if (data['msgMedia'] == 6) {
       item = Image.asset(data['content']['url']);
     }
-    if (data['msgMedia'] == 5) {
+    if (data['msgMedia'] == 2) {
       if (isImageFile(data['content']['url'])) {
         item = GestureDetector(
           onTap: () {
@@ -207,7 +209,39 @@ class _ChatMessageState extends State<ChatMessage> {
         // item = Image.network(data['content']['url']);
       }
     }
+    if (data['msgMedia'] == 3) {
+      item = PlayAudio(data['content']['url']);
+    }
+    if (data['msgMedia'] == 4) {
+      item = PlayVideo(data['content']['url']);
+    }
+
+    if (data['msgMedia'] == 5) {
+      item = InkWell(
+        onTap: () {
+          _launchUrl(data['content']['url']);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            data['content']['name'],
+            style: const TextStyle(
+              fontSize: 18,
+              color: Colors.blue,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+      );
+    }
+
     return item;
+  }
+
+  Future<void> _launchUrl(String url) async {
+    if (!await launchUrl(Uri.parse(url))) {
+      throw Exception('Could not launch $url');
+    }
   }
 
   Future<void> _getMessageList() async {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
@@ -36,42 +37,27 @@ class GroupPage extends StatefulWidget {
 
 class _GroupPageState extends State<GroupPage> {
   final TalkobjController talkobjController = Get.find();
+  final GroupController groupController = Get.find();
 
   int uid = 0;
   Map userInfo = {};
+
   Map talkObj = {};
+  Map groupObj = {};
 
   List _groupUsers = [];
-  Map _groupInfo = {
-    "groupId": 0,
-    "ownerUid": 0,
-    "name": "",
-    "icon": "https://im.guiaihai.com/static/images/6d6c0e2553734c6c43b54405c9bbf90f.jpg",
-    "info": "",
-    "num": 0,
-    "exp": 0,
-    "createTime": 0,
-    "groupPower": 0,
-    "level": 0,
-    "remark": "",
-    "nickname": "",
-    "isTop": 0,
-    "isHidden": 0,
-    "isQuiet": 0,
-    "joinTime": 0
-  };
 
   @override
   void initState() {
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
+    groupObj = groupController.getOneGroup(talkObj['objId'])!;
     _fetchData();
     super.initState();
   }
 
   void _fetchData() async {
-    await _getGroupInfo();
     await _getGroupUser();
   }
 
@@ -80,10 +66,10 @@ class _GroupPageState extends State<GroupPage> {
     return ListView(
       children: [
         ListTile(
-          title: Text(_groupInfo['name'] ?? ''),
-          subtitle: Text(_groupInfo['info'] ?? ''),
+          title: Text(groupObj['name'] ?? ''),
+          subtitle: Text(groupObj['info'] ?? ''),
           leading: CircleAvatar(
-            backgroundImage: NetworkImage(_groupInfo['icon'] ?? ''),
+            backgroundImage: NetworkImage(groupObj['icon'] ?? ''),
           ),
           trailing: const Icon(
             Icons.chevron_right,
@@ -111,17 +97,17 @@ class _GroupPageState extends State<GroupPage> {
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: GridView.builder(
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(), // 禁止滚动
+            physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 5, // 设置每行显示的列数
-              crossAxisSpacing: 10.0, // 列之间的间距
-              mainAxisSpacing: 10.0, // 行之间的间距
-              childAspectRatio: 1.0, // 宽高比
+              crossAxisCount: 5,
+              crossAxisSpacing: 10.0,
+              mainAxisSpacing: 10.0,
+              childAspectRatio: 1.0,
             ),
             itemCount: _groupUsers.length > 15 ? 15 : _groupUsers.length,
             itemBuilder: (BuildContext context, int index) {
               return Container(
-                height: 90, // 固定高度，使得内容可以完全显示
+                height: 90,
                 alignment: Alignment.center,
                 child: Column(
                   children: [
@@ -147,7 +133,7 @@ class _GroupPageState extends State<GroupPage> {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_groupInfo['name'] ?? ''),
+              Text(groupObj['name'] ?? ''),
               const Icon(Icons.chevron_right),
             ],
           ),
@@ -162,7 +148,7 @@ class _GroupPageState extends State<GroupPage> {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${_groupInfo['groupId']}'),
+              Text('${groupObj['groupId']}'),
               const Icon(Icons.chevron_right),
             ],
           ),
@@ -174,7 +160,7 @@ class _GroupPageState extends State<GroupPage> {
         ),
         ListTile(
           title: const Text("群公告"),
-          subtitle: Text(_groupInfo['info'] ?? ''),
+          subtitle: Text(groupObj['info'] ?? ''),
           trailing: const Icon(
             Icons.chevron_right,
           ),
@@ -189,7 +175,7 @@ class _GroupPageState extends State<GroupPage> {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_groupInfo['nickname'] == null || _groupInfo['nickname'] == "" ? '未设置' : _groupInfo['nickname']),
+              Text(groupObj['nickname'] == null || groupObj['nickname'] == "" ? '未设置' : groupObj['nickname']),
               const Icon(Icons.chevron_right),
             ],
           ),
@@ -204,7 +190,7 @@ class _GroupPageState extends State<GroupPage> {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_groupInfo['remark'] == null || _groupInfo['remark'] == "" ? '未设置' : _groupInfo['remark']),
+              Text(groupObj['remark'] == null || groupObj['remark'] == "" ? '未设置' : groupObj['remark']),
               const Icon(Icons.chevron_right),
             ],
           ),
@@ -233,7 +219,7 @@ class _GroupPageState extends State<GroupPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("设为置顶"),
           trailing: Switch(
-            value: _groupInfo['isTop'] == 1 ? true : false,
+            value: groupObj['isTop'] == 1 ? true : false,
             onChanged: (bool value) {},
           ),
         ),
@@ -245,7 +231,7 @@ class _GroupPageState extends State<GroupPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("隐藏会话"),
           trailing: Switch(
-            value: _groupInfo['isHidden'] == 1 ? true : false,
+            value: groupObj['isHidden'] == 1 ? true : false,
             onChanged: (bool value) {},
           ),
         ),
@@ -257,7 +243,7 @@ class _GroupPageState extends State<GroupPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("消息免打扰"),
           trailing: Switch(
-            value: _groupInfo['isQuiet'] == 1 ? true : false,
+            value: groupObj['isQuiet'] == 1 ? true : false,
             onChanged: (bool value) {},
           ),
         ),
@@ -305,20 +291,6 @@ class _GroupPageState extends State<GroupPage> {
     ContactApi.getGroupUser(params, onSuccess: (res) {
       setState(() {
         _groupUsers = res['data'];
-      });
-    }, onError: (res) {
-      TipHelper.instance.showToast(res['msg']);
-    });
-  }
-
-  Future<void> _getGroupInfo() async {
-    var params = {
-      'fromId': uid,
-      'toId': talkObj['objId'],
-    };
-    ContactApi.getGroupOne(params, onSuccess: (res) {
-      setState(() {
-        _groupInfo = res['data'];
       });
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);

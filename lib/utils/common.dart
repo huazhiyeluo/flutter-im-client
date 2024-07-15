@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
+import 'package:qim/controller/group.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/user.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/play.dart';
@@ -108,4 +110,20 @@ Future<void> joinMessage(int uid, Map temp) async {
 bool isImageFile(String path) {
   final mimeType = lookupMimeType(path);
   return mimeType != null && mimeType.startsWith('image/');
+}
+
+Map getTalkCommonObj(Map talkObj) {
+  Map talkCommonObj = {};
+  if (talkObj['type'] == 1) {
+    final UserController userController = Get.find();
+    Map? user = userController.getOneUser(talkObj['objId']);
+    talkCommonObj['icon'] = user?['avatar'];
+    talkCommonObj['name'] = user?['username'];
+  } else if (talkObj['type'] == 2) {
+    final GroupController groupController = Get.find();
+    Map? group = groupController.getOneGroup(talkObj['objId']);
+    talkCommonObj['icon'] = group?['icon'];
+    talkCommonObj['name'] = group?['name'];
+  }
+  return talkCommonObj;
 }

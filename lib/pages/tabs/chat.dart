@@ -180,16 +180,12 @@ class _ChatPageState extends State<ChatPage> {
                 Map talkobj = {
                   "objId": temp["objId"],
                   "type": temp["type"],
-                  "name": temp["name"],
-                  "icon": temp["icon"],
-                  "info": temp["info"],
-                  "remark": temp["remark"],
                 };
                 talkobjController.setTalkObj(talkobj);
 
                 Map chatData = {};
-                chatData['objId'] = talkobj['objId'];
-                chatData['type'] = talkobj['type'];
+                chatData['objId'] = temp["objId"];
+                chatData['type'] = temp["type"];
                 chatData['tips'] = 0;
                 chatController.upsetChat(chatData);
                 saveDbChat(chatData);
@@ -224,6 +220,18 @@ class _ChatPageState extends State<ChatPage> {
     }
     if (msgMedia == 6) {
       return "[表情]";
+    }
+
+    if (msgMedia == 2) {
+      return "[图片]";
+    }
+
+    if (msgMedia == 3) {
+      return "[音频]";
+    }
+
+    if (msgMedia == 4) {
+      return "[视频]";
     }
 
     if (msgMedia == 5) {

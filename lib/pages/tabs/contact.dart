@@ -245,31 +245,26 @@ class _ContactPageState extends State<ContactPage> {
             data: _firendArr,
             itemCount: _firendArr.length,
             itemBuilder: (context, index) {
+              ChatModel itemFriend = _firendArr[index];
               return Column(
                 children: [
                   SizedBox(
                     height: 70,
                     child: ListTile(
                       leading: CircleAvatar(
-                        // 聊天对象的头像
                         radius: 20,
-                        backgroundImage: NetworkImage(_firendArr[index].icon!),
+                        backgroundImage: NetworkImage(itemFriend.icon!),
                       ),
-                      title:
-                          Text('${_firendArr[index].remark != "" ? _firendArr[index].remark : _firendArr[index].name}'),
+                      title: Text('${itemFriend.remark != "" ? itemFriend.remark : itemFriend.name}'),
                       subtitle: Text(
-                        "[${_firendArr[index].isOnline == 1 ? '在线' : '离线'}] ${_firendArr[index].info}",
+                        "[${itemFriend.isOnline == 1 ? '在线' : '离线'}] ${itemFriend.info}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       onTap: () {
                         Map talkobj = {
-                          "objId": _firendArr[index].uid,
+                          "objId": itemFriend.uid,
                           "type": 1,
-                          "name": _firendArr[index].name,
-                          "icon": _firendArr[index].icon,
-                          "info": _firendArr[index].info,
-                          "remark": _firendArr[index].remark != "" ? _firendArr[index].remark : _firendArr[index].name,
                         };
                         talkobjController.setTalkObj(talkobj);
                         Navigator.pushNamed(
@@ -351,7 +346,7 @@ class _ContactPageState extends State<ContactPage> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: _contactGroupArr[index]['children'].length,
                   itemBuilder: (BuildContext context, int indexc) {
-                    var ctemp = _contactGroupArr[index]['children'][indexc];
+                    Map itemFriend = _contactGroupArr[index]['children'][indexc];
                     return Padding(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       child: Column(
@@ -359,22 +354,18 @@ class _ContactPageState extends State<ContactPage> {
                           ListTile(
                             leading: CircleAvatar(
                               radius: 20,
-                              backgroundImage: NetworkImage(ctemp['avatar']),
+                              backgroundImage: NetworkImage(itemFriend['avatar']),
                             ),
-                            title: Text(ctemp['remark'] != "" ? ctemp['remark'] : ctemp['username']),
+                            title: Text(itemFriend['remark'] != "" ? itemFriend['remark'] : itemFriend['username']),
                             subtitle: Text(
-                              "[${ctemp['isOnline'] == 1 ? '在线' : '离线'}] ${ctemp['info']}",
+                              "[${itemFriend['isOnline'] == 1 ? '在线' : '离线'}] ${itemFriend['info']}",
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             onTap: () {
                               Map talkobj = {
-                                "objId": ctemp['uid'],
+                                "objId": itemFriend['uid'],
                                 "type": 1,
-                                "name": ctemp['username'],
-                                "icon": ctemp['avatar'],
-                                "info": ctemp['info'],
-                                "remark": ctemp['remark'] != "" ? ctemp['remark'] : ctemp['username'],
                               };
                               talkobjController.setTalkObj(talkobj);
                               Navigator.pushNamed(
@@ -397,28 +388,25 @@ class _ContactPageState extends State<ContactPage> {
       ListView.builder(
         itemCount: _groupArr.length,
         itemBuilder: (BuildContext context, int index) {
+          Map itemGroup = _groupArr[index];
           return Padding(
             padding: const EdgeInsets.fromLTRB(5, 0, 10, 0),
             child: Column(children: [
               ListTile(
                 leading: CircleAvatar(
                   radius: 20,
-                  backgroundImage: NetworkImage(_groupArr[index]['icon']),
+                  backgroundImage: NetworkImage(itemGroup['icon']),
                 ),
-                title: Text(_groupArr[index]['remark'] != "" ? _groupArr[index]['remark'] : _groupArr[index]['name']),
+                title: Text(itemGroup['remark'] != "" ? itemGroup['remark'] : itemGroup['name']),
                 subtitle: Text(
-                  _groupArr[index]['info'],
+                  itemGroup['info'],
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 onTap: () {
                   Map talkobj = {
-                    "objId": _groupArr[index]['groupId'],
+                    "objId": itemGroup['groupId'],
                     "type": 2,
-                    "name": _groupArr[index]['name'],
-                    "icon": _groupArr[index]['icon'],
-                    "info": _groupArr[index]['info'],
-                    "remark": _groupArr[index]['remark'] != "" ? _groupArr[index]['remark'] : _groupArr[index]['name'],
                   };
                   talkobjController.setTalkObj(talkobj);
                   Navigator.pushNamed(

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qim/api/common.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/group.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/user.dart';
@@ -38,12 +39,27 @@ class Talk extends StatefulWidget {
 
 class _TalkState extends State<Talk> {
   final TalkobjController talkobjController = Get.find();
+  final UserController userController = Get.find();
+  final GroupController groupController = Get.find();
 
   Map talkObj = {};
+
+  String iconObj = '';
+  String textObj = '';
+
   @override
   void initState() {
     super.initState();
     talkObj = talkobjController.talkObj;
+    if (talkObj['type'] == 1) {
+      Map? user = userController.getOneUser(talkObj['objId']);
+      iconObj = user?['avatar'];
+      textObj = user?['username'];
+    } else if (talkObj['type'] == 2) {
+      Map? group = groupController.getOneGroup(talkObj['objId']);
+      iconObj = group?['icon'];
+      textObj = "${group?['name']}(${group?['num']})";
+    }
   }
 
   @override
@@ -58,19 +74,15 @@ class _TalkState extends State<Talk> {
         ),
         title: Row(
           children: [
-            Obx(
-              () => CircleAvatar(
-                radius: 15,
-                backgroundImage: NetworkImage(talkObj['icon'] ?? ''),
-              ),
+            CircleAvatar(
+              radius: 15,
+              backgroundImage: NetworkImage(iconObj),
             ),
             const SizedBox(width: 8),
-            Obx(
-              () => Text(
-                talkObj['remark'] != '' ? talkObj['remark'] : talkObj['name'],
-                style: const TextStyle(
-                  fontSize: 20,
-                ),
+            Text(
+              textObj,
+              style: const TextStyle(
+                fontSize: 20,
               ),
             ),
           ],
@@ -119,6 +131,7 @@ class _TalkPageState extends State<TalkPage> {
   int uid = 0;
   Map userInfo = {};
   Map talkObj = {};
+  Map talkCommonObj = {};
   int isShowEmoji = 0;
   int isShowPlus = 0;
 
@@ -126,8 +139,6 @@ class _TalkPageState extends State<TalkPage> {
   final _remoteRenderer = webrtc.RTCVideoRenderer();
   Signaling? _signaling;
   Session? _session;
-
-  int ttype = 0;
 
   final FocusNode _focusNode = FocusNode();
 
@@ -138,6 +149,7 @@ class _TalkPageState extends State<TalkPage> {
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
+    talkCommonObj = getTalkCommonObj(talkObj);
 
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
@@ -258,6 +270,7 @@ class _TalkPageState extends State<TalkPage> {
               child: PlusList(
                 isShowPlus: isShowPlus,
                 keyboardHeight: keyboardHeight,
+                isneedphone: talkObj['type'] == 1,
                 onPlus: (int index) {
                   setState(() {
                     _pick(index);
@@ -366,7 +379,7 @@ class _TalkPageState extends State<TalkPage> {
 
   Widget _phoneTo(BuildContext context) {
     return PhoneTo(
-      talkObj: talkObj,
+      talkCommonObj: talkCommonObj,
       onPhoneCancel: () {
         Navigator.of(context).pop(false);
         _reject();
@@ -376,7 +389,7 @@ class _TalkPageState extends State<TalkPage> {
 
   Widget _phoneFrom(BuildContext context) {
     return PhoneFrom(
-      talkObj: talkObj,
+      talkCommonObj: talkCommonObj,
       onPhoneQuit: () {
         Navigator.of(context).pop(false);
       },
@@ -438,17 +451,23 @@ class _TalkPageState extends State<TalkPage> {
 
   //----------------------------------------------------------------文件处理----------------------------------------------------------------
 
-  Future<void> _pick(int index) async {
-    if (index == 0) {
-      _pickFile(5);
+  Future<void> _pick(int val) async {
+    if (val == 1) {
+      _pickPhoto(2);
     }
-    if (index == 1) {
-      _pickCamera(5);
+    if (val == 2) {
+      _pickCamera(2);
     }
-    if (index == 2) {
+    if (val == 3) {
       _invite();
     }
-    if (index == 3) {
+    if (val == 4) {
+      _pickFile(3);
+    }
+    if (val == 5) {
+      _pickFile(4);
+    }
+    if (val == 6) {
       _pickFile(5);
     }
   }
@@ -470,12 +489,10 @@ class _TalkPageState extends State<TalkPage> {
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
-    } else {
-      // User canceled the image picking
     }
   }
 
-  Future<void> _pickFile(int msgMedia) async {
+  Future<void> _pickPhoto(int msgMedia) async {
     var isGrantedStorage = await PermissionUtil.requestStoragePermission();
     if (!isGrantedStorage) {
       TipHelper.instance.showToast("未允许存储读写权限");
@@ -493,7 +510,39 @@ class _TalkPageState extends State<TalkPage> {
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
-    } else {}
+    }
+  }
+
+  Future<void> _pickFile(int msgMedia) async {
+    var isGrantedStorage = await PermissionUtil.requestStoragePermission();
+    if (!isGrantedStorage) {
+      TipHelper.instance.showToast("未允许存储读写权限");
+      return;
+    }
+
+    FilePickerResult? result;
+
+    if (msgMedia == 3) {
+      result = await FilePicker.platform.pickFiles(type: FileType.audio);
+    }
+    if (msgMedia == 4) {
+      result = await FilePicker.platform.pickFiles(type: FileType.video);
+    }
+    if (msgMedia == 5) {
+      result = await FilePicker.platform.pickFiles(type: FileType.image);
+    }
+
+    if (result != null) {
+      PlatformFile pickedFile = result.files.first;
+      dio.MultipartFile file = await dio.MultipartFile.fromFile(pickedFile.path!);
+      CommonApi.upload({'file': file}, onSuccess: (res) {
+        setState(() {
+          _sendFile(res['data'], msgMedia, pickedFile.name);
+        });
+      }, onError: (res) {
+        TipHelper.instance.showToast(res['msg']);
+      });
+    }
   }
 
   Future<XFile> _compressImage(XFile pickedFile) async {
@@ -620,7 +669,6 @@ class _TalkPageState extends State<TalkPage> {
         'msgMedia': msgMedia,
       };
       webSocketController.sendMessage(msg);
-
       if (msgType == 1) {
         msg['createTime'] = getTime();
         joinData(fromId, msg);

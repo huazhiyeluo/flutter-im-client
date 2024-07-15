@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:qim/widget/custom_button.dart';
 
 class PhoneTo extends StatefulWidget {
-  final Map talkObj;
+  final Map talkCommonObj;
   final Function onPhoneCancel;
 
-  const PhoneTo({super.key, required this.talkObj, required this.onPhoneCancel});
+  const PhoneTo({super.key, required this.talkCommonObj, required this.onPhoneCancel});
 
   @override
   State<PhoneTo> createState() => _PhoneToState();
@@ -23,7 +23,7 @@ class _PhoneToState extends State<PhoneTo> {
           CircleAvatar(
             radius: 80,
             backgroundImage: NetworkImage(
-              widget.talkObj['icon'],
+              widget.talkCommonObj['icon'],
               scale: 1,
             ),
           ),
@@ -31,7 +31,7 @@ class _PhoneToState extends State<PhoneTo> {
             height: 20,
           ),
           Text(
-            widget.talkObj['name'],
+            widget.talkCommonObj['name'],
             style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(

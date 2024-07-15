@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/user.dart';
 import 'package:qim/widget/custom_button.dart';
 
 class User extends StatefulWidget {
@@ -32,15 +33,26 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   final TalkobjController talkobjController = Get.find();
+  final UserController userController = Get.find();
+
+  Map talkObj = {};
+  Map userObj = {};
+
+  @override
+  void initState() {
+    talkObj = talkobjController.talkObj;
+    userObj = userController.getOneUser(talkObj['objId'])!;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Map? talkObj = talkobjController.talkObj;
     return ListView(
       children: [
         ListTile(
-          title: Text(talkObj['name'] ?? ''),
+          title: Text(userObj['username'] ?? ''),
           leading: CircleAvatar(
-            backgroundImage: NetworkImage(talkObj['icon'] ?? ''),
+            backgroundImage: NetworkImage(userObj['avatar'] ?? ''),
           ),
           trailing: const Icon(
             Icons.chevron_right,
@@ -103,7 +115,7 @@ class _UserPageState extends State<UserPage> {
           child: const Divider(),
         ),
         const ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
+          contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: Text("删除聊天记录"),
         ),
         Container(

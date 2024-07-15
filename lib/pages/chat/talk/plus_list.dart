@@ -3,21 +3,40 @@ import 'package:flutter/material.dart';
 class PlusList extends StatefulWidget {
   final int isShowPlus;
   final double keyboardHeight;
+  final bool isneedphone;
   final Function(int) onPlus;
 
-  const PlusList({super.key, required this.isShowPlus, required this.keyboardHeight, required this.onPlus});
+  const PlusList({
+    super.key,
+    required this.isShowPlus,
+    required this.keyboardHeight,
+    required this.isneedphone,
+    required this.onPlus,
+  });
 
   @override
   State<PlusList> createState() => _PlusListState();
 }
 
 class _PlusListState extends State<PlusList> {
-  final List<IconData> icons = [
-    Icons.image,
-    Icons.camera_alt,
-    Icons.call,
-    Icons.folder,
+  final List<Map<String, dynamic>> icons = [
+    {"val": 1, "icon": Icons.image},
+    {"val": 2, "icon": Icons.camera_alt},
+    {"val": 4, "icon": Icons.audio_file},
+    {"val": 5, "icon": Icons.videocam},
+    {"val": 6, "icon": Icons.folder},
   ];
+
+  @override
+  void initState() {
+    if (widget.isneedphone) {
+      icons.add({"val": 3, "icon": Icons.call});
+      icons.sort((a, b) {
+        return a['val'].compareTo(b['val']);
+      });
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +56,9 @@ class _PlusListState extends State<PlusList> {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              widget.onPlus(index);
+              widget.onPlus(icons[index]['val']);
             },
-            child: Icon(icons[index], size: 56),
+            child: Icon(icons[index]['icon'], size: 56),
           );
         },
       ),
