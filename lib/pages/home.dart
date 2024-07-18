@@ -200,7 +200,7 @@ class _HomeState extends State<Home> {
 
   void _getContactGroupList() async {
     var params = {"ownUid": uid};
-    ContactApi.getFriendGroup(params, onSuccess: (res) {
+    ContactApi.getContactFriendGroup(params, onSuccess: (res) {
       if (!mounted) return;
       List contactGroupArr = [];
       if (res['data'] != null) {
@@ -223,7 +223,7 @@ class _HomeState extends State<Home> {
     var params = {
       'fromId': uid,
     };
-    ContactApi.getFriendList(params, onSuccess: (res) {
+    ContactApi.getContactFriendList(params, onSuccess: (res) {
       if (!mounted) return;
       List friendArr = [];
       if (res['data'] != null) {
@@ -242,7 +242,7 @@ class _HomeState extends State<Home> {
     var params = {
       'fromId': uid,
     };
-    ContactApi.getGroupList(params, onSuccess: (res) {
+    ContactApi.getContactGroupList(params, onSuccess: (res) {
       if (!mounted) return;
       List groupArr = [];
       if (res['data'] != null) {

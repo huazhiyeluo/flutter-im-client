@@ -2,54 +2,54 @@ import 'package:qim/common/apis.dart';
 import 'package:qim/utils/request.dart';
 
 class ContactApi {
-  static void getFriendList(params, {Function? onSuccess, Function? onError}) {
+  static void actContactFriend(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.getFriendList,
+      Apis.actContactFriend,
       data: params,
       onSuccess: onSuccess,
       onError: onError,
     );
   }
 
-  static void getFriendOne(params, {Function? onSuccess, Function? onError}) {
+  static void actContactGroup(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.getFriendOne,
+      Apis.actContactGroup,
       data: params,
       onSuccess: onSuccess,
       onError: onError,
     );
   }
 
-  static void getFriendGroup(params, {Function? onSuccess, Function? onError}) {
+  static void getContactFriendGroup(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.getFriendGroup,
+      Apis.getContactFriendGroup,
       data: params,
       onSuccess: onSuccess,
       onError: onError,
     );
   }
 
-  static void getGroupList(params, {Function? onSuccess, Function? onError}) {
+  static void getContactFriendList(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.getGroupList,
+      Apis.getContactFriendList,
       data: params,
       onSuccess: onSuccess,
       onError: onError,
     );
   }
 
-  static void getGroupOne(params, {Function? onSuccess, Function? onError}) {
+  static void getContactGroupList(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.getGroupOne,
+      Apis.getContactGroupList,
       data: params,
       onSuccess: onSuccess,
       onError: onError,
     );
   }
 
-  static void getGroupUser(params, {Function? onSuccess, Function? onError}) {
+  static void getContactGroupUser(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.getGroupUser,
+      Apis.getContactGroupUser,
       data: params,
       onSuccess: onSuccess,
       onError: onError,

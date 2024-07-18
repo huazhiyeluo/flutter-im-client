@@ -111,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(height: 20),
           CustomButton(
             onPressed: () {
-              loginAction();
+              _loginAction();
             },
             text: "登录",
             backgroundColor: Colors.blue,
@@ -151,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  loginAction() async {
+  _loginAction() async {
     var params = {'username': usernameController.text, 'password': passwordController.text};
     UserApi.login(params, onSuccess: (res) async {
       CacheHelper.saveData(Keys.userInfo, res['data']);

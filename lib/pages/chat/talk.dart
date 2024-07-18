@@ -63,6 +63,12 @@ class _TalkState extends State<Talk> {
   }
 
   @override
+  void dispose() {
+    talkobjController.setTalkObj({"objId": 0});
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -95,12 +101,12 @@ class _TalkState extends State<Talk> {
               if (talkObj['type'] == 1) {
                 Navigator.pushNamed(
                   context,
-                  '/user',
+                  '/user-setting-chat',
                 );
               } else if (talkObj['type'] == 2) {
                 Navigator.pushNamed(
                   context,
-                  '/group',
+                  '/group-setting',
                 );
               }
             },
@@ -160,6 +166,12 @@ class _TalkPageState extends State<TalkPage> {
 
     initRenderers();
     _connect(context);
+    if (Get.arguments != null) {
+      int actionType = Get.arguments['actionType'];
+      if (actionType == 1) {
+        _invite();
+      }
+    }
   }
 
   initRenderers() async {
@@ -175,15 +187,8 @@ class _TalkPageState extends State<TalkPage> {
     _signaling?.close();
     _localRenderer.dispose();
     _remoteRenderer.dispose();
-    setTalkOjb();
+    talkobjController.setTalkObj({"objId": 0});
     super.dispose();
-  }
-
-  void setTalkOjb() {
-    Map talkobj = {
-      "objId": 0,
-    };
-    talkobjController.setTalkObj(talkobj);
   }
 
   @override

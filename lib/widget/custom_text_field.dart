@@ -26,7 +26,7 @@ class CustomTextField extends StatelessWidget {
         minHeight: minHeight,
       ),
       child: TextField(
-        style: TextStyle(textBaseline: TextBaseline.alphabetic),
+        style: const TextStyle(textBaseline: TextBaseline.alphabetic),
         decoration: InputDecoration(
           hintText: hintText,
           contentPadding: const EdgeInsets.symmetric(

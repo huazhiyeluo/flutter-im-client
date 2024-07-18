@@ -266,10 +266,10 @@ class _ContactPageState extends State<ContactPage> {
                           "objId": itemFriend.uid,
                           "type": 1,
                         };
-                        talkobjController.setTalkObj(talkobj);
                         Navigator.pushNamed(
                           context,
-                          '/talk',
+                          '/user-detail',
+                          arguments: talkobj,
                         );
                       },
                     ),
@@ -367,10 +367,10 @@ class _ContactPageState extends State<ContactPage> {
                                 "objId": itemFriend['uid'],
                                 "type": 1,
                               };
-                              talkobjController.setTalkObj(talkobj);
                               Navigator.pushNamed(
                                 context,
-                                '/talk',
+                                '/user-detail',
+                                arguments: talkobj,
                               );
                             },
                           ),

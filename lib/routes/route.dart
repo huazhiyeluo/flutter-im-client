@@ -1,13 +1,16 @@
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/middleware/homeMiddleware.dart';
-import 'package:qim/pages/other/group.dart';
-import 'package:qim/pages/other/group_user.dart';
+import 'package:qim/pages/contact/group_setting.dart';
+import 'package:qim/pages/contact/group_user.dart';
 import 'package:qim/pages/chat/talk.dart';
-import 'package:qim/pages/other/notice_group.dart';
-import 'package:qim/pages/other/notice_user.dart';
-import 'package:qim/pages/other/notice_user_detail.dart';
-import 'package:qim/pages/other/user.dart';
+import 'package:qim/pages/contact/user_detail.dart';
+import 'package:qim/pages/contact/user_setting.dart';
+import 'package:qim/pages/contact/user_setting_remark.dart';
+import 'package:qim/pages/notice/notice_group.dart';
+import 'package:qim/pages/notice/notice_user.dart';
+import 'package:qim/pages/notice/notice_user_detail.dart';
+import 'package:qim/pages/contact/user_setting_chat.dart';
 import 'package:qim/pages/home.dart';
 import 'package:qim/pages/person/setting.dart';
 import 'package:qim/pages/search.dart';
@@ -31,8 +34,11 @@ class AppPage {
     GetPage(name: "/repasswd", page: () => const Repasswd()),
     GetPage(name: "/search", page: () => const Search()),
     GetPage(name: "/talk", page: () => const Talk()),
-    GetPage(name: "/user", page: () => const User()),
-    GetPage(name: "/group", page: () => const Group()),
+    GetPage(name: "/user-setting", page: () => const UserSetting()),
+    GetPage(name: "/user-setting-remark", page: () => const UserSettingRemark()),
+    GetPage(name: "/user-setting-chat", page: () => const UserSettingChat()),
+    GetPage(name: "/user-detail", page: () => const UserDetail()),
+    GetPage(name: "/group-setting", page: () => const Group()),
     GetPage(name: "/group-user", page: () => const GroupUser()),
     GetPage(name: "/notice-user", page: () => const NoticeUser()),
     GetPage(name: "/notice-user-detail", page: () => const NoticeUserDetail()),

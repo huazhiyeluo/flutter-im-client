@@ -4,14 +4,14 @@ import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/widget/custom_button.dart';
 
-class User extends StatefulWidget {
-  const User({super.key});
+class UserSettingChat extends StatefulWidget {
+  const UserSettingChat({super.key});
 
   @override
-  State<User> createState() => _UserState();
+  State<UserSettingChat> createState() => _UserSettingChatState();
 }
 
-class _UserState extends State<User> {
+class _UserSettingChatState extends State<UserSettingChat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,19 +19,19 @@ class _UserState extends State<User> {
         title: const Text("聊天设置"),
         backgroundColor: Colors.grey[100],
       ),
-      body: const UserPage(),
+      body: const UserSettingChatPage(),
     );
   }
 }
 
-class UserPage extends StatefulWidget {
-  const UserPage({super.key});
+class UserSettingChatPage extends StatefulWidget {
+  const UserSettingChatPage({super.key});
 
   @override
-  State<UserPage> createState() => _UserPageState();
+  State<UserSettingChatPage> createState() => _UserSettingChatPageState();
 }
 
-class _UserPageState extends State<UserPage> {
+class _UserSettingChatPageState extends State<UserSettingChatPage> {
   final TalkobjController talkobjController = Get.find();
   final UserController userController = Get.find();
 

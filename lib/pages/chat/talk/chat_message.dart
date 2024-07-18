@@ -84,7 +84,7 @@ class _ChatMessageState extends State<ChatMessage> {
                       padding: const EdgeInsets.all(5),
                       constraints: BoxConstraints(
                         minWidth: MediaQuery.of(context).size.width * 0.1,
-                        maxWidth: MediaQuery.of(context).size.width * 0.6,
+                        maxWidth: MediaQuery.of(context).size.width * 0.65,
                       ),
                       decoration: BoxDecoration(
                         color: isSentByMe

@@ -288,7 +288,7 @@ class _GroupPageState extends State<GroupPage> {
     var params = {
       'groupId': talkObj['objId'],
     };
-    ContactApi.getGroupUser(params, onSuccess: (res) {
+    ContactApi.getContactGroupUser(params, onSuccess: (res) {
       setState(() {
         _groupUsers = res['data'];
       });
