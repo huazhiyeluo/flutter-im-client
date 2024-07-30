@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact.dart';
+import 'package:qim/common/apis.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/contact_group.dart';
@@ -55,7 +56,8 @@ class _HomeState extends State<Home> {
 
     Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
     uid = userInfo == null ? "" : userInfo['uid'];
-    webSocketController = Get.put(WebSocketController(uid, 'ws://139.196.98.139:8081/chat'));
+
+    webSocketController = Get.put(WebSocketController(uid, Apis.socketUrl));
     _initOnReceive();
 
     _getContactGroupList();
