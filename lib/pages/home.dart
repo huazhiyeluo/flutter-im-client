@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/contact.dart';
+import 'package:qim/api/contact_friend.dart';
+import 'package:qim/api/contact_group.dart';
 import 'package:qim/common/apis.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
@@ -12,7 +13,6 @@ import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/routes/route.dart';
-import 'package:qim/utils/device_info.dart';
 import 'package:qim/utils/play.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
@@ -24,7 +24,6 @@ import 'tabs/contact.dart';
 import 'tabs/contact_bar.dart';
 import 'tabs/person.dart';
 import 'tabs/person_bar.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -202,7 +201,7 @@ class _HomeState extends State<Home> {
 
   void _getContactGroupList() async {
     var params = {"ownUid": uid};
-    ContactApi.getContactFriendGroup(params, onSuccess: (res) {
+    ContactFriendApi.getContactFriendGroup(params, onSuccess: (res) {
       if (!mounted) return;
       List contactGroupArr = [];
       if (res['data'] != null) {
@@ -225,7 +224,7 @@ class _HomeState extends State<Home> {
     var params = {
       'fromId': uid,
     };
-    ContactApi.getContactFriendList(params, onSuccess: (res) {
+    ContactFriendApi.getContactFriendList(params, onSuccess: (res) {
       if (!mounted) return;
       List friendArr = [];
       if (res['data'] != null) {
@@ -244,7 +243,7 @@ class _HomeState extends State<Home> {
     var params = {
       'fromId': uid,
     };
-    ContactApi.getContactGroupList(params, onSuccess: (res) {
+    ContactGroupApi.getContactGroupList(params, onSuccess: (res) {
       if (!mounted) return;
       List groupArr = [];
       if (res['data'] != null) {

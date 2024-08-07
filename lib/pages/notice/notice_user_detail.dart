@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qim/api/contact.dart';
+import 'package:qim/api/apply.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
@@ -152,7 +152,7 @@ class _NoticeUserDetailPageState extends State<NoticeUserDetailPage> {
       'uid': uid,
       'type': 1,
     };
-    ContactApi.getApplyList(params, onSuccess: (res) {
+    ApplyApi.getApplyList(params, onSuccess: (res) {
       setState(() {
         _applys = res['data'];
       });

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/api/login.dart';
 import 'package:qim/api/user.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/routes/route.dart';
@@ -153,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
 
   _loginAction() async {
     var params = {'username': usernameController.text, 'password': passwordController.text};
-    UserApi.login(params, onSuccess: (res) async {
+    LoginApi.login(params, onSuccess: (res) async {
       CacheHelper.saveData(Keys.userInfo, res['data']);
       String initialRouteData = await initialRoute();
       Get.offAndToNamed(initialRouteData);

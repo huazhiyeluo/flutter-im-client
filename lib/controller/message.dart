@@ -10,6 +10,14 @@ class MessageController extends GetxController {
     update();
   }
 
+  void delMessage(int msgType, int fromId, int toId) {
+    final key = getKey(msgType: msgType, fromId: fromId, toId: toId);
+    if (allUserMessages.containsKey(key)) {
+      allUserMessages[key]?.clear();
+      update();
+    }
+  }
+
   // 获取指定用户的消息列表
   RxList<Map> getMessages(String key) {
     return allUserMessages[key] ?? <Map>[].obs;

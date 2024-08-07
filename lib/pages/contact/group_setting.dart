@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/contact.dart';
+import 'package:qim/api/contact_group.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
@@ -288,7 +288,7 @@ class _GroupPageState extends State<GroupPage> {
     var params = {
       'groupId': talkObj['objId'],
     };
-    ContactApi.getContactGroupUser(params, onSuccess: (res) {
+    ContactGroupApi.getContactGroupUser(params, onSuccess: (res) {
       setState(() {
         _groupUsers = res['data'];
       });

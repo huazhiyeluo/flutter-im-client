@@ -1,19 +1,19 @@
 import 'package:qim/common/apis.dart';
 import 'package:qim/utils/request.dart';
 
-class UserApi {
-  static void editUser(params, {Function? onSuccess, Function? onError}) {
+class ApplyApi {
+  static void getApplyList(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.editUser,
+      Apis.getApplyList,
       data: params,
       onSuccess: onSuccess,
       onError: onError,
     );
   }
 
-  static void actUser(params, {Function? onSuccess, Function? onError}) {
+  static void operateApply(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.login,
+      Apis.operateApply,
       data: params,
       onSuccess: onSuccess,
       onError: onError,

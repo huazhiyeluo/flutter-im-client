@@ -107,7 +107,7 @@ class _GroupUserPageState extends State<GroupUserPage> {
                   trailing: TextButton(
                     onPressed: () {},
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                      shape: WidgetStateProperty.all<OutlinedBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(2.0), // 设置按钮的圆角
                           side: const BorderSide(color: Colors.grey), // 设置按钮的边框颜色和宽度

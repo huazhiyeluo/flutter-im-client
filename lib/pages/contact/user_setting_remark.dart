@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/contact.dart';
+import 'package:qim/api/contact_friend.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/user.dart';
@@ -46,7 +46,7 @@ class _UserSettingRemarkState extends State<UserSettingRemark> {
       'toId': talkObj['objId'],
       'remark': remarkCtr.text,
     };
-    ContactApi.actContactFriend(params, onSuccess: (res) async {
+    ContactFriendApi.actContactFriend(params, onSuccess: (res) async {
       userController.upsetUser({"uid": talkObj['objId'], "remark": remarkCtr.text});
       Navigator.pop(context);
     }, onError: (res) {

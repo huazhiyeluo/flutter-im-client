@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/api/contact_friend.dart';
+import 'package:qim/common/keys.dart';
+import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/user.dart';
+import 'package:qim/utils/cache.dart';
+import 'package:qim/utils/db.dart';
+import 'package:qim/utils/functions.dart';
+import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
+import 'package:qim/widget/dialog_confirm.dart';
 
 class UserSettingChat extends StatefulWidget {
   const UserSettingChat({super.key});
@@ -34,14 +42,19 @@ class UserSettingChatPage extends StatefulWidget {
 class _UserSettingChatPageState extends State<UserSettingChatPage> {
   final TalkobjController talkobjController = Get.find();
   final UserController userController = Get.find();
+  final MessageController messageController = Get.find();
 
   Map talkObj = {};
   Map userObj = {};
+  int uid = 0;
+  Map userInfo = {};
 
   @override
   void initState() {
     talkObj = talkobjController.talkObj;
     userObj = userController.getOneUser(talkObj['objId'])!;
+    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+    uid = userInfo['uid'] ?? "";
     super.initState();
   }
 
@@ -82,8 +95,10 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("设为置顶"),
           trailing: Switch(
-            value: true,
-            onChanged: (bool value) {},
+            value: userObj['isTop'] == 1 ? true : false,
+            onChanged: (bool value) {
+              actContactFriend('isTop', value as int);
+            },
           ),
         ),
         Container(
@@ -94,8 +109,10 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("隐藏会话"),
           trailing: Switch(
-            value: true,
-            onChanged: (bool value) {},
+            value: userObj['isHidden'] == 1 ? true : false,
+            onChanged: (bool value) {
+              actContactFriend('isHidden', value as int);
+            },
           ),
         ),
         Container(
@@ -106,17 +123,20 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("消息免打扰"),
           trailing: Switch(
-            value: true,
-            onChanged: (bool value) {},
+            value: userObj['isQuiet'] == 1 ? true : false,
+            onChanged: (bool value) {
+              actContactFriend('isQuiet', value as int);
+            },
           ),
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
-        const ListTile(
-          contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-          title: Text("删除聊天记录"),
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
+          title: const Text("删除聊天记录"),
+          onTap: delMessage,
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -145,5 +165,47 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
         ),
       ],
     );
+  }
+
+  void delMessage() {
+    showCustomDialog(
+      context: context,
+      content: '确定要删除和${userObj['username'] ?? ''}的聊天记录吗？',
+      onConfirm: () async {
+        await DBHelper.deleteData('message', [
+          ['msgType', '=', talkObj['type']],
+          ['toId', '=', talkObj['objId']],
+          ['fromId', '=', uid]
+        ]);
+        await DBHelper.deleteData('message', [
+          ['msgType', '=', talkObj['type']],
+          ['toId', '=', uid],
+          ['fromId', '=', talkObj['objId']]
+        ]);
+        messageController.delMessage(talkObj['type'], uid, talkObj['objId']);
+        TipHelper.instance.showToast("删除成功");
+      },
+      onConfirmText: "清空",
+      onCancel: () {
+        // 处理取消逻辑
+      },
+      onCancelText: "取消",
+    );
+  }
+
+  void actContactFriend(String field, int value) {
+    var params = {
+      'fromId': uid,
+      'toId': talkObj['objId'],
+      field: value,
+    };
+    ContactFriendApi.actContactFriend(params, onSuccess: (res) {
+      logPrint(res);
+      setState(() {
+        // _groupUsers = res['data'];
+      });
+    }, onError: (res) {
+      TipHelper.instance.showToast(res['msg']);
+    });
   }
 }

@@ -1,17 +1,17 @@
 import 'package:qim/common/apis.dart';
 import 'package:qim/utils/request.dart';
 
-class UserApi {
-  static void editUser(params, {Function? onSuccess, Function? onError}) {
+class GroupApi {
+  static void editGroup(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.editUser,
+      Apis.editGroup,
       data: params,
       onSuccess: onSuccess,
       onError: onError,
     );
   }
 
-  static void actUser(params, {Function? onSuccess, Function? onError}) {
+  static void actGroup(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
       Apis.login,
       data: params,
