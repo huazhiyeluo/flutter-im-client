@@ -2,7 +2,7 @@ import 'package:azlistview/azlistview.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lpinyin/lpinyin.dart';
-import 'package:qim/widget/custom_text_field.dart';
+import 'package:qim/widget/custom_search_field.dart';
 
 class UserModel extends ISuspensionBean {
   int? uid;
@@ -77,7 +77,7 @@ class _GroupUserPageState extends State<GroupUserPage> {
         preferredSize: const Size.fromHeight(60),
         child: AppBar(
           automaticallyImplyLeading: false,
-          title: CustomTextField(
+          title: CustomSearchField(
             controller: inputController,
             hintText: '搜索',
             expands: false,

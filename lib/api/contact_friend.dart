@@ -11,6 +11,24 @@ class ContactFriendApi {
     );
   }
 
+  static void addContactFriendGroup(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.addContactFriendGroup,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
+
+  static void delContactFriendGroup(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.delContactFriendGroup,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
+
   static void getContactFriendList(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
       Apis.getContactFriendList,

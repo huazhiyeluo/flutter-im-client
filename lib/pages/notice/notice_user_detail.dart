@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:qim/api/apply.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/apply.dart';
+import 'package:qim/dbdata/deldbdata.dart';
 import 'package:qim/utils/cache.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 
-class NoticeUserDetail extends StatefulWidget {
-  const NoticeUserDetail({super.key});
+class NoticeFriendDetail extends StatefulWidget {
+  const NoticeFriendDetail({super.key});
 
   @override
-  State<NoticeUserDetail> createState() => _NoticeUserDetailState();
+  State<NoticeFriendDetail> createState() => _NoticeFriendDetailState();
 }
 
-class _NoticeUserDetailState extends State<NoticeUserDetail> {
+class _NoticeFriendDetailState extends State<NoticeFriendDetail> {
+  final ApplyController applyController = Get.find();
+
+  void _clearApply() {
+    applyController.clearApply(1);
+    delDbApply(1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,28 +33,26 @@ class _NoticeUserDetailState extends State<NoticeUserDetail> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pushNamed(
-                context,
-                '/notice-user-detail',
-              );
+              _clearApply();
             },
             child: const Text("清空"),
           ),
         ],
       ),
-      body: const NoticeUserDetailPage(),
+      body: const NoticeFriendDetailPage(),
     );
   }
 }
 
-class NoticeUserDetailPage extends StatefulWidget {
-  const NoticeUserDetailPage({super.key});
+class NoticeFriendDetailPage extends StatefulWidget {
+  const NoticeFriendDetailPage({super.key});
 
   @override
-  State<NoticeUserDetailPage> createState() => _NoticeUserDetailPageState();
+  State<NoticeFriendDetailPage> createState() => _NoticeFriendDetailPageState();
 }
 
-class _NoticeUserDetailPageState extends State<NoticeUserDetailPage> {
+class _NoticeFriendDetailPageState extends State<NoticeFriendDetailPage> {
+  final ApplyController applyController = Get.find();
   final TextEditingController inputController = TextEditingController();
 
   int uid = 0;
@@ -53,6 +62,9 @@ class _NoticeUserDetailPageState extends State<NoticeUserDetailPage> {
 
   @override
   void initState() {
+    ever(applyController.allFriendChats, (_) => _formatData());
+    _formatData();
+
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     _fetchData();
@@ -63,7 +75,13 @@ class _NoticeUserDetailPageState extends State<NoticeUserDetailPage> {
     await _getApplyList();
   }
 
-  Widget _getStatusWidget(bool isFrom, int status) {
+  void _formatData() {
+    setState(() {
+      _applys = applyController.allFriendChats;
+    });
+  }
+
+  Widget _getStatusWidget(bool isFrom, int status, int id) {
     if (isFrom) {
       if (status == 0) {
         return const Text("等待验证");
@@ -80,7 +98,9 @@ class _NoticeUserDetailPageState extends State<NoticeUserDetailPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             CustomButton(
-              onPressed: () {},
+              onPressed: () {
+                _operateApply(id, 1);
+              },
               text: "同意",
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
@@ -92,7 +112,9 @@ class _NoticeUserDetailPageState extends State<NoticeUserDetailPage> {
             ),
             const SizedBox(width: 8), // Add some spacing between the buttons
             CustomButton(
-              onPressed: () {},
+              onPressed: () {
+                _operateApply(id, 2);
+              },
               text: "拒绝",
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
@@ -138,7 +160,7 @@ class _NoticeUserDetailPageState extends State<NoticeUserDetailPage> {
                   radius: 20,
                   backgroundImage: NetworkImage(isFrom ? _applys[index]['toIcon'] : _applys[index]['fromIcon']),
                 ),
-                trailing: _getStatusWidget(isFrom, _applys[index]['status']),
+                trailing: _getStatusWidget(isFrom, _applys[index]['status'], _applys[index]['id']),
               );
             },
           ),
@@ -154,7 +176,23 @@ class _NoticeUserDetailPageState extends State<NoticeUserDetailPage> {
     };
     ApplyApi.getApplyList(params, onSuccess: (res) {
       setState(() {
-        _applys = res['data'];
+        if (res['data'] != null) {
+          _applys = res['data'];
+        }
+      });
+    }, onError: (res) {
+      TipHelper.instance.showToast(res['msg']);
+    });
+  }
+
+  Future<void> _operateApply(int id, int status) async {
+    var params = {
+      'id': id,
+      'status': status,
+    };
+    ApplyApi.operateApply(params, onSuccess: (res) {
+      setState(() {
+        logPrint(res);
       });
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);

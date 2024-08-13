@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/user.dart';
+import 'package:qim/controller/friend.dart';
+import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/db.dart';
 import 'package:qim/utils/functions.dart';
@@ -12,14 +14,14 @@ import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:qim/widget/dialog_confirm.dart';
 
-class UserSettingChat extends StatefulWidget {
-  const UserSettingChat({super.key});
+class FriendSettingChat extends StatefulWidget {
+  const FriendSettingChat({super.key});
 
   @override
-  State<UserSettingChat> createState() => _UserSettingChatState();
+  State<FriendSettingChat> createState() => _FriendSettingChatState();
 }
 
-class _UserSettingChatState extends State<UserSettingChat> {
+class _FriendSettingChatState extends State<FriendSettingChat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,32 +29,33 @@ class _UserSettingChatState extends State<UserSettingChat> {
         title: const Text("聊天设置"),
         backgroundColor: Colors.grey[100],
       ),
-      body: const UserSettingChatPage(),
+      body: const FriendSettingChatPage(),
     );
   }
 }
 
-class UserSettingChatPage extends StatefulWidget {
-  const UserSettingChatPage({super.key});
+class FriendSettingChatPage extends StatefulWidget {
+  const FriendSettingChatPage({super.key});
 
   @override
-  State<UserSettingChatPage> createState() => _UserSettingChatPageState();
+  State<FriendSettingChatPage> createState() => _FriendSettingChatPageState();
 }
 
-class _UserSettingChatPageState extends State<UserSettingChatPage> {
+class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
   final TalkobjController talkobjController = Get.find();
-  final UserController userController = Get.find();
+  final FriendController friendController = Get.find();
   final MessageController messageController = Get.find();
+  final ChatController chatController = Get.find();
 
   Map talkObj = {};
-  Map userObj = {};
+  Map friendObj = {};
   int uid = 0;
   Map userInfo = {};
 
   @override
   void initState() {
     talkObj = talkobjController.talkObj;
-    userObj = userController.getOneUser(talkObj['objId'])!;
+    friendObj = friendController.getOneFriend(talkObj['objId'])!;
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     super.initState();
@@ -63,14 +66,21 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
     return ListView(
       children: [
         ListTile(
-          title: Text(userObj['username'] ?? ''),
+          title: Text(friendObj['remark'] != '' ? friendObj['remark'] : friendObj['username']),
           leading: CircleAvatar(
-            backgroundImage: NetworkImage(userObj['avatar'] ?? ''),
+            backgroundImage: NetworkImage(friendObj['avatar'] ?? ''),
           ),
-          trailing: const Icon(
-            Icons.chevron_right,
-          ),
-          onTap: () {},
+          onTap: () {
+            Map talkobj = {
+              "objId": talkObj['objId'],
+              "type": 1,
+            };
+            Navigator.pushNamed(
+              context,
+              '/friend-detail',
+              arguments: talkobj,
+            );
+          },
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -95,9 +105,10 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("设为置顶"),
           trailing: Switch(
-            value: userObj['isTop'] == 1 ? true : false,
-            onChanged: (bool value) {
-              actContactFriend('isTop', value as int);
+            value: friendObj['isTop'] == 1 ? true : false,
+            onChanged: (bool val) {
+              int v = val == true ? 1 : 0;
+              _actContact('isTop', v);
             },
           ),
         ),
@@ -109,9 +120,10 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("隐藏会话"),
           trailing: Switch(
-            value: userObj['isHidden'] == 1 ? true : false,
-            onChanged: (bool value) {
-              actContactFriend('isHidden', value as int);
+            value: friendObj['isHidden'] == 1 ? true : false,
+            onChanged: (bool val) {
+              int v = val == true ? 1 : 0;
+              _actContact('isHidden', v);
             },
           ),
         ),
@@ -123,9 +135,10 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("消息免打扰"),
           trailing: Switch(
-            value: userObj['isQuiet'] == 1 ? true : false,
-            onChanged: (bool value) {
-              actContactFriend('isQuiet', value as int);
+            value: friendObj['isQuiet'] == 1 ? true : false,
+            onChanged: (bool val) {
+              int v = val == true ? 1 : 0;
+              _actContact('isQuiet', v);
             },
           ),
         ),
@@ -147,7 +160,9 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
             const SizedBox(width: 20),
             Expanded(
               child: CustomButton(
-                onPressed: () {},
+                onPressed: () {
+                  _delContact();
+                },
                 text: "删除好友",
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.red,
@@ -170,7 +185,10 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
   void delMessage() {
     showCustomDialog(
       context: context,
-      content: '确定要删除和${userObj['username'] ?? ''}的聊天记录吗？',
+      content: Text(
+        '确定要删除和${friendObj['username'] ?? ''}的聊天记录吗？',
+        style: const TextStyle(fontSize: 18),
+      ),
       onConfirm: () async {
         await DBHelper.deleteData('message', [
           ['msgType', '=', talkObj['type']],
@@ -193,7 +211,7 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
     );
   }
 
-  void actContactFriend(String field, int value) {
+  void _actContact(String field, int value) {
     var params = {
       'fromId': uid,
       'toId': talkObj['objId'],
@@ -202,10 +220,51 @@ class _UserSettingChatPageState extends State<UserSettingChatPage> {
     ContactFriendApi.actContactFriend(params, onSuccess: (res) {
       logPrint(res);
       setState(() {
-        // _groupUsers = res['data'];
+        friendObj[field] = res['data'][field];
+        friendController.upsetFriend(res['data']);
+        saveDbFriend(res['data']);
+
+        if (["isTop", "isHidden", "isQuiet"].contains(field)) {
+          Map chatData = {};
+          chatData['objId'] = talkObj['objId'];
+          chatData['type'] = 1;
+          chatData[field] = res['data'][field];
+          chatController.upsetChat(chatData);
+          saveDbChat(chatData);
+        }
       });
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
+  }
+
+  void _delContact() {
+    showCustomDialog(
+      context: context,
+      content: const Text(
+        '确定要删除该好友吗？删除后将清理聊天记录。',
+        style: TextStyle(fontSize: 18),
+      ),
+      onConfirm: () async {
+        var params = {
+          'fromId': uid,
+          'toId': talkObj['objId'],
+        };
+        ContactFriendApi.delContactFriend(params, onSuccess: (res) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/',
+            (route) => false,
+          );
+        }, onError: (res) {
+          TipHelper.instance.showToast(res['msg']);
+        });
+      },
+      onConfirmText: "确定",
+      onCancel: () {
+        // 处理取消逻辑
+      },
+      onCancelText: "取消",
+    );
   }
 }

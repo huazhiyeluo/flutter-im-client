@@ -13,7 +13,16 @@ class GroupApi {
 
   static void actGroup(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.login,
+      Apis.actGroup,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
+
+  static void searchGroup(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.searchGroup,
       data: params,
       onSuccess: onSuccess,
       onError: onError,

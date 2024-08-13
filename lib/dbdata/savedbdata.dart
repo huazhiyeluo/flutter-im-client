@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:qim/utils/db.dart';
+import 'package:qim/utils/functions.dart';
 
 //0、保存用户组
-void saveDbContactGroup(Map data) {
-  Map<String, dynamic> contactGroup = {};
+void saveDbFriendGroup(Map data) {
+  Map<String, dynamic> friendGroup = {};
 
   // 需要保存的字段列表
   List<String> fields = [
@@ -15,17 +16,17 @@ void saveDbContactGroup(Map data) {
   // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
   for (var field in fields) {
     if (data[field] != null) {
-      contactGroup[field] = data[field];
+      friendGroup[field] = data[field];
     }
   }
-  DBHelper.upsertData('contact_groups', contactGroup, [
-    ["friendGroupId", "=", contactGroup['friendGroupId']]
+  DBHelper.upsertData('friend_group', friendGroup, [
+    ["friendGroupId", "=", friendGroup['friendGroupId']]
   ]);
 }
 
 //1、保存用户
-void saveDbUser(Map data) {
-  Map<String, dynamic> user = {};
+void saveDbFriend(Map data) {
+  Map<String, dynamic> friend = {};
 
   // 需要保存的字段列表
   List<String> fields = [
@@ -42,6 +43,7 @@ void saveDbUser(Map data) {
     'friendGroupId',
     'level',
     'remark',
+    'desc',
     'isTop',
     'isHidden',
     'isQuiet',
@@ -51,11 +53,11 @@ void saveDbUser(Map data) {
   // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
   for (var field in fields) {
     if (data[field] != null) {
-      user[field] = data[field];
+      friend[field] = data[field];
     }
   }
-  DBHelper.upsertData('users', user, [
-    ["uid", "=", user['uid']]
+  DBHelper.upsertData('friends', friend, [
+    ["uid", "=", friend['uid']]
   ]);
 }
 
@@ -107,7 +109,9 @@ void saveDbChat(Map data) {
     'info',
     'remark',
     'icon',
-    'weight',
+    'isTop',
+    'isHidden',
+    'isQuiet',
     'tips',
     'operateTime',
     'msgMedia',
@@ -125,6 +129,8 @@ void saveDbChat(Map data) {
     }
   }
 
+  logPrint(chat);
+
   DBHelper.upsertData('chats', chat, [
     ["objId", "=", chat['objId']],
     ["type", "=", chat['type']]
@@ -137,7 +143,6 @@ void saveDbMessage(Map data) {
 
   // 需要保存的字段列表
   List<String> fields = [
-    'belongFlag',
     'fromId',
     'toId',
     'avatar',
@@ -158,4 +163,32 @@ void saveDbMessage(Map data) {
     }
   }
   DBHelper.insertData('message', message);
+}
+
+//5、保存apply
+void saveDbApply(Map data) {
+  Map<String, dynamic> apply = {};
+
+  // 需要保存的字段列表
+  List<String> fields = [
+    'id',
+    'fromId',
+    'fromName',
+    'fromIcon',
+    'toId',
+    'toName',
+    'toIcon',
+    'type',
+    'status',
+    'reason',
+    'operateTime',
+  ];
+
+  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
+  for (var field in fields) {
+    if (data[field] != null) {
+      apply[field] = data[field];
+    }
+  }
+  DBHelper.insertData('apply', apply);
 }

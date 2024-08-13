@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 class ChatController extends GetxController {
   final RxList<Map> allChats = <Map>[].obs;
+  final RxList<Map> allShowChats = <Map>[].obs;
 
   void upsetChat(Map chat) {
     final objId = chat['objId'];
@@ -25,13 +26,15 @@ class ChatController extends GetxController {
     }
 
     allChats.sort((a, b) {
-      int compareWeight = b['weight'].compareTo(a['weight']);
+      int compareWeight = b['isTop'].compareTo(a['isTop']);
       if (compareWeight != 0) {
         return compareWeight;
       } else {
         return b['operateTime'].compareTo(a['operateTime']);
       }
     });
+
+    allShowChats.assignAll(allChats.where((c) => c['isHidden'] != 1).toList());
 
     update();
   }
@@ -41,6 +44,7 @@ class ChatController extends GetxController {
 
     if (existingChatIndex != -1) {
       allChats.removeAt(existingChatIndex);
+      allShowChats.removeAt(existingChatIndex);
       update();
     }
   }
@@ -56,7 +60,7 @@ class ChatController extends GetxController {
 
   int getTipsTotalNum() {
     int total = 0;
-    for (var item in allChats) {
+    for (var item in allShowChats) {
       total += (item["tips"] ?? 0) as int;
     }
     return total;

@@ -3,12 +3,13 @@ import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
 import 'package:qim/api/contact_group.dart';
 import 'package:qim/common/apis.dart';
+import 'package:qim/controller/apply.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
-import 'package:qim/controller/contact_group.dart';
+import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/user.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
@@ -34,11 +35,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late WebSocketController webSocketController;
-  final ContactGroupController contactGroupController = Get.put(ContactGroupController());
-  final UserController userController = Get.put(UserController());
+  final FriendGroupController friendGroupController = Get.put(FriendGroupController());
+  final FriendController friendController = Get.put(FriendController());
   final GroupController groupController = Get.put(GroupController());
   final ChatController chatController = Get.put(ChatController());
   final TalkobjController talkobjController = Get.put(TalkobjController());
+  final ApplyController applyController = Get.put(ApplyController());
   int _currentIndex = 0;
 
   late AudioPlayerManager _audioPlayerManager;
@@ -85,28 +87,30 @@ class _HomeState extends State<Home> {
           CacheHelper.remove(Keys.userInfo);
           CacheHelper.remove(Keys.entryPage);
           String initialRouteData = await initialRoute();
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            initialRouteData,
-            (route) => false,
-          );
+          Get.offAllNamed(initialRouteData);
         }
         if (msg['msgMedia'] == 11) {
           Map item = {"uid": msg['fromId'], "isOnline": 1};
-          userController.upsetUser(item);
-          saveDbUser(item);
+          friendController.upsetFriend(item);
+          saveDbFriend(item);
           await _audioPlayerManager.playSound("1.mp3");
         }
         if (msg['msgMedia'] == 12) {
           Map item = {"uid": msg['fromId'], "isOnline": 0};
-          userController.upsetUser(item);
-          saveDbUser(item);
+          friendController.upsetFriend(item);
+          saveDbFriend(item);
+        }
+        if ([21, 22, 23, 24].contains(msg['msgMedia'])) {
+          loadFriendManage(uid, msg);
+        }
+        if ([30, 31, 32, 33, 34, 35].contains(msg['msgMedia'])) {
+          loadGroupManage(uid, msg);
         }
       }
 
       //设置当前聊天Obj
       if ([4].contains(msg['msgType']) && msg['msgMedia'] == 0) {
-        Map<String, dynamic>? objUser = await getDbOneUser(msg['fromId']);
+        Map<String, dynamic>? objUser = await getDbOneFriend(msg['fromId']);
         if (objUser == null) {
           return;
         }
@@ -133,8 +137,9 @@ class _HomeState extends State<Home> {
     final List<Widget> pages = [const Chat(), const Contact(), const Person()];
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: _pagesBar[_currentIndex](),
+      extendBody: false,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color.fromRGBO(237, 237, 237, 1),
         currentIndex: _currentIndex,
@@ -186,7 +191,40 @@ class _HomeState extends State<Home> {
               );
             }),
           ),
-          const BottomNavigationBarItem(label: '通讯录', icon: Icon(Icons.contacts)),
+          BottomNavigationBarItem(
+            label: '通讯录',
+            icon: Obx(() {
+              bool showRedPoint = applyController.showRedPoint.value;
+              return Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(2),
+                    width: 60,
+                    height: 30,
+                    child: const Icon(Icons.contacts),
+                  ),
+                  if (showRedPoint)
+                    Positioned(
+                      right: 5,
+                      top: 2,
+                      child: Container(
+                        height: 12,
+                        padding: const EdgeInsets.all(0),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        constraints: const BoxConstraints(
+                          maxWidth: 12,
+                          minWidth: 12,
+                          minHeight: 12,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }),
+          ),
           const BottomNavigationBarItem(label: '我', icon: Icon(Icons.person)),
         ],
         onTap: (value) {
@@ -200,20 +238,20 @@ class _HomeState extends State<Home> {
   }
 
   void _getContactGroupList() async {
-    var params = {"ownUid": uid};
+    var params = {"ownerUid": uid};
     ContactFriendApi.getContactFriendGroup(params, onSuccess: (res) {
       if (!mounted) return;
-      List contactGroupArr = [];
+      List friendGroupArr = [];
       if (res['data'] != null) {
-        contactGroupArr = res['data'];
+        friendGroupArr = res['data'];
       }
-      Map defaultContactGroup = {"friendGroupId": 0, "name": "默认分组"};
-      contactGroupController.upsetContactGroup(defaultContactGroup);
-      saveDbContactGroup(defaultContactGroup);
+      Map defaultContactGroup = {"friendGroupId": 0, "ownerUid": uid, "name": "默认分组"};
+      friendGroupController.upsetFriendGroup(defaultContactGroup);
+      saveDbFriendGroup(defaultContactGroup);
 
-      for (var item in contactGroupArr) {
-        contactGroupController.upsetContactGroup(item);
-        saveDbContactGroup(item);
+      for (var item in friendGroupArr) {
+        friendGroupController.upsetFriendGroup(item);
+        saveDbFriendGroup(item);
       }
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
@@ -231,8 +269,8 @@ class _HomeState extends State<Home> {
         friendArr = res['data'];
       }
       for (var item in friendArr) {
-        userController.upsetUser(item);
-        saveDbUser(item);
+        friendController.upsetFriend(item);
+        saveDbFriend(item);
       }
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
-import 'package:qim/controller/contact_group.dart';
+import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/user.dart';
+import 'package:qim/controller/friend.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:azlistview/azlistview.dart';
 import 'package:lpinyin/lpinyin.dart';
-import 'package:qim/widget/custom_text_field.dart';
+import 'package:qim/widget/custom_search_field.dart';
 
 class ChatModel extends ISuspensionBean {
   int? uid;
@@ -54,8 +54,9 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
             SliverAppBar(
+              backgroundColor: Colors.white,
               pinned: false,
-              expandedHeight: 160,
+              expandedHeight: 170,
               flexibleSpace: FlexibleSpaceBar(
                 background: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -63,7 +64,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                     Container(
                       height: 50,
                       padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
-                      child: CustomTextField(
+                      child: CustomSearchField(
                         controller: inputController,
                         hintText: '搜索',
                         expands: false,
@@ -126,6 +127,11 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                         ),
                       ),
                     ),
+                    Container(
+                      height: 10,
+                      padding: EdgeInsets.zero,
+                      color: const Color.fromARGB(136, 238, 237, 237),
+                    ),
                   ],
                 ),
               ),
@@ -165,8 +171,8 @@ class ContactPage extends StatefulWidget {
 
 class _ContactPageState extends State<ContactPage> {
   final TalkobjController talkobjController = Get.find();
-  final ContactGroupController contactGroupController = Get.find();
-  final UserController userController = Get.find();
+  final FriendGroupController friendGroupController = Get.find();
+  final FriendController friendController = Get.find();
   final GroupController groupController = Get.find();
 
   List<ChatModel> _firendArr = [];
@@ -184,9 +190,9 @@ class _ContactPageState extends State<ContactPage> {
 
     _groupArr = groupController.allGroups;
 
-    // 监听 userController 和 contactGroupController 的数据变化
-    ever(userController.allUsers, (_) => _formatData());
-    ever(contactGroupController.allContactGroups, (_) => _formatData());
+    // 监听 friendController 和 friendGroupController 的数据变化
+    ever(friendController.allFriends, (_) => _formatData());
+    ever(friendGroupController.allFriendGroups, (_) => _formatData());
 
     _formatData();
   }
@@ -199,7 +205,7 @@ class _ContactPageState extends State<ContactPage> {
 
   void _formatData() {
     _firendArr.clear();
-    for (var item in userController.allUsers) {
+    for (var item in friendController.allFriends) {
       ChatModel chat = ChatModel();
       chat.uid = item['uid'];
       chat.name = item['username'];
@@ -215,10 +221,10 @@ class _ContactPageState extends State<ContactPage> {
     _firendArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
     SuspensionUtil.setShowSuspensionStatus(_firendArr);
     _contactGroupArr.clear();
-    _contactGroupArr = List.from(contactGroupController.allContactGroups);
+    _contactGroupArr = List.from(friendGroupController.allFriendGroups);
     for (var item in _contactGroupArr) {
       item['children'] = [];
-      for (var citem in userController.allUsers) {
+      for (var citem in friendController.allFriends) {
         if (citem['friendGroupId'] == item['friendGroupId']) {
           if (item['children'] == null) {
             item['children'] = [];
@@ -268,7 +274,7 @@ class _ContactPageState extends State<ContactPage> {
                         };
                         Navigator.pushNamed(
                           context,
-                          '/user-detail',
+                          '/friend-detail',
                           arguments: talkobj,
                         );
                       },
@@ -369,7 +375,7 @@ class _ContactPageState extends State<ContactPage> {
                               };
                               Navigator.pushNamed(
                                 context,
-                                '/user-detail',
+                                '/friend-detail',
                                 arguments: talkobj,
                               );
                             },

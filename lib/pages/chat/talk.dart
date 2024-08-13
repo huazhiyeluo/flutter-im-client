@@ -5,10 +5,10 @@ import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qim/api/common.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/friend.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/user.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/pages/chat/talk/emoji_list.dart';
 import 'package:qim/pages/chat/talk/phone_from.dart';
@@ -39,7 +39,7 @@ class Talk extends StatefulWidget {
 
 class _TalkState extends State<Talk> {
   final TalkobjController talkobjController = Get.find();
-  final UserController userController = Get.find();
+  final FriendController friendController = Get.find();
   final GroupController groupController = Get.find();
 
   Map talkObj = {};
@@ -52,13 +52,13 @@ class _TalkState extends State<Talk> {
     super.initState();
     talkObj = talkobjController.talkObj;
     if (talkObj['type'] == 1) {
-      Map? user = userController.getOneUser(talkObj['objId']);
-      iconObj = user?['avatar'];
-      textObj = user?['username'];
+      Map friendObj = friendController.getOneFriend(talkObj['objId'])!;
+      iconObj = friendObj['avatar'];
+      textObj = friendObj['remark'] != '' ? friendObj['remark'] : friendObj['username'];
     } else if (talkObj['type'] == 2) {
-      Map? group = groupController.getOneGroup(talkObj['objId']);
-      iconObj = group?['icon'];
-      textObj = "${group?['name']}(${group?['num']})";
+      Map? groupObj = groupController.getOneGroup(talkObj['objId'])!;
+      iconObj = groupObj['icon'];
+      textObj = "${groupObj['remark'] != '' ? groupObj['remark'] : groupObj['name']}(${groupObj['num']})";
     }
   }
 
@@ -101,7 +101,7 @@ class _TalkState extends State<Talk> {
               if (talkObj['type'] == 1) {
                 Navigator.pushNamed(
                   context,
-                  '/user-setting-chat',
+                  '/friend-chat-setting',
                 );
               } else if (talkObj['type'] == 2) {
                 Navigator.pushNamed(
@@ -130,7 +130,7 @@ class _TalkPageState extends State<TalkPage> {
   final WebSocketController webSocketController = Get.find();
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
-  final UserController userController = Get.find();
+  final FriendController friendController = Get.find();
   final TextEditingController _inputController = TextEditingController();
 
   double keyboardHeight = 270.0;

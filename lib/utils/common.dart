@@ -1,12 +1,17 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
+import 'package:qim/controller/apply.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/user.dart';
+import 'package:qim/controller/friend.dart';
+import 'package:qim/dbdata/deldbdata.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/play.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:mime/mime.dart';
@@ -51,7 +56,7 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
   Map? lastChat = chatController.getOneChat(objId, msg['msgType']);
   if (lastChat == null) {
     if ([1].contains(msg['msgType'])) {
-      Map<String, dynamic>? objUser = await getDbOneUser(objId);
+      Map<String, dynamic>? objUser = await getDbOneFriend(objId);
       if (objUser == null) {
         return;
       }
@@ -59,6 +64,9 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
       chatData['info'] = objUser['info'];
       chatData['remark'] = objUser['remark'];
       chatData['icon'] = objUser['avatar'];
+      chatData['isTop'] = objUser['isTop'];
+      chatData['isHidden'] = objUser['isHidden'];
+      chatData['isQuiet'] = objUser['isQuiet'];
     }
 
     if (msg['msgType'] == 2) {
@@ -70,14 +78,18 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
       chatData['info'] = objGroup['info'];
       chatData['remark'] = objGroup['remark'];
       chatData['icon'] = objGroup['icon'];
+      chatData['isTop'] = objGroup['isTop'];
+      chatData['isHidden'] = objGroup['isHidden'];
+      chatData['isQuiet'] = objGroup['isQuiet'];
     }
-    chatData['weight'] = 0;
   } else {
     chatData['name'] = lastChat['name'];
     chatData['info'] = lastChat['info'];
     chatData['remark'] = lastChat['remark'];
     chatData['icon'] = lastChat['icon'];
-    chatData['weight'] = lastChat['weight'];
+    chatData['isTop'] = lastChat['isTop'];
+    chatData['isHidden'] = lastChat['isHidden'];
+    chatData['isQuiet'] = lastChat['isQuiet'];
   }
 
   final TalkobjController talkobjController = Get.put(TalkobjController());
@@ -100,7 +112,7 @@ Future<void> joinMessage(int uid, Map temp) async {
     Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
     msg['avatar'] = userInfo?['avatar'];
   } else {
-    Map<String, dynamic>? objUser = await getDbOneUser(msg['fromId']);
+    Map<String, dynamic>? objUser = await getDbOneFriend(msg['fromId']);
     msg['avatar'] = objUser?['avatar'];
   }
   messageController.addMessage(msg);
@@ -115,8 +127,8 @@ bool isImageFile(String path) {
 Map getTalkCommonObj(Map talkObj) {
   Map talkCommonObj = {};
   if (talkObj['type'] == 1) {
-    final UserController userController = Get.find();
-    Map? user = userController.getOneUser(talkObj['objId']);
+    final FriendController friendController = Get.find();
+    Map? user = friendController.getOneFriend(talkObj['objId']);
     talkCommonObj['icon'] = user?['avatar'];
     talkCommonObj['name'] = user?['username'];
   } else if (talkObj['type'] == 2) {
@@ -126,4 +138,37 @@ Map getTalkCommonObj(Map talkObj) {
     talkCommonObj['name'] = group?['name'];
   }
   return talkCommonObj;
+}
+
+Future<void> loadFriendManage(int uid, Map msg) async {
+  final FriendController friendController = Get.find();
+  final ApplyController applyController = Get.find();
+  final ChatController chatController = Get.find();
+  Map data = json.decode(msg['content']['data']);
+  if ([21, 22, 23].contains(msg['msgMedia'])) {
+    applyController.upsetApply(data['apply']);
+    saveDbApply(data['apply']);
+  }
+  //同意
+  if ([22].contains(msg['msgMedia'])) {
+    friendController.upsetFriend(data['user']);
+    saveDbFriend(data['user']);
+  }
+  //删除
+  if ([24].contains(msg['msgMedia'])) {
+    friendController.delFriend(data['user']['uid']);
+    delDbFriend(data['user']['uid']);
+
+    chatController.delChat(data['user']['uid'], 1);
+    delDbChat(data['user']['uid'], 1);
+  }
+}
+
+Future<void> loadGroupManage(int uid, Map msg) async {
+  if ([30].contains(msg['msgMedia'])) {}
+  if ([31].contains(msg['msgMedia'])) {}
+  if ([32].contains(msg['msgMedia'])) {}
+  if ([33].contains(msg['msgMedia'])) {}
+  if ([34].contains(msg['msgMedia'])) {}
+  if ([35].contains(msg['msgMedia'])) {}
 }

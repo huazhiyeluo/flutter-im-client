@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/utils/cache.dart';
 
@@ -24,7 +25,13 @@ AppBar contactBar() {
       ],
     ),
     backgroundColor: Colors.grey[100],
-    actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.person_add_alt))],
+    actions: [
+      IconButton(
+          onPressed: () {
+            Get.toNamed('/add-contact');
+          },
+          icon: const Icon(Icons.person_add_alt))
+    ],
     // 其他属性设置...
   );
 }

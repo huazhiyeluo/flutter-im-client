@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'routes/route.dart';
 import 'utils/cache.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,12 @@ import 'package:get/get.dart';
 void main() async {
   /// 确保初始化完成
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 设置系统UI样式
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    systemNavigationBarColor: Color.fromRGBO(237, 237, 237, 1), // 设置导航栏为透明色
+    systemNavigationBarIconBrightness: Brightness.dark, // 设置导航栏图标颜色
+  ));
 
   /// sp初始化
   await CacheHelper.getInstance();

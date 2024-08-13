@@ -3,13 +3,21 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:qim/api/contact_friend.dart';
+import 'package:qim/api/contact_group.dart';
+import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
+import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/friend.dart';
 import 'package:qim/dbdata/deldbdata.dart';
+import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/db.dart';
 import 'package:qim/dbdata/savedbdata.dart';
-import 'package:qim/widget/custom_text_field.dart';
+import 'package:qim/utils/functions.dart';
+import 'package:qim/utils/tips.dart';
+import 'package:qim/widget/custom_search_field.dart';
 
 class Chat extends StatefulWidget {
   const Chat({super.key});
@@ -28,7 +36,8 @@ class _ChatState extends State<Chat> {
         preferredSize: const Size.fromHeight(60),
         child: Column(children: [
           AppBar(
-            title: CustomTextField(
+            backgroundColor: Colors.white,
+            title: CustomSearchField(
               controller: inputController,
               hintText: '搜索',
               expands: false,
@@ -54,12 +63,18 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final TalkobjController talkobjController = Get.put(TalkobjController());
-  final ChatController chatController = Get.put(ChatController());
+  final TalkobjController talkobjController = Get.find();
+  final ChatController chatController = Get.find();
+  final FriendController friendController = Get.find();
+  final GroupController groupController = Get.find();
+  int uid = 0;
+  Map userInfo = {};
 
   @override
   void initState() {
     super.initState();
+    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+    uid = userInfo['uid'] ?? "";
     _getChatList();
   }
 
@@ -67,13 +82,13 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Obx(() {
       return ListView.builder(
-        itemCount: chatController.allChats.length,
+        itemCount: chatController.allShowChats.length,
         itemBuilder: (BuildContext context, int index) {
-          var temp = chatController.allChats[index];
+          var temp = chatController.allShowChats[index];
           double extentRatioTop = 2.0;
           String textTop = "置顶";
           int flexTop = 3;
-          if (temp['weight'] == 1) {
+          if (temp['isTop'] == 1) {
             extentRatioTop = 2.2;
             textTop = '取消置顶';
             flexTop = 4;
@@ -89,12 +104,7 @@ class _ChatPageState extends State<ChatPage> {
                 CustomSlidableAction(
                   flex: flexTop,
                   onPressed: (slidCtx) {
-                    Map chatData = {};
-                    chatData['objId'] = temp['objId'];
-                    chatData['type'] = temp['type'];
-                    chatData['weight'] = 1 - temp['weight'];
-                    chatController.upsetChat(chatData);
-                    saveDbChat(chatData);
+                    _setTop(temp);
                   },
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
@@ -171,10 +181,12 @@ class _ChatPageState extends State<ChatPage> {
                   style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 5),
-                Text(
-                  '${temp["tips"]}',
-                  style: const TextStyle(fontSize: 15),
-                ),
+                temp['isQuiet'] == 1
+                    ? const Icon(Icons.notifications_off_outlined)
+                    : Text(
+                        '${temp["tips"]}',
+                        style: const TextStyle(fontSize: 15),
+                      ),
               ]),
               onTap: () {
                 Map talkobj = {
@@ -200,6 +212,42 @@ class _ChatPageState extends State<ChatPage> {
         },
       );
     });
+  }
+
+  void _setTop(Map temp) {
+    Map chatData = {};
+    chatData['objId'] = temp['objId'];
+    chatData['type'] = temp['type'];
+    chatData['isTop'] = 1 - temp['isTop'];
+    chatController.upsetChat(chatData);
+    saveDbChat(chatData);
+    actContact(temp['objId'], 'isTop', chatData['isTop'], temp['type']);
+  }
+
+  void actContact(int toId, String field, int value, int type) {
+    var params = {
+      'fromId': uid,
+      'toId': toId,
+      field: value,
+    };
+    if (type == 1) {
+      ContactFriendApi.actContactFriend(params, onSuccess: (res) {
+        logPrint(res);
+        friendController.upsetFriend(res['data']);
+        saveDbFriend(res['data']);
+      }, onError: (res) {
+        TipHelper.instance.showToast(res['msg']);
+      });
+    }
+    if (type == 2) {
+      ContactGroupApi.actContactGroup(params, onSuccess: (res) {
+        logPrint(res);
+        groupController.upsetGroup(res['data']);
+        saveDbGroup(res['data']);
+      }, onError: (res) {
+        TipHelper.instance.showToast(res['msg']);
+      });
+    }
   }
 
   _getChatList() async {

@@ -1,11 +1,11 @@
 //1、保存用户
 import 'package:qim/utils/db.dart';
 
-Future<Map<String, dynamic>?> getDbOneUser(int uid) async {
-  Map<String, dynamic>? user = await DBHelper.getOne('users', [
+Future<Map<String, dynamic>?> getDbOneFriend(int uid) async {
+  Map<String, dynamic>? friend = await DBHelper.getOne('friends', [
     ['uid', '=', uid]
   ]);
-  return user;
+  return friend;
 }
 
 Future<Map<String, dynamic>?> getDbOneGroup(int groupId) async {

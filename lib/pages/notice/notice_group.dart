@@ -152,7 +152,9 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
     };
     ApplyApi.getApplyList(params, onSuccess: (res) {
       setState(() {
-        _applys = res['data'];
+        if (res['data'] != null) {
+          _applys = res['data'];
+        }
       });
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
