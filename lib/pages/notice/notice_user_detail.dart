@@ -5,7 +5,6 @@ import 'package:qim/common/keys.dart';
 import 'package:qim/controller/apply.dart';
 import 'package:qim/dbdata/deldbdata.dart';
 import 'package:qim/utils/cache.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 
@@ -190,11 +189,7 @@ class _NoticeFriendDetailPageState extends State<NoticeFriendDetailPage> {
       'id': id,
       'status': status,
     };
-    ApplyApi.operateApply(params, onSuccess: (res) {
-      setState(() {
-        logPrint(res);
-      });
-    }, onError: (res) {
+    ApplyApi.operateApply(params, onSuccess: (res) {}, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
   }

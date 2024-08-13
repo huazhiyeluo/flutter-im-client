@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:qim/api/apply.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/apply.dart';
 import 'package:qim/utils/cache.dart';
+import 'package:qim/utils/db.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 
@@ -39,8 +42,7 @@ class NoticeGroupPage extends StatefulWidget {
 }
 
 class _NoticeGroupPageState extends State<NoticeGroupPage> {
-  final TextEditingController inputController = TextEditingController();
-
+  final ApplyController applyController = Get.find();
   int uid = 0;
   Map userInfo = {};
 
@@ -48,6 +50,9 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
 
   @override
   void initState() {
+    ever(applyController.allGroupChats, (_) => _formatData());
+    _formatData();
+
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     _fetchData();
@@ -58,7 +63,13 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
     await _getApplyList();
   }
 
-  Widget _getStatusWidget(bool isFrom, int status) {
+  void _formatData() {
+    setState(() {
+      _applys = applyController.allGroupChats;
+    });
+  }
+
+  Widget _getStatusWidget(bool isFrom, int status, int id) {
     if (isFrom) {
       if (status == 0) {
         return const Text("等待验证");
@@ -75,7 +86,9 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             CustomButton(
-              onPressed: () {},
+              onPressed: () {
+                _operateApply(id, 1);
+              },
               text: "同意",
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
@@ -87,7 +100,9 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
             ),
             const SizedBox(width: 8), // Add some spacing between the buttons
             CustomButton(
-              onPressed: () {},
+              onPressed: () {
+                _operateApply(id, 2);
+              },
               text: "拒绝",
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
@@ -136,7 +151,7 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
                   radius: 20,
                   backgroundImage: NetworkImage(isFrom ? _applys[index]['toIcon'] : _applys[index]['fromIcon']),
                 ),
-                trailing: _getStatusWidget(isFrom, _applys[index]['status']),
+                trailing: _getStatusWidget(isFrom, _applys[index]['status'], _applys[index]['id']),
               );
             },
           ),
@@ -146,17 +161,23 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
   }
 
   Future<void> _getApplyList() async {
+    if (applyController.allFriendChats.isEmpty) {
+      List applys = await DBHelper.getData('apply', [
+        ['type', '=', 2]
+      ]);
+      for (var item in applys) {
+        Map<String, dynamic> temp = Map.from(item);
+        applyController.upsetApply(temp);
+      }
+    }
+  }
+
+  Future<void> _operateApply(int id, int status) async {
     var params = {
-      'uid': uid,
-      'type': 2,
+      'id': id,
+      'status': status,
     };
-    ApplyApi.getApplyList(params, onSuccess: (res) {
-      setState(() {
-        if (res['data'] != null) {
-          _applys = res['data'];
-        }
-      });
-    }, onError: (res) {
+    ApplyApi.operateApply(params, onSuccess: (res) {}, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
   }

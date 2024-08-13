@@ -184,24 +184,10 @@ class _NoticeUserPageState extends State<NoticeUserPage> {
   }
 
   Future<void> _getApplyList() async {
-    // var params = {
-    //   'uid': uid,
-    //   'type': 1,
-    // };
-    // ApplyApi.getApplyList(params, onSuccess: (res) {
-    //   setState(() {
-    //     if (res['data'] != null) {
-    //       _applys = res['data'];
-    //     }
-    //   });
-    // }, onError: (res) {
-    //   TipHelper.instance.showToast(res['msg']);
-    // });
     if (applyController.allFriendChats.isEmpty) {
-      List applys = await DBHelper.getData('apply', []);
-
-      logPrint(applys);
-
+      List applys = await DBHelper.getData('apply', [
+        ['type', '=', 1]
+      ]);
       for (var item in applys) {
         Map<String, dynamic> temp = Map.from(item);
         applyController.upsetApply(temp);
@@ -214,11 +200,7 @@ class _NoticeUserPageState extends State<NoticeUserPage> {
       'id': id,
       'status': status,
     };
-    ApplyApi.operateApply(params, onSuccess: (res) {
-      setState(() {
-        logPrint(res);
-      });
-    }, onError: (res) {
+    ApplyApi.operateApply(params, onSuccess: (res) {}, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
   }
