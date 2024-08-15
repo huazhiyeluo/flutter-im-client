@@ -1,4 +1,4 @@
-import 'package:azlistview/azlistview.dart';
+import 'package:azlistview_plus/azlistview_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lpinyin/lpinyin.dart';

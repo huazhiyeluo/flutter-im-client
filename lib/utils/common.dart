@@ -4,14 +4,16 @@ import 'package:get/get.dart';
 import 'package:qim/controller/apply.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
+import 'package:qim/controller/contact_group.dart';
+import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/user.dart';
 import 'package:qim/dbdata/deldbdata.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/play.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:mime/mime.dart';
@@ -35,7 +37,12 @@ Future<void> joinData(int uid, Map msg, {AudioPlayerManager? audioPlayerManager}
 
 Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager) async {
   Map msg = Map.from(temp);
-  final ChatController chatController = Get.put(ChatController());
+  final ChatController chatController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
+  final UserController userController = Get.find();
+  final GroupController groupController = Get.find();
+
   int objId = 0;
   if ([1, 4].contains(msg['msgType'])) {
     objId = uid == msg['fromId'] ? msg['toId'] : msg['fromId'];
@@ -56,31 +63,28 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
   Map? lastChat = chatController.getOneChat(objId, msg['msgType']);
   if (lastChat == null) {
     if ([1].contains(msg['msgType'])) {
-      Map<String, dynamic>? objUser = await getDbOneFriend(objId);
-      if (objUser == null) {
-        return;
-      }
-      chatData['name'] = objUser['username'];
-      chatData['info'] = objUser['info'];
-      chatData['remark'] = objUser['remark'];
-      chatData['icon'] = objUser['avatar'];
-      chatData['isTop'] = objUser['isTop'];
-      chatData['isHidden'] = objUser['isHidden'];
-      chatData['isQuiet'] = objUser['isQuiet'];
+      Map userObj = userController.getOneUser(objId)!;
+      Map contactFriendObj = contactFriendController.getOneContactFriend(uid, objId)!;
+
+      chatData['name'] = userObj['username'];
+      chatData['info'] = userObj['info'];
+      chatData['icon'] = userObj['avatar'];
+      chatData['remark'] = contactFriendObj['remark'];
+      chatData['isTop'] = contactFriendObj['isTop'];
+      chatData['isHidden'] = contactFriendObj['isHidden'];
+      chatData['isQuiet'] = contactFriendObj['isQuiet'];
     }
 
     if (msg['msgType'] == 2) {
-      Map<String, dynamic>? objGroup = await getDbOneGroup(msg['toId']);
-      if (objGroup == null) {
-        return;
-      }
-      chatData['name'] = objGroup['name'];
-      chatData['info'] = objGroup['info'];
-      chatData['remark'] = objGroup['remark'];
-      chatData['icon'] = objGroup['icon'];
-      chatData['isTop'] = objGroup['isTop'];
-      chatData['isHidden'] = objGroup['isHidden'];
-      chatData['isQuiet'] = objGroup['isQuiet'];
+      Map? groupObj = groupController.getOneGroup(objId)!;
+      Map contactGroupObj = contactGroupController.getOneContactGroup(uid, objId)!;
+      chatData['name'] = groupObj['name'];
+      chatData['info'] = groupObj['info'];
+      chatData['icon'] = groupObj['icon'];
+      chatData['remark'] = contactGroupObj['remark'];
+      chatData['isTop'] = contactGroupObj['isTop'];
+      chatData['isHidden'] = contactGroupObj['isHidden'];
+      chatData['isQuiet'] = contactGroupObj['isQuiet'];
     }
   } else {
     chatData['name'] = lastChat['name'];
@@ -106,14 +110,15 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
 
 Future<void> joinMessage(int uid, Map temp) async {
   Map msg = Map.from(temp);
-  final MessageController messageController = Get.put(MessageController());
+  final MessageController messageController = Get.find();
   bool isSelf = uid == msg['fromId'] ? true : false;
   if (isSelf) {
     Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
     msg['avatar'] = userInfo?['avatar'];
   } else {
-    Map<String, dynamic>? objUser = await getDbOneFriend(msg['fromId']);
-    msg['avatar'] = objUser?['avatar'];
+    final UserController userController = Get.find();
+    Map userObj = userController.getOneUser(msg['fromId'])!;
+    msg['avatar'] = userObj['avatar'];
   }
   messageController.addMessage(msg);
   saveDbMessage(msg);
@@ -127,21 +132,23 @@ bool isImageFile(String path) {
 Map getTalkCommonObj(Map talkObj) {
   Map talkCommonObj = {};
   if (talkObj['type'] == 1) {
-    final FriendController friendController = Get.find();
-    Map? user = friendController.getOneFriend(talkObj['objId']);
-    talkCommonObj['icon'] = user?['avatar'];
-    talkCommonObj['name'] = user?['username'];
+    final UserController userController = Get.find();
+    Map userObj = userController.getOneUser(talkObj['objId'])!;
+    talkCommonObj['icon'] = userObj['avatar'];
+    talkCommonObj['name'] = userObj['username'];
   } else if (talkObj['type'] == 2) {
     final GroupController groupController = Get.find();
-    Map? group = groupController.getOneGroup(talkObj['objId']);
-    talkCommonObj['icon'] = group?['icon'];
-    talkCommonObj['name'] = group?['name'];
+    Map? groupObj = groupController.getOneGroup(talkObj['objId'])!;
+    talkCommonObj['icon'] = groupObj['icon'];
+    talkCommonObj['name'] = groupObj['name'];
   }
   return talkCommonObj;
 }
 
 Future<void> loadFriendManage(int uid, Map msg) async {
-  final FriendController friendController = Get.find();
+  final UserController userController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
+
   final ApplyController applyController = Get.find();
   final ChatController chatController = Get.find();
   Map data = json.decode(msg['content']['data']);
@@ -151,13 +158,15 @@ Future<void> loadFriendManage(int uid, Map msg) async {
   }
   //同意
   if ([22].contains(msg['msgMedia'])) {
-    friendController.upsetFriend(data['user']);
-    saveDbFriend(data['user']);
+    userController.upsetUser(data['user']);
+    saveDbUser(data['user']);
+    contactFriendController.upsetContactFriend(data['contactFriend']);
+    saveDbContactFriend(data['contactFriend']);
   }
   //删除
   if ([24].contains(msg['msgMedia'])) {
-    friendController.delFriend(data['user']['uid']);
-    delDbFriend(data['user']['uid']);
+    contactFriendController.delContactFriend(data['contactFriend']['fromId'], data['contactFriend']['toId']);
+    delDbContactFriend(data['contactFriend']['fromId'], data['contactFriend']['toId']);
 
     chatController.delChat(data['user']['uid'], 1);
     delDbChat(data['user']['uid'], 1);
@@ -165,10 +174,29 @@ Future<void> loadFriendManage(int uid, Map msg) async {
 }
 
 Future<void> loadGroupManage(int uid, Map msg) async {
-  if ([30].contains(msg['msgMedia'])) {}
-  if ([31].contains(msg['msgMedia'])) {}
-  if ([32].contains(msg['msgMedia'])) {}
-  if ([33].contains(msg['msgMedia'])) {}
-  if ([34].contains(msg['msgMedia'])) {}
-  if ([35].contains(msg['msgMedia'])) {}
+  // final GroupController groupController = Get.find();
+  // final ApplyController applyController = Get.find();
+  // final ChatController chatController = Get.find();
+  // Map data = json.decode(msg['content']['data']);
+  // if ([31, 32, 33].contains(msg['msgMedia'])) {
+  //   if (data['apply'] != null) {
+  //     applyController.upsetApply(data['apply']);
+  //     saveDbApply(data['apply']);
+  //   }
+  // }
+
+  // //同意
+  // if ([32].contains(msg['msgMedia'])) {
+  //   groupController.upsetGroup(data['group']);
+  //   saveDbFriend(data['group']);
+  // }
+
+  // //退出
+  // if ([34].contains(msg['msgMedia'])) {
+  //   groupController.upsetGroup(data['group']);
+  //   saveDbGroup(data['group']);
+
+  //   chatController.delChat(data['group']['groupId'], 2);
+  //   delDbChat(data['group']['groupId'], 2);
+  // }
 }

@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/apply.dart';
+import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/user.dart';
 import 'package:qim/utils/cache.dart';
-import 'package:azlistview/azlistview.dart';
+import 'package:azlistview_plus/azlistview_plus.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:qim/widget/custom_search_field.dart';
 
 class ChatModel extends ISuspensionBean {
-  int? uid;
+  int? toId;
   String? name;
   String? icon;
   String? info;
@@ -32,13 +35,34 @@ class Contact extends StatefulWidget {
 }
 
 class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
+  final ApplyController applyController = Get.find();
   final TextEditingController inputController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   late TabController _tabController;
+  bool showFriendRedPoint = false;
+  bool showGroupRedPoint = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+
+    ever(applyController.showFriendRedPoint, (_) => _formatData(1));
+    ever(applyController.showGroupRedPoint, (_) => _formatData(2));
+    _formatData(1);
+    _formatData(2);
+  }
+
+  _formatData(int type) {
+    if (!mounted) return;
+    setState(() {
+      if (type == 1) {
+        showFriendRedPoint = applyController.showFriendRedPoint.value;
+      }
+      if (type == 2) {
+        showGroupRedPoint = applyController.showGroupRedPoint.value;
+      }
+    });
   }
 
   @override
@@ -51,6 +75,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(
+        controller: _scrollController,
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
             SliverAppBar(
@@ -86,16 +111,32 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                             '/notice-user',
                           );
                         },
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
+                              const Text(
                                 '新朋友',
                                 style: TextStyle(fontSize: 16.0), // 根据需要设置字体大小
                               ),
-                              Icon(Icons.chevron_right),
+                              Expanded(child: Container()),
+                              showFriendRedPoint
+                                  ? Container(
+                                      height: 12,
+                                      padding: const EdgeInsets.all(0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        maxWidth: 12,
+                                        minWidth: 12,
+                                        minHeight: 12,
+                                      ),
+                                    )
+                                  : Container(),
+                              const Icon(Icons.chevron_right),
                             ],
                           ),
                         ),
@@ -112,16 +153,32 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                             '/notice-group',
                           );
                         },
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
+                              const Text(
                                 '群通知',
                                 style: TextStyle(fontSize: 16.0), // 根据需要设置字体大小
                               ),
-                              Icon(Icons.chevron_right),
+                              Expanded(child: Container()),
+                              showGroupRedPoint
+                                  ? Container(
+                                      height: 12,
+                                      padding: const EdgeInsets.all(0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        maxWidth: 12,
+                                        minWidth: 12,
+                                        minHeight: 12,
+                                      ),
+                                    )
+                                  : Container(),
+                              const Icon(Icons.chevron_right),
                             ],
                           ),
                         ),
@@ -155,6 +212,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
         },
         body: ContactPage(
           tabController: _tabController,
+          scrollController: _scrollController,
         ),
       ),
     );
@@ -163,7 +221,8 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
 
 class ContactPage extends StatefulWidget {
   final TabController tabController;
-  const ContactPage({super.key, required this.tabController});
+  final ScrollController scrollController;
+  const ContactPage({super.key, required this.tabController, required this.scrollController});
 
   @override
   State<ContactPage> createState() => _ContactPageState();
@@ -172,12 +231,15 @@ class ContactPage extends StatefulWidget {
 class _ContactPageState extends State<ContactPage> {
   final TalkobjController talkobjController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
-  final FriendController friendController = Get.find();
-  final GroupController groupController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
 
-  List<ChatModel> _firendArr = [];
-  List _groupArr = [];
-  List _contactGroupArr = [];
+  final UserController userController = Get.put(UserController());
+  final GroupController groupController = Get.put(GroupController());
+
+  List<ChatModel> _tabArr1 = [];
+  List _tabArr2 = [];
+  List _tabArr3 = [];
 
   Map isExpandeds = {}; // 初始化展开状态
   int uid = 0;
@@ -188,11 +250,10 @@ class _ContactPageState extends State<ContactPage> {
     Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
     uid = userInfo == null ? "" : userInfo['uid'];
 
-    _groupArr = groupController.allGroups;
-
     // 监听 friendController 和 friendGroupController 的数据变化
-    ever(friendController.allFriends, (_) => _formatData());
     ever(friendGroupController.allFriendGroups, (_) => _formatData());
+    ever(contactFriendController.allContactFriends, (_) => _formatData());
+    ever(contactGroupController.allContactGroups, (_) => _formatData());
 
     _formatData();
   }
@@ -204,128 +265,136 @@ class _ContactPageState extends State<ContactPage> {
   }
 
   void _formatData() {
-    _firendArr.clear();
-    for (var item in friendController.allFriends) {
+    _tabArr1.clear();
+    for (var contactFriendObj in contactFriendController.allContactFriends) {
       ChatModel chat = ChatModel();
-      chat.uid = item['uid'];
-      chat.name = item['username'];
-      chat.icon = item['avatar'];
-      chat.info = item['info'];
-      chat.remark = item['remark'];
-      chat.isOnline = item['isOnline'];
-      chat.namePinyin = PinyinHelper.getPinyin(item['username']);
+
+      Map? userObj = userController.getOneUser(contactFriendObj['toId'])!;
+
+      chat.toId = contactFriendObj['toId'];
+      chat.name = userObj['username'];
+      chat.icon = userObj['avatar'];
+      chat.info = userObj['info'];
+      chat.remark = contactFriendObj['remark'];
+      chat.isOnline = contactFriendObj['isOnline'];
+      chat.namePinyin =
+          PinyinHelper.getPinyin(contactFriendObj['remark'] != "" ? contactFriendObj['remark'] : userObj['username']);
       String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
       chat.tagIndex = firstLetter.toUpperCase();
-      _firendArr.add(chat);
+      _tabArr1.add(chat);
     }
-    _firendArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
-    SuspensionUtil.setShowSuspensionStatus(_firendArr);
-    _contactGroupArr.clear();
-    _contactGroupArr = List.from(friendGroupController.allFriendGroups);
-    for (var item in _contactGroupArr) {
-      item['children'] = [];
-      for (var citem in friendController.allFriends) {
-        if (citem['friendGroupId'] == item['friendGroupId']) {
-          if (item['children'] == null) {
-            item['children'] = [];
+    SuspensionUtil.sortListBySuspensionTag(_tabArr1);
+    SuspensionUtil.setShowSuspensionStatus(_tabArr1);
+
+    _tabArr2.clear();
+    _tabArr2 = List.from(friendGroupController.allFriendGroups);
+    for (var friendGroupObj in _tabArr2) {
+      friendGroupObj['children'] = [];
+      for (var contactFriendObj in contactFriendController.allContactFriends) {
+        if (contactFriendObj['friendGroupId'] == friendGroupObj['friendGroupId']) {
+          if (friendGroupObj['children'] == null) {
+            friendGroupObj['children'] = [];
           }
-          item['children'].add(citem);
+          Map userObj = userController.getOneUser(contactFriendObj['toId'])!;
+          contactFriendObj['name'] = userObj['username'];
+          contactFriendObj['icon'] = userObj['avatar'];
+          contactFriendObj['info'] = userObj['info'];
+          friendGroupObj['children'].add(contactFriendObj);
         }
       }
     }
-    if (mounted) {
-      setState(() {
-        _contactGroupArr = _contactGroupArr;
-        _firendArr = _firendArr;
-      });
+
+    _tabArr3.clear();
+    _tabArr3 = List.from(contactGroupController.allContactGroups);
+    for (var item in _tabArr3) {
+      Map? tempGroup = groupController.getOneGroup(item['toId']);
+      item['name'] = tempGroup?['name'];
+      item['icon'] = tempGroup?['icon'];
+      item['info'] = tempGroup?['info'];
     }
+    if (!mounted) return;
+    setState(() {
+      _tabArr1 = _tabArr1;
+      _tabArr2 = _tabArr2;
+      _tabArr3 = _tabArr3;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return TabBarView(controller: widget.tabController, children: [
-      SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: AzListView(
-            data: _firendArr,
-            itemCount: _firendArr.length,
-            itemBuilder: (context, index) {
-              ChatModel itemFriend = _firendArr[index];
-              return Column(
-                children: [
-                  SizedBox(
-                    height: 70,
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(itemFriend.icon!),
-                      ),
-                      title: Text('${itemFriend.remark != "" ? itemFriend.remark : itemFriend.name}'),
-                      subtitle: Text(
-                        "[${itemFriend.isOnline == 1 ? '在线' : '离线'}] ${itemFriend.info}",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      onTap: () {
-                        Map talkobj = {
-                          "objId": itemFriend.uid,
-                          "type": 1,
-                        };
-                        Navigator.pushNamed(
-                          context,
-                          '/friend-detail',
-                          arguments: talkobj,
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              );
+      AzListView(
+        data: _tabArr1,
+        itemCount: _tabArr1.length,
+        itemBuilder: (context, index) {
+          ChatModel itemFriend = _tabArr1[index];
+          return ListTile(
+            leading: CircleAvatar(
+              radius: 20,
+              backgroundImage: NetworkImage(itemFriend.icon!),
+            ),
+            title: Text(
+              '${itemFriend.remark != "" ? itemFriend.remark : itemFriend.name}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(
+              "[${itemFriend.isOnline == 1 ? '在线' : '离线'}] ${itemFriend.info}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            onTap: () {
+              Map talkobj = {
+                "objId": itemFriend.toId,
+                "type": 1,
+              };
+              Navigator.pushNamed(context, '/friend-detail', arguments: talkobj);
             },
-            susItemBuilder: (BuildContext context, int index) {
-              ChatModel model = _firendArr[index];
-              String tag = model.getSuspensionTag();
-              if ('★' == model.getSuspensionTag()) {
-                return Container();
-              }
-              return Container(
-                height: 40,
-                width: MediaQuery.of(context).size.width,
-                padding: const EdgeInsets.only(left: 15.0),
-                color: const Color(0xfff3f4f5),
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  tag,
-                  softWrap: false,
-                  style: const TextStyle(fontSize: 14.0, color: Color(0xff999999)),
-                ),
-              );
-            },
-            indexBarData: SuspensionUtil.getTagIndexList(_firendArr),
-            indexHintBuilder: (context, hint) {
-              return Container(
-                alignment: Alignment.center,
-                width: 80.0,
-                height: 80.0,
-                decoration: const BoxDecoration(
-                  color: Colors.yellow,
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  hint,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 30.0,
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
+            contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+          );
+        },
+        padding: EdgeInsets.zero,
+        susItemBuilder: (BuildContext context, int index) {
+          ChatModel model = _tabArr1[index];
+          String tag = model.getSuspensionTag();
+          if ('★' == model.getSuspensionTag()) {
+            return Container();
+          }
+          return Container(
+            height: 40,
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.only(left: 15.0),
+            color: const Color(0xfff3f4f5),
+            alignment: Alignment.centerLeft,
+            child: Text(
+              tag,
+              softWrap: false,
+              style: const TextStyle(fontSize: 14.0, color: Color(0xff999999)),
+            ),
+          );
+        },
+        indexBarData: SuspensionUtil.getTagIndexList(_tabArr1),
+        indexHintBuilder: (context, hint) {
+          return Container(
+            alignment: Alignment.center,
+            width: 80.0,
+            height: 80.0,
+            decoration: const BoxDecoration(
+              color: Colors.blue,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              hint,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 30.0,
+              ),
+            ),
+          );
+        },
       ),
       ListView.builder(
-        itemCount: _contactGroupArr.length, // Replace with actual count
+        itemCount: _tabArr2.length, // Replace with actual count
         itemBuilder: (BuildContext context, int index) {
           if (isExpandeds[index] == null) {
             isExpandeds[index] = false;
@@ -333,7 +402,7 @@ class _ContactPageState extends State<ContactPage> {
           return Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              title: Text(_contactGroupArr[index]['name']),
+              title: Text(_tabArr2[index]['name']),
               controlAffinity: ListTileControlAffinity.leading,
               leading: Icon(
                 isExpandeds[index] ? Icons.arrow_drop_down : Icons.arrow_right,
@@ -350,9 +419,9 @@ class _ContactPageState extends State<ContactPage> {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _contactGroupArr[index]['children'].length,
+                  itemCount: _tabArr2[index]['children'].length,
                   itemBuilder: (BuildContext context, int indexc) {
-                    Map itemFriend = _contactGroupArr[index]['children'][indexc];
+                    Map itemFriend = _tabArr2[index]['children'][indexc];
                     return Padding(
                       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       child: Column(
@@ -360,9 +429,9 @@ class _ContactPageState extends State<ContactPage> {
                           ListTile(
                             leading: CircleAvatar(
                               radius: 20,
-                              backgroundImage: NetworkImage(itemFriend['avatar']),
+                              backgroundImage: NetworkImage(itemFriend['icon']),
                             ),
-                            title: Text(itemFriend['remark'] != "" ? itemFriend['remark'] : itemFriend['username']),
+                            title: Text(itemFriend['remark'] != "" ? itemFriend['remark'] : itemFriend['name']),
                             subtitle: Text(
                               "[${itemFriend['isOnline'] == 1 ? '在线' : '离线'}] ${itemFriend['info']}",
                               maxLines: 1,
@@ -370,7 +439,7 @@ class _ContactPageState extends State<ContactPage> {
                             ),
                             onTap: () {
                               Map talkobj = {
-                                "objId": itemFriend['uid'],
+                                "objId": itemFriend['toId'],
                                 "type": 1,
                               };
                               Navigator.pushNamed(
@@ -392,9 +461,9 @@ class _ContactPageState extends State<ContactPage> {
         },
       ),
       ListView.builder(
-        itemCount: _groupArr.length,
+        itemCount: _tabArr3.length,
         itemBuilder: (BuildContext context, int index) {
-          Map itemGroup = _groupArr[index];
+          Map itemGroup = _tabArr3[index];
           return Padding(
             padding: const EdgeInsets.fromLTRB(5, 0, 10, 0),
             child: Column(children: [
@@ -411,7 +480,7 @@ class _ContactPageState extends State<ContactPage> {
                 ),
                 onTap: () {
                   Map talkobj = {
-                    "objId": itemGroup['groupId'],
+                    "objId": itemGroup['toId'],
                     "type": 2,
                   };
                   talkobjController.setTalkObj(talkobj);

@@ -45,7 +45,7 @@ dependencies:
   web_socket_channel: ^3.0.0
   path: ^1.9.0
   sqflite: ^2.3.3+1
-  azlistview: ^2.0.0
+  azlistview_plus: ^3.0.0
   lpinyin: ^2.0.3
   flutter_slidable: ^3.1.0
   image_picker: ^1.1.1

@@ -1,9 +1,36 @@
 import 'dart:convert';
 
 import 'package:qim/utils/db.dart';
-import 'package:qim/utils/functions.dart';
 
-//0、保存用户组
+//1-1、保存user
+void saveDbUser(Map data) {
+  Map<String, dynamic> user = {};
+
+  // 需要保存的字段列表
+  List<String> fields = [
+    'uid',
+    'username',
+    'email',
+    'phone',
+    'avatar',
+    'sex',
+    'birthday',
+    'info',
+    'exp',
+    'createTime',
+  ];
+  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
+  for (var field in fields) {
+    if (data[field] != null) {
+      user[field] = data[field];
+    }
+  }
+  DBHelper.upsertData('user', user, [
+    ["uid", "=", user['uid']]
+  ]);
+}
+
+//1-2、保存用户组
 void saveDbFriendGroup(Map data) {
   Map<String, dynamic> friendGroup = {};
 
@@ -24,22 +51,14 @@ void saveDbFriendGroup(Map data) {
   ]);
 }
 
-//1、保存用户
-void saveDbFriend(Map data) {
-  Map<String, dynamic> friend = {};
+//1-3、保存联系人好友
+void saveDbContactFriend(Map data) {
+  Map<String, dynamic> contactFriend = {};
 
   // 需要保存的字段列表
   List<String> fields = [
-    'uid',
-    'username',
-    'email',
-    'phone',
-    'avatar',
-    'sex',
-    'birthday',
-    'info',
-    'exp',
-    'createTime',
+    'fromId',
+    'toId',
     'friendGroupId',
     'level',
     'remark',
@@ -53,15 +72,16 @@ void saveDbFriend(Map data) {
   // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
   for (var field in fields) {
     if (data[field] != null) {
-      friend[field] = data[field];
+      contactFriend[field] = data[field];
     }
   }
-  DBHelper.upsertData('friends', friend, [
-    ["uid", "=", friend['uid']]
+  DBHelper.upsertData('contact_friend', contactFriend, [
+    ["fromId", "=", contactFriend['fromId']],
+    ["toId", "=", contactFriend['toId']]
   ]);
 }
 
-//2、保存群组
+//2-1、保存群组
 void saveDbGroup(Map data) {
   Map<String, dynamic> group = {};
 
@@ -75,6 +95,28 @@ void saveDbGroup(Map data) {
     'num',
     'exp',
     'createTime',
+  ];
+
+  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
+  for (var field in fields) {
+    if (data[field] != null) {
+      group[field] = data[field];
+    }
+  }
+
+  DBHelper.upsertData('group', group, [
+    ["groupId", "=", group['groupId']]
+  ]);
+}
+
+//2-2、保存联系群
+void saveDbContactGroup(Map data) {
+  Map<String, dynamic> contactGroup = {};
+
+  // 需要保存的字段列表
+  List<String> fields = [
+    'fromId',
+    'toId',
     'groupPower',
     'level',
     'remark',
@@ -88,12 +130,13 @@ void saveDbGroup(Map data) {
   // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
   for (var field in fields) {
     if (data[field] != null) {
-      group[field] = data[field];
+      contactGroup[field] = data[field];
     }
   }
 
-  DBHelper.upsertData('groups', group, [
-    ["groupId", "=", group['groupId']]
+  DBHelper.upsertData('contact_group', contactGroup, [
+    ["fromId", "=", contactGroup['fromId']],
+    ["toId", "=", contactGroup['toId']]
   ]);
 }
 
@@ -129,9 +172,7 @@ void saveDbChat(Map data) {
     }
   }
 
-  logPrint(chat);
-
-  DBHelper.upsertData('chats', chat, [
+  DBHelper.upsertData('chat', chat, [
     ["objId", "=", chat['objId']],
     ["type", "=", chat['type']]
   ]);
@@ -190,5 +231,7 @@ void saveDbApply(Map data) {
       apply[field] = data[field];
     }
   }
-  DBHelper.insertData('apply', apply);
+  DBHelper.upsertData('apply', apply, [
+    ["id", "=", apply['id']],
+  ]);
 }

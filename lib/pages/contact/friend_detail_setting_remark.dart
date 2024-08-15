@@ -3,9 +3,11 @@ import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/user.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/cache.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 
 class FriendDetailSettingRemark extends StatefulWidget {
@@ -17,7 +19,9 @@ class FriendDetailSettingRemark extends StatefulWidget {
 
 class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
   final TalkobjController talkobjController = Get.find();
-  final FriendController friendController = Get.find();
+
+  final UserController userController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
 
   final TextEditingController remarkCtr = TextEditingController();
   final TextEditingController descCtr = TextEditingController();
@@ -26,29 +30,38 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
   Map userInfo = {};
 
   Map talkObj = {};
-  Map friendObj = {};
+  Map contactFriendObj = {};
 
   @override
   void initState() {
+    super.initState();
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     if (Get.arguments != null) {
       talkObj = Get.arguments;
-      friendObj = friendController.getOneFriend(talkObj['objId'])!;
-      remarkCtr.text = friendObj['remark'];
-      descCtr.text = friendObj['desc'];
+
+      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+      remarkCtr.text = contactFriendObj['remark'];
+      descCtr.text = contactFriendObj['desc'];
     }
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    remarkCtr.dispose();
+    descCtr.dispose();
+    super.dispose();
   }
 
   _doneAction() async {
     var params = {'fromId': uid, 'toId': talkObj['objId'], 'remark': remarkCtr.text, "desc": descCtr.text};
     ContactFriendApi.actContactFriend(params, onSuccess: (res) async {
-      Map data = {"uid": talkObj['objId'], "remark": remarkCtr.text, "desc": descCtr.text};
-      friendController.upsetFriend(data);
-      saveDbFriend(data);
+      Map data = {"fromId": uid, "toId": talkObj['objId'], "remark": remarkCtr.text, "desc": descCtr.text};
+      contactFriendController.upsetContactFriend(data);
+      saveDbContactFriend(data);
+      if (!mounted) return;
       setState(() {
-        friendObj = res['data'];
+        contactFriendObj = res['data'];
       });
       Navigator.pop(context);
     }, onError: (res) {

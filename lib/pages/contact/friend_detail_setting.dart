@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/api/contact_friend.dart';
+import 'package:qim/common/keys.dart';
 import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/user.dart';
+import 'package:qim/utils/cache.dart';
+import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
+import 'package:qim/widget/dialog_confirm.dart';
 
 class FriendDetailSetting extends StatefulWidget {
   const FriendDetailSetting({super.key});
@@ -34,26 +40,63 @@ class FriendDetailSettingPage extends StatefulWidget {
 
 class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
   final TalkobjController talkobjController = Get.find();
-  final FriendController friendController = Get.find();
+
+  final UserController userController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
 
+  int uid = 0;
+  Map userInfo = {};
+
   Map talkObj = {};
-  Map friendObj = {};
+  Map contactFriendObj = {};
   Map friendGroupObj = {};
 
   @override
   void initState() {
+    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+    uid = userInfo['uid'] ?? "";
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
     super.initState();
   }
 
+  void _delContact() {
+    showCustomDialog(
+      context: context,
+      content: const Text(
+        '确定要删除该好友吗？删除后将清理聊天记录。',
+        style: TextStyle(fontSize: 18),
+      ),
+      onConfirm: () async {
+        var params = {
+          'fromId': uid,
+          'toId': talkObj['objId'],
+        };
+        ContactFriendApi.delContactFriend(params, onSuccess: (res) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/',
+            (route) => false,
+          );
+        }, onError: (res) {
+          TipHelper.instance.showToast(res['msg']);
+        });
+      },
+      onConfirmText: "确定",
+      onCancel: () {
+        // 处理取消逻辑
+      },
+      onCancelText: "取消",
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      friendObj = friendController.getOneFriend(talkObj['objId'])!;
-      friendGroupObj = friendGroupController.getOneFriendGroup(friendObj['friendGroupId'])!;
+      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+      friendGroupObj = friendGroupController.getOneFriendGroup(contactFriendObj['friendGroupId'])!;
       return ListView(
         children: [
           ListTile(
@@ -62,7 +105,7 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  friendObj['remark'] != "" ? friendObj['remark'] : '未设置',
+                  contactFriendObj['remark'] != "" ? contactFriendObj['remark'] : '未设置',
                   style: const TextStyle(fontSize: 15),
                 ),
                 const Icon(Icons.chevron_right),
@@ -101,7 +144,9 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
               const SizedBox(width: 20),
               Expanded(
                 child: CustomButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _delContact();
+                  },
                   text: "删除好友",
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.red,

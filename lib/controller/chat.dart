@@ -41,12 +41,15 @@ class ChatController extends GetxController {
 
   void delChat(int objId, int type) {
     final existingChatIndex = allChats.indexWhere((c) => c['objId'] == objId && c['type'] == type);
-
     if (existingChatIndex != -1) {
       allChats.removeAt(existingChatIndex);
-      allShowChats.removeAt(existingChatIndex);
-      update();
     }
+
+    final existingChatShowIndex = allShowChats.indexWhere((c) => c['objId'] == objId && c['type'] == type);
+    if (existingChatIndex != -1) {
+      allShowChats.removeAt(existingChatShowIndex);
+    }
+    update();
   }
 
   Map? getOneChat(int objId, int type) {

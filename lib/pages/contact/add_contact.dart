@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:qim/api/group.dart';
 import 'package:qim/api/user.dart';
 import 'package:qim/common/keys.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/functions.dart';
@@ -99,7 +99,7 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
   final ScrollController _scrollGroupController = ScrollController();
   final TextEditingController _inputUserController = TextEditingController();
   final TextEditingController _inputGroupController = TextEditingController();
-  final FriendController friendController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
   final GroupController groupController = Get.find();
 
   bool _isUserLoading = false;
@@ -127,7 +127,7 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
 
-    _myFriendArr = friendController.allFriends;
+    _myFriendArr = contactFriendController.allContactFriends;
     _myGroupArr = groupController.allGroups;
 
     _scrollUserController.addListener(() {
@@ -371,9 +371,15 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
                         ),
                         trailing: _checkGroup(_groupArr[index]['groupId'])
                             ? TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/add-contact-group-do',
+                                    arguments: _groupArr[index],
+                                  );
+                                },
                                 style: ButtonStyle(
-                                  minimumSize: WidgetStateProperty.all<Size>(const Size(100, 40)),
+                                  minimumSize: WidgetStateProperty.all<Size>(const Size(40, 25)),
                                   shape: WidgetStateProperty.all<OutlinedBorder>(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(1.0), // 设置按钮的圆角

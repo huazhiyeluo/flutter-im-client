@@ -5,10 +5,12 @@ import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qim/api/common.dart';
 import 'package:qim/common/keys.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/user.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/pages/chat/talk/emoji_list.dart';
 import 'package:qim/pages/chat/talk/phone_from.dart';
@@ -39,10 +41,15 @@ class Talk extends StatefulWidget {
 
 class _TalkState extends State<Talk> {
   final TalkobjController talkobjController = Get.find();
-  final FriendController friendController = Get.find();
+  final UserController userController = Get.find();
   final GroupController groupController = Get.find();
 
+  final ContactFriendController contactFriendController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
+
   Map talkObj = {};
+  Map userInfo = {};
+  int uid = 0;
 
   String iconObj = '';
   String textObj = '';
@@ -51,14 +58,19 @@ class _TalkState extends State<Talk> {
   void initState() {
     super.initState();
     talkObj = talkobjController.talkObj;
+    Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
+    uid = userInfo == null ? "" : userInfo['uid'];
+
     if (talkObj['type'] == 1) {
-      Map friendObj = friendController.getOneFriend(talkObj['objId'])!;
-      iconObj = friendObj['avatar'];
-      textObj = friendObj['remark'] != '' ? friendObj['remark'] : friendObj['username'];
+      Map userObj = userController.getOneUser(talkObj['objId'])!;
+      Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+      iconObj = userObj['avatar'];
+      textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['username'];
     } else if (talkObj['type'] == 2) {
       Map? groupObj = groupController.getOneGroup(talkObj['objId'])!;
+      Map contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId'])!;
       iconObj = groupObj['icon'];
-      textObj = "${groupObj['remark'] != '' ? groupObj['remark'] : groupObj['name']}(${groupObj['num']})";
+      textObj = "${contactGroupObj['remark'] != '' ? contactGroupObj['remark'] : groupObj['name']}(${groupObj['num']})";
     }
   }
 
@@ -130,7 +142,6 @@ class _TalkPageState extends State<TalkPage> {
   final WebSocketController webSocketController = Get.find();
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
-  final FriendController friendController = Get.find();
   final TextEditingController _inputController = TextEditingController();
 
   double keyboardHeight = 270.0;

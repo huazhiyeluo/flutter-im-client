@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
@@ -7,15 +5,13 @@ import 'package:qim/api/contact_friend.dart';
 import 'package:qim/api/contact_group.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
-import 'package:qim/controller/group.dart';
+import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/dbdata/deldbdata.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/date.dart';
-import 'package:qim/utils/db.dart';
 import 'package:qim/dbdata/savedbdata.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_search_field.dart';
 
@@ -65,8 +61,8 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TalkobjController talkobjController = Get.find();
   final ChatController chatController = Get.find();
-  final FriendController friendController = Get.find();
-  final GroupController groupController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
   int uid = 0;
   Map userInfo = {};
 
@@ -75,7 +71,6 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
-    _getChatList();
   }
 
   @override
@@ -170,14 +165,14 @@ class _ChatPageState extends State<ChatPage> {
                   temp["icon"],
                 ),
               ),
-              title: Text(temp["name"]),
+              title: Text(temp["remark"] != '' ? temp["remark"] : temp["name"]),
               subtitle: Text(_getContent(temp["msgMedia"], temp["content"])),
               trailing: Column(children: [
                 const SizedBox(
                   height: 5,
                 ),
                 Text(
-                  _getDate(temp["operateTime"]),
+                  getSpecialDate(temp["operateTime"]),
                   style: const TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 5),
@@ -221,10 +216,10 @@ class _ChatPageState extends State<ChatPage> {
     chatData['isTop'] = 1 - temp['isTop'];
     chatController.upsetChat(chatData);
     saveDbChat(chatData);
-    actContact(temp['objId'], 'isTop', chatData['isTop'], temp['type']);
+    _actContact(temp['objId'], 'isTop', chatData['isTop'], temp['type']);
   }
 
-  void actContact(int toId, String field, int value, int type) {
+  void _actContact(int toId, String field, int value, int type) {
     var params = {
       'fromId': uid,
       'toId': toId,
@@ -232,33 +227,19 @@ class _ChatPageState extends State<ChatPage> {
     };
     if (type == 1) {
       ContactFriendApi.actContactFriend(params, onSuccess: (res) {
-        logPrint(res);
-        friendController.upsetFriend(res['data']);
-        saveDbFriend(res['data']);
+        contactFriendController.upsetContactFriend(res['data']);
+        saveDbContactFriend(res['data']);
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
     }
     if (type == 2) {
       ContactGroupApi.actContactGroup(params, onSuccess: (res) {
-        logPrint(res);
-        groupController.upsetGroup(res['data']);
-        saveDbGroup(res['data']);
+        contactGroupController.upsetContactGroup(res['data']);
+        saveDbContactGroup(res['data']);
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
-    }
-  }
-
-  _getChatList() async {
-    if (chatController.allChats.isEmpty) {
-      List chats = await DBHelper.getData('chats', []);
-
-      for (var item in chats) {
-        Map<String, dynamic> temp = Map.from(item);
-        temp['content'] = jsonDecode(item['content']);
-        chatController.upsetChat(temp);
-      }
     }
   }
 
@@ -290,16 +271,5 @@ class _ChatPageState extends State<ChatPage> {
       return "通话时长: ${formatSecondsToHMS(int.parse(content['data']))}";
     }
     return "";
-  }
-
-  String _getDate(int createTime) {
-    int nowtime = getTime();
-    String today = formatDate(nowtime, customFormat: "yyyy-MM-dd");
-    String mDay = formatDate(createTime, customFormat: "yyyy-MM-dd");
-    if (today == mDay) {
-      return formatDate(createTime, customFormat: "HH:mm");
-    } else {
-      return formatDate(createTime, customFormat: "MM-dd");
-    }
   }
 }

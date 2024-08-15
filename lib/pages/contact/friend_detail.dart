@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/keys.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/user.dart';
+import 'package:qim/utils/cache.dart';
 
 class FriendDetail extends StatefulWidget {
   const FriendDetail({super.key});
@@ -53,14 +56,22 @@ class FriendDetailPage extends StatefulWidget {
 
 class _FriendDetailPageState extends State<FriendDetailPage> {
   final TalkobjController talkobjController = Get.find();
-  final FriendController friendController = Get.find();
+
+  final UserController userController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
+
+  int uid = 0;
+  Map userInfo = {};
 
   Map talkObj = {};
-  Map friendObj = {};
+  Map userObj = {};
+  Map contactFriendObj = {};
 
   @override
   void initState() {
     super.initState();
+    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+    uid = userInfo['uid'] ?? "";
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
@@ -68,38 +79,39 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
 
   List<Widget> _getTitle() {
     List<Widget> data = [];
-    if (friendObj['remark'] != '') {
+    if (contactFriendObj['remark'] != '') {
       data.add(Text(
-        '${friendObj['remark']}',
+        '${contactFriendObj['remark']}',
         style: const TextStyle(
           fontSize: 24,
         ),
       ));
-      data.add(Text('用户名: ${friendObj['username']}'));
+      data.add(Text('用户名: ${userObj['username']}'));
     } else {
       data.add(Text(
-        '${friendObj['username']}',
+        '${userObj['username']}',
         style: const TextStyle(
           fontSize: 24,
         ),
       ));
     }
 
-    data.add(Text('QID: ${friendObj['uid']}'));
+    data.add(Text('QID: ${userObj['uid']}'));
     return data;
   }
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      friendObj = friendController.getOneFriend(talkObj['objId'])!;
+      userObj = userController.getOneUser(talkObj['objId'])!;
+      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
       return ListView(
         children: [
           ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(20.0), // 必须与 Container 的 borderRadius 相同
               child: Image.network(
-                friendObj['avatar'], // 替换为你的图片URL
+                userObj['avatar'], // 替换为你的图片URL
                 width: 60.0,
                 height: 60.0,
                 fit: BoxFit.cover,

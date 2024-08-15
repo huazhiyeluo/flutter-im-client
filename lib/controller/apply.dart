@@ -4,7 +4,8 @@ class ApplyController extends GetxController {
   final RxList<Map> allApplys = <Map>[].obs;
   final RxList<Map> allFriendChats = <Map>[].obs;
   final RxList<Map> allGroupChats = <Map>[].obs;
-  RxBool showRedPoint = false.obs;
+  RxBool showFriendRedPoint = false.obs;
+  RxBool showGroupRedPoint = false.obs;
 
   void upsetApply(Map apply) {
     final id = apply['id'];
@@ -26,9 +27,22 @@ class ApplyController extends GetxController {
       allApplys.add(apply);
     }
     allFriendChats.assignAll(allApplys.where((c) => c['type'] == 1).toList());
-    allGroupChats.assignAll(allApplys.where((c) => c['type'] == 1).toList());
+    allGroupChats.assignAll(allApplys.where((c) => c['type'] == 2).toList());
 
-    showRedPoint.value = true;
+    allFriendChats.sort((a, b) {
+      return a['status'].compareTo(b['status']);
+    });
+    allGroupChats.sort((a, b) {
+      return a['status'].compareTo(b['status']);
+    });
+
+    allApplys.where((c) => c['type'] == 1 && c['status'] == 0).forEach((element) {
+      showFriendRedPoint.value = true;
+    });
+
+    allApplys.where((c) => c['type'] == 2 && c['status'] == 0).forEach((element) {
+      showGroupRedPoint.value = true;
+    });
 
     update();
   }

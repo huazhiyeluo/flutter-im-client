@@ -5,11 +5,11 @@ import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/user.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/db.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:qim/widget/dialog_confirm.dart';
@@ -43,21 +43,27 @@ class FriendSettingChatPage extends StatefulWidget {
 
 class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
   final TalkobjController talkobjController = Get.find();
-  final FriendController friendController = Get.find();
   final MessageController messageController = Get.find();
   final ChatController chatController = Get.find();
+  final UserController userController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
 
   Map talkObj = {};
-  Map friendObj = {};
   int uid = 0;
   Map userInfo = {};
+
+  Map userObj = {};
+  Map contactFriendObj = {};
 
   @override
   void initState() {
     talkObj = talkobjController.talkObj;
-    friendObj = friendController.getOneFriend(talkObj['objId'])!;
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
+
+    userObj = userController.getOneUser(talkObj['objId'])!;
+    contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+
     super.initState();
   }
 
@@ -66,9 +72,9 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
     return ListView(
       children: [
         ListTile(
-          title: Text(friendObj['remark'] != '' ? friendObj['remark'] : friendObj['username']),
+          title: Text(contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['username']),
           leading: CircleAvatar(
-            backgroundImage: NetworkImage(friendObj['avatar'] ?? ''),
+            backgroundImage: NetworkImage(userObj['avatar'] ?? ''),
           ),
           onTap: () {
             Map talkobj = {
@@ -105,7 +111,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("设为置顶"),
           trailing: Switch(
-            value: friendObj['isTop'] == 1 ? true : false,
+            value: contactFriendObj['isTop'] == 1 ? true : false,
             onChanged: (bool val) {
               int v = val == true ? 1 : 0;
               _actContact('isTop', v);
@@ -120,7 +126,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("隐藏会话"),
           trailing: Switch(
-            value: friendObj['isHidden'] == 1 ? true : false,
+            value: contactFriendObj['isHidden'] == 1 ? true : false,
             onChanged: (bool val) {
               int v = val == true ? 1 : 0;
               _actContact('isHidden', v);
@@ -135,7 +141,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("消息免打扰"),
           trailing: Switch(
-            value: friendObj['isQuiet'] == 1 ? true : false,
+            value: contactFriendObj['isQuiet'] == 1 ? true : false,
             onChanged: (bool val) {
               int v = val == true ? 1 : 0;
               _actContact('isQuiet', v);
@@ -186,7 +192,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
     showCustomDialog(
       context: context,
       content: Text(
-        '确定要删除和${friendObj['username'] ?? ''}的聊天记录吗？',
+        '确定要删除和${userObj['username'] ?? ''}的聊天记录吗？',
         style: const TextStyle(fontSize: 18),
       ),
       onConfirm: () async {
@@ -218,11 +224,11 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
       field: value,
     };
     ContactFriendApi.actContactFriend(params, onSuccess: (res) {
-      logPrint(res);
+      if (!mounted) return;
       setState(() {
-        friendObj[field] = res['data'][field];
-        friendController.upsetFriend(res['data']);
-        saveDbFriend(res['data']);
+        contactFriendObj[field] = res['data'][field];
+        contactFriendController.upsetContactFriend(res['data']);
+        saveDbContactFriend(res['data']);
 
         if (["isTop", "isHidden", "isQuiet"].contains(field)) {
           Map chatData = {};

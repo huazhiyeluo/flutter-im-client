@@ -38,3 +38,14 @@ String formatSecondsToHMS(int totalSeconds) {
 
   return formattedTime;
 }
+
+String getSpecialDate(int createTime) {
+  int nowtime = getTime();
+  String today = formatDate(nowtime, customFormat: "yyyy-MM-dd");
+  String mDay = formatDate(createTime, customFormat: "yyyy-MM-dd");
+  if (today == mDay) {
+    return formatDate(createTime, customFormat: "HH:mm");
+  } else {
+    return formatDate(createTime, customFormat: "MM-dd");
+  }
+}

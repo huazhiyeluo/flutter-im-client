@@ -1,19 +1,25 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/api/apply.dart';
 import 'package:qim/api/contact_friend.dart';
 import 'package:qim/api/contact_group.dart';
 import 'package:qim/common/apis.dart';
 import 'package:qim/controller/apply.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/user.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/routes/route.dart';
+import 'package:qim/utils/db.dart';
 import 'package:qim/utils/play.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
@@ -36,13 +42,17 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   late WebSocketController webSocketController;
   final FriendGroupController friendGroupController = Get.put(FriendGroupController());
-  final FriendController friendController = Get.put(FriendController());
+  final ContactFriendController contactFriendController = Get.put(ContactFriendController());
+  final ContactGroupController contactGroupController = Get.put(ContactGroupController());
+
+  final UserController userController = Get.put(UserController());
   final GroupController groupController = Get.put(GroupController());
+
   final ChatController chatController = Get.put(ChatController());
   final TalkobjController talkobjController = Get.put(TalkobjController());
   final ApplyController applyController = Get.put(ApplyController());
-  int _currentIndex = 0;
 
+  int _currentIndex = 0;
   late AudioPlayerManager _audioPlayerManager;
 
   Map userInfo = {};
@@ -57,13 +67,14 @@ class _HomeState extends State<Home> {
 
     Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
     uid = userInfo == null ? "" : userInfo['uid'];
-
     webSocketController = Get.put(WebSocketController(uid, Apis.socketUrl));
     _initOnReceive();
 
+    _getFriendGroupList();
+    _getContactFriendList();
     _getContactGroupList();
-    _getFriendList();
-    _getGroupList();
+    _getChatList();
+    _getApplyList();
   }
 
   @override
@@ -75,7 +86,6 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _initOnReceive() async {
-    // 初始化 WebSocket 监听
     webSocketController.message.listen((msg) async {
       // 1、私聊和群聊消息到数据库  2、加入chat列表|保存chat数据到  3、obj对象
       if ([1, 2].contains(msg['msgType']) || ([4].contains(msg['msgType']) && [0].contains(msg['msgMedia']))) {
@@ -90,15 +100,15 @@ class _HomeState extends State<Home> {
           Get.offAllNamed(initialRouteData);
         }
         if (msg['msgMedia'] == 11) {
-          Map item = {"uid": msg['fromId'], "isOnline": 1};
-          friendController.upsetFriend(item);
-          saveDbFriend(item);
+          Map item = {"fromId": msg['toId'], "toId": msg['fromId'], "isOnline": 1};
+          contactFriendController.upsetContactFriend(item);
+          saveDbContactFriend(item);
           await _audioPlayerManager.playSound("1.mp3");
         }
         if (msg['msgMedia'] == 12) {
-          Map item = {"uid": msg['fromId'], "isOnline": 0};
-          friendController.upsetFriend(item);
-          saveDbFriend(item);
+          Map item = {"fromId": msg['toId'], "toId": msg['fromId'], "isOnline": 0};
+          contactFriendController.upsetContactFriend(item);
+          saveDbContactFriend(item);
         }
         if ([21, 22, 23, 24].contains(msg['msgMedia'])) {
           loadFriendManage(uid, msg);
@@ -110,7 +120,7 @@ class _HomeState extends State<Home> {
 
       //设置当前聊天Obj
       if ([4].contains(msg['msgType']) && msg['msgMedia'] == 0) {
-        Map<String, dynamic>? objUser = await getDbOneFriend(msg['fromId']);
+        Map<String, dynamic>? objUser = await getDbOneUser(msg['fromId']);
         if (objUser == null) {
           return;
         }
@@ -194,7 +204,7 @@ class _HomeState extends State<Home> {
           BottomNavigationBarItem(
             label: '通讯录',
             icon: Obx(() {
-              bool showRedPoint = applyController.showRedPoint.value;
+              bool showRedPoint = applyController.showFriendRedPoint.value || applyController.showGroupRedPoint.value;
               return Stack(
                 children: [
                   Container(
@@ -237,7 +247,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  void _getContactGroupList() async {
+  void _getFriendGroupList() async {
     var params = {"ownerUid": uid};
     ContactFriendApi.getContactFriendGroup(params, onSuccess: (res) {
       if (!mounted) return;
@@ -246,8 +256,7 @@ class _HomeState extends State<Home> {
         friendGroupArr = res['data'];
       }
       Map defaultContactGroup = {"friendGroupId": 0, "ownerUid": uid, "name": "默认分组"};
-      friendGroupController.upsetFriendGroup(defaultContactGroup);
-      saveDbFriendGroup(defaultContactGroup);
+      friendGroupArr.insert(0, defaultContactGroup);
 
       for (var item in friendGroupArr) {
         friendGroupController.upsetFriendGroup(item);
@@ -258,41 +267,99 @@ class _HomeState extends State<Home> {
     });
   }
 
-  void _getFriendList() async {
+  void _getContactFriendList() async {
     var params = {
       'fromId': uid,
     };
     ContactFriendApi.getContactFriendList(params, onSuccess: (res) {
       if (!mounted) return;
-      List friendArr = [];
-      if (res['data'] != null) {
-        friendArr = res['data'];
+      List usersArr = [];
+      if (res['data']['users'] != null) {
+        usersArr = res['data']['users'];
       }
-      for (var item in friendArr) {
-        friendController.upsetFriend(item);
-        saveDbFriend(item);
+      for (var item in usersArr) {
+        userController.upsetUser(item);
+        saveDbUser(item);
+      }
+
+      List contactFriendsArr = [];
+      if (res['data']['contactFriends'] != null) {
+        contactFriendsArr = res['data']['contactFriends'];
+      }
+      for (var item in contactFriendsArr) {
+        contactFriendController.upsetContactFriend(item);
+        saveDbContactFriend(item);
       }
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
   }
 
-  void _getGroupList() async {
+  void _getContactGroupList() async {
     var params = {
       'fromId': uid,
     };
     ContactGroupApi.getContactGroupList(params, onSuccess: (res) {
       if (!mounted) return;
-      List groupArr = [];
-      if (res['data'] != null) {
-        groupArr = res['data'];
+      List groupsArr = [];
+      if (res['data']['groups'] != null) {
+        groupsArr = res['data']['groups'];
       }
-      for (var item in groupArr) {
+      for (var item in groupsArr) {
         groupController.upsetGroup(item);
         saveDbGroup(item);
+      }
+
+      List contactGroupsArr = [];
+      if (res['data']['contactGroups'] != null) {
+        contactGroupsArr = res['data']['contactGroups'];
+      }
+      for (var item in contactGroupsArr) {
+        contactGroupController.upsetContactGroup(item);
+        saveDbContactGroup(item);
       }
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
+  }
+
+  void _getChatList() async {
+    if (chatController.allChats.isEmpty) {
+      List chats = await DBHelper.getData('chat', []);
+
+      for (var item in chats) {
+        Map<String, dynamic> temp = Map.from(item);
+        temp['content'] = jsonDecode(item['content']);
+        chatController.upsetChat(temp);
+      }
+    }
+  }
+
+  void _getApplyList() async {
+    // var params = {
+    //   'uid': uid,
+    // };
+    // ApplyApi.getApplyList(params, onSuccess: (res) {
+    //   if (!mounted) return;
+    //   List applyArr = [];
+    //   if (res['data'] != null) {
+    //     applyArr = res['data'];
+    //   }
+    //   for (var item in applyArr) {
+    //     applyController.upsetApply(item);
+    //     saveDbApply(item);
+    //   }
+    // }, onError: (res) {
+    //   TipHelper.instance.showToast(res['msg']);
+    // });
+
+    if (applyController.allApplys.isEmpty) {
+      List applys = await DBHelper.getData('apply', []);
+
+      for (var item in applys) {
+        Map<String, dynamic> temp = Map.from(item);
+        applyController.upsetApply(temp);
+      }
+    }
   }
 }

@@ -55,13 +55,19 @@ class _NoticeUserPageState extends State<NoticeUserPage> {
 
   @override
   void initState() {
+    super.initState();
     ever(applyController.allFriendChats, (_) => _formatData());
     _formatData();
 
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
     _fetchData();
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    inputController.dispose();
+    super.dispose();
   }
 
   void _fetchData() async {
@@ -69,6 +75,7 @@ class _NoticeUserPageState extends State<NoticeUserPage> {
   }
 
   void _formatData() {
+    if (!mounted) return;
     setState(() {
       _applys = applyController.allFriendChats;
     });

@@ -4,7 +4,7 @@ import 'package:qim/api/contact_friend.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/friend.dart';
+import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
@@ -19,7 +19,7 @@ class FriendDetailSettingGroup extends StatefulWidget {
 
 class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
   final TalkobjController talkobjController = Get.find();
-  final FriendController friendController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
   final TextEditingController nameCtr = TextEditingController();
 
@@ -27,7 +27,7 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
   Map userInfo = {};
 
   Map talkObj = {};
-  Map friendObj = {};
+  Map contactFriendObj = {};
 
   @override
   void initState() {
@@ -35,23 +35,23 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
     uid = userInfo['uid'] ?? "";
     if (Get.arguments != null) {
       talkObj = Get.arguments;
-      friendObj = friendController.getOneFriend(talkObj['objId'])!;
+      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
     }
     super.initState();
   }
 
   void _doneAction(int friendGroupId) async {
-    if (friendGroupId == friendObj['friendObj']) {
+    if (friendGroupId == contactFriendObj['friendGroupId']) {
       TipHelper.instance.showToast("已经在该分组中");
     } else {
-      friendObj['friendObj'] = friendGroupId;
+      contactFriendObj['friendGroupId'] = friendGroupId;
       var params = {'fromId': uid, 'toId': talkObj['objId'], 'friendGroupId': friendGroupId};
       ContactFriendApi.actContactFriend(params, onSuccess: (res) async {
-        Map data = {"uid": talkObj['objId'], "friendGroupId": friendGroupId};
-        friendController.upsetFriend(data);
-        saveDbFriend(data);
+        Map data = {"fromId": uid, "toId": talkObj['objId'], "friendGroupId": friendGroupId};
+        contactFriendController.upsetContactFriend(data);
+        saveDbContactFriend(data);
         setState(() {
-          friendObj = res['data'];
+          contactFriendObj = res['data'];
         });
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
@@ -71,10 +71,8 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
       onConfirm: () async {
         var params = {'ownerUid': uid, 'name': nameCtr.text};
         ContactFriendApi.addContactFriendGroup(params, onSuccess: (res) async {
-          if (res['code'] == 0) {
-            friendGroupController.upsetFriendGroup(res['data']);
-            saveDbFriendGroup(res['data']);
-          }
+          friendGroupController.upsetFriendGroup(res['data']);
+          saveDbFriendGroup(res['data']);
         }, onError: (res) {
           TipHelper.instance.showToast(res['msg']);
         });
@@ -118,7 +116,7 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
                       children: [
                         ListTile(
                           title: Text(temp["name"]),
-                          trailing: friendObj['friendGroupId'] == temp['friendGroupId']
+                          trailing: contactFriendObj['friendGroupId'] == temp['friendGroupId']
                               ? const Icon(
                                   Icons.done,
                                   color: Colors.blue,

@@ -3,6 +3,7 @@ import 'package:qim/common/keys.dart';
 import 'package:qim/middleware/homeMiddleware.dart';
 import 'package:qim/pages/contact/add_contact.dart';
 import 'package:qim/pages/contact/add_contact_friend_do.dart';
+import 'package:qim/pages/contact/add_contact_group_do.dart';
 import 'package:qim/pages/contact/group_setting.dart';
 import 'package:qim/pages/contact/group_user.dart';
 import 'package:qim/pages/chat/talk.dart';
@@ -51,6 +52,7 @@ class AppPage {
     GetPage(name: "/person-setting", page: () => const Setting()),
     GetPage(name: "/add-contact", page: () => const AddContact()),
     GetPage(name: "/add-contact-friend-do", page: () => const AddContactFriendDo()),
+    GetPage(name: "/add-contact-group-do", page: () => const AddContactGroupDo()),
   ];
 }
 
@@ -74,13 +76,14 @@ Future<void> initialDb(int uid) async {
   String dbName = 'qim-$uid.db';
   // await DBHelper.deleteDatabase(dbName);
   List<String> tableSQLs = [
-    'CREATE TABLE IF NOT EXISTS friend_group (friendGroupId INTEGER PRIMARY KEY, name TEXT, ownerUid INTEGER);',
-    'CREATE TABLE IF NOT EXISTS friends (uid INTEGER PRIMARY KEY, username TEXT, email TEXT, phone TEXT, avatar TEXT, sex INTEGER, birthday INTEGER, info TEXT, exp INTEGER, createTime INTEGER, friendGroupId INTEGER, level INTEGER, remark TEXT,desc TEXT,isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER, isOnline INTEGER);',
-    'CREATE TABLE IF NOT EXISTS groups (groupId INTEGER PRIMARY KEY, ownerUid INTEGER, name TEXT, icon TEXT, info TEXT, num INTEGER, exp INTEGER, createTime INTEGER, groupPower INTEGER, level INTEGER, remark TEXT, nickname TEXT, isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER);',
-    'CREATE TABLE IF NOT EXISTS group_members (id INTEGER PRIMARY KEY AUTOINCREMENT, groupId INTEGER, memberId INTEGER, username TEXT, avatar TEXT,level INTEGER, remark TEXT,joinTime INTEGER, isOnline INTEGER)',
-    'CREATE TABLE IF NOT EXISTS message (id INTEGER PRIMARY KEY AUTOINCREMENT, fromId INTEGER, toId INTEGER, avatar TEXT, msgType INTEGER, msgMedia INTEGER, content TEXT,  createTime INTEGER)',
-    'CREATE TABLE IF NOT EXISTS apply (id INTEGER PRIMARY KEY AUTOINCREMENT, fromId INTEGER, fromName TEXT, fromIcon TEXT, toId INTEGER, toName TEXT, toIcon TEXT, type INTEGER, status INTEGER, reason TEXT, operateTime INTEGER)',
-    'CREATE TABLE IF NOT EXISTS chats (id INTEGER PRIMARY KEY,objId INTEGER,type INTEGER, name TEXT, info TEXT,remark TEXT, icon TEXT, isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, tips INTEGER, operateTime INTEGER, msgMedia INTEGER, content TEXT)',
+    'CREATE TABLE IF NOT EXISTS `apply` (id INTEGER PRIMARY KEY, fromId INTEGER, fromName TEXT, fromIcon TEXT, toId INTEGER, toName TEXT, toIcon TEXT, type INTEGER, status INTEGER, reason TEXT, operateTime INTEGER)',
+    'CREATE TABLE IF NOT EXISTS `friend_group` (friendGroupId INTEGER PRIMARY KEY, name TEXT, ownerUid INTEGER);',
+    'CREATE TABLE IF NOT EXISTS `user` (uid INTEGER PRIMARY KEY, username TEXT, email TEXT, phone TEXT, avatar TEXT, sex INTEGER, birthday INTEGER, info TEXT, exp INTEGER, createTime INTEGER)',
+    'CREATE TABLE IF NOT EXISTS `contact_friend` (fromId INTEGER,toId INTEGER,friendGroupId INTEGER, level INTEGER, remark TEXT,desc TEXT,isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER, isOnline INTEGER);',
+    'CREATE TABLE IF NOT EXISTS `group` (groupId INTEGER PRIMARY KEY, ownerUid INTEGER, name TEXT, icon TEXT, info TEXT, num INTEGER, exp INTEGER, createTime INTEGER)',
+    'CREATE TABLE IF NOT EXISTS `contact_group` (fromId INTEGER,toId INTEGER,groupPower INTEGER, level INTEGER, remark TEXT, nickname TEXT, isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER);',
+    'CREATE TABLE IF NOT EXISTS `message` (id INTEGER PRIMARY KEY, fromId INTEGER, toId INTEGER, avatar TEXT, msgType INTEGER, msgMedia INTEGER, content TEXT,  createTime INTEGER)',
+    'CREATE TABLE IF NOT EXISTS `chat` (id INTEGER PRIMARY KEY,objId INTEGER,type INTEGER, name TEXT, info TEXT,remark TEXT, icon TEXT, isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, tips INTEGER, operateTime INTEGER, msgMedia INTEGER, content TEXT)',
   ];
   await DBHelper.initDatabase(dbName, tableSQLs);
 }
