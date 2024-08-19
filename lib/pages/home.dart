@@ -128,7 +128,7 @@ class _HomeState extends State<Home> {
         Map talkobj = {
           "objId": msg['fromId'],
           "type": 1,
-          "name": objUser['username'],
+          "name": objUser['nickname'],
           "icon": objUser['avatar'],
           "info": objUser['info'],
           "remark": objUser['remark'],

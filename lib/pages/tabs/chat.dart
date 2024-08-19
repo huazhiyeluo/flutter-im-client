@@ -97,6 +97,7 @@ class _ChatPageState extends State<ChatPage> {
               extentRatio: extentRatioTop / 3,
               children: [
                 CustomSlidableAction(
+                  padding: EdgeInsets.zero,
                   flex: flexTop,
                   onPressed: (slidCtx) {
                     _setTop(temp);
@@ -158,50 +159,75 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ],
             ),
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 20,
-                backgroundImage: NetworkImage(
-                  temp["icon"],
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(5, 0, 10, 0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                border: const Border(
+                  bottom: BorderSide(color: Color.fromARGB(255, 203, 201, 201), width: 1.0),
                 ),
               ),
-              title: Text(temp["remark"] != '' ? temp["remark"] : temp["name"]),
-              subtitle: Text(_getContent(temp["msgMedia"], temp["content"])),
-              trailing: Column(children: [
-                const SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  getSpecialDate(temp["operateTime"]),
-                  style: const TextStyle(fontSize: 14),
-                ),
-                const SizedBox(height: 5),
-                temp['isQuiet'] == 1
-                    ? const Icon(Icons.notifications_off_outlined)
-                    : Text(
-                        '${temp["tips"]}',
-                        style: const TextStyle(fontSize: 15),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: CircleAvatar(
+                      radius: 20,
+                      backgroundImage: NetworkImage(
+                        temp["icon"],
                       ),
-              ]),
-              onTap: () {
-                Map talkobj = {
-                  "objId": temp["objId"],
-                  "type": temp["type"],
-                };
-                talkobjController.setTalkObj(talkobj);
+                    ),
+                    title: Text(temp["remark"] != '' ? temp["remark"] : temp["name"]),
+                    subtitle: Text(
+                      _getContent(temp["msgMedia"], temp["content"]),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: Column(children: [
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        getSpecialDate(temp["operateTime"]),
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                      const SizedBox(height: 3),
+                      temp['isQuiet'] == 1
+                          ? const Icon(Icons.notifications_off_outlined)
+                          : Container(
+                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                              decoration: BoxDecoration(
+                                color: temp["type"] == 1 ? Colors.red[200] : Colors.grey[200],
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '${temp["tips"]}',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                ),
+                              )),
+                    ]),
+                    onTap: () {
+                      Map talkobj = {
+                        "objId": temp["objId"],
+                        "type": temp["type"],
+                      };
+                      talkobjController.setTalkObj(talkobj);
 
-                Map chatData = {};
-                chatData['objId'] = temp["objId"];
-                chatData['type'] = temp["type"];
-                chatData['tips'] = 0;
-                chatController.upsetChat(chatData);
-                saveDbChat(chatData);
+                      Map chatData = {};
+                      chatData['objId'] = temp["objId"];
+                      chatData['type'] = temp["type"];
+                      chatData['tips'] = 0;
+                      chatController.upsetChat(chatData);
+                      saveDbChat(chatData);
 
-                Navigator.pushNamed(
-                  context,
-                  '/talk',
-                );
-              },
+                      Navigator.pushNamed(
+                        context,
+                        '/talk',
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           );
         },

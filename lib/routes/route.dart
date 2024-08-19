@@ -4,7 +4,7 @@ import 'package:qim/middleware/homeMiddleware.dart';
 import 'package:qim/pages/contact/add_contact.dart';
 import 'package:qim/pages/contact/add_contact_friend_do.dart';
 import 'package:qim/pages/contact/add_contact_group_do.dart';
-import 'package:qim/pages/contact/group_setting.dart';
+import 'package:qim/pages/contact/group_chat_setting.dart';
 import 'package:qim/pages/contact/group_user.dart';
 import 'package:qim/pages/chat/talk.dart';
 import 'package:qim/pages/contact/friend_detail.dart';
@@ -44,7 +44,7 @@ class AppPage {
     GetPage(name: "/friend-detail-setting-remark", page: () => const FriendDetailSettingRemark()),
     GetPage(name: "/friend-detail-setting-group", page: () => const FriendDetailSettingGroup()),
     GetPage(name: "/friend-chat-setting", page: () => const FriendSettingChat()),
-    GetPage(name: "/group-setting", page: () => const Group()),
+    GetPage(name: "/group-chat-setting", page: () => const GroupChatSetting()),
     GetPage(name: "/group-user", page: () => const GroupUser()),
     GetPage(name: "/notice-user", page: () => const NoticeUser()),
     GetPage(name: "/notice-friend-detail", page: () => const NoticeFriendDetail()),
@@ -78,7 +78,7 @@ Future<void> initialDb(int uid) async {
   List<String> tableSQLs = [
     'CREATE TABLE IF NOT EXISTS `apply` (id INTEGER PRIMARY KEY, fromId INTEGER, fromName TEXT, fromIcon TEXT, toId INTEGER, toName TEXT, toIcon TEXT, type INTEGER, status INTEGER, reason TEXT, operateTime INTEGER)',
     'CREATE TABLE IF NOT EXISTS `friend_group` (friendGroupId INTEGER PRIMARY KEY, name TEXT, ownerUid INTEGER);',
-    'CREATE TABLE IF NOT EXISTS `user` (uid INTEGER PRIMARY KEY, username TEXT, email TEXT, phone TEXT, avatar TEXT, sex INTEGER, birthday INTEGER, info TEXT, exp INTEGER, createTime INTEGER)',
+    'CREATE TABLE IF NOT EXISTS `user` (uid INTEGER PRIMARY KEY, nickname TEXT, email TEXT, phone TEXT, avatar TEXT, sex INTEGER, birthday INTEGER, info TEXT, exp INTEGER, createTime INTEGER)',
     'CREATE TABLE IF NOT EXISTS `contact_friend` (fromId INTEGER,toId INTEGER,friendGroupId INTEGER, level INTEGER, remark TEXT,desc TEXT,isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER, isOnline INTEGER);',
     'CREATE TABLE IF NOT EXISTS `group` (groupId INTEGER PRIMARY KEY, ownerUid INTEGER, name TEXT, icon TEXT, info TEXT, num INTEGER, exp INTEGER, createTime INTEGER)',
     'CREATE TABLE IF NOT EXISTS `contact_group` (fromId INTEGER,toId INTEGER,groupPower INTEGER, level INTEGER, remark TEXT, nickname TEXT, isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER);',

@@ -65,7 +65,7 @@ class _TalkState extends State<Talk> {
       Map userObj = userController.getOneUser(talkObj['objId'])!;
       Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
       iconObj = userObj['avatar'];
-      textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['username'];
+      textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname'];
     } else if (talkObj['type'] == 2) {
       Map? groupObj = groupController.getOneGroup(talkObj['objId'])!;
       Map contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId'])!;
@@ -118,7 +118,7 @@ class _TalkState extends State<Talk> {
               } else if (talkObj['type'] == 2) {
                 Navigator.pushNamed(
                   context,
-                  '/group-setting',
+                  '/group-chat-setting',
                 );
               }
             },

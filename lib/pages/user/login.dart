@@ -37,7 +37,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController nicknameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
           SizedBox(
               height: 50, // 设置TextField的高度
               child: TextField(
-                controller: usernameController, // 用户名控制器
+                controller: nicknameController, // 用户名控制器
                 keyboardType: TextInputType.name,
                 decoration: InputDecoration(
                   labelText: '用户名',
@@ -153,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _loginAction() async {
-    var params = {'username': usernameController.text, 'password': passwordController.text};
+    var params = {'nickname': nicknameController.text, 'password': passwordController.text};
     LoginApi.login(params, onSuccess: (res) async {
       CacheHelper.saveData(Keys.userInfo, res['data']);
       String initialRouteData = await initialRoute();

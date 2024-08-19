@@ -72,7 +72,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
     return ListView(
       children: [
         ListTile(
-          title: Text(contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['username']),
+          title: Text(contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname']),
           leading: CircleAvatar(
             backgroundImage: NetworkImage(userObj['avatar'] ?? ''),
           ),
@@ -155,7 +155,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
         ListTile(
           contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
           title: const Text("删除聊天记录"),
-          onTap: delMessage,
+          onTap: _delMessage,
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -188,11 +188,11 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
     );
   }
 
-  void delMessage() {
+  void _delMessage() {
     showCustomDialog(
       context: context,
       content: Text(
-        '确定要删除和${userObj['username'] ?? ''}的聊天记录吗？',
+        '确定要删除和${userObj['nickname'] ?? ''}的聊天记录吗？',
         style: const TextStyle(fontSize: 18),
       ),
       onConfirm: () async {
@@ -231,12 +231,15 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
         saveDbContactFriend(res['data']);
 
         if (["isTop", "isHidden", "isQuiet"].contains(field)) {
-          Map chatData = {};
-          chatData['objId'] = talkObj['objId'];
-          chatData['type'] = 1;
-          chatData[field] = res['data'][field];
-          chatController.upsetChat(chatData);
-          saveDbChat(chatData);
+          Map? chat = chatController.getOneChat(talkObj['objId'], 1);
+          if (chat != null) {
+            Map chatData = {};
+            chatData['objId'] = talkObj['objId'];
+            chatData['type'] = 1;
+            chatData[field] = res['data'][field];
+            chatController.upsetChat(chatData);
+            saveDbChat(chatData);
+          }
         }
       });
     }, onError: (res) {

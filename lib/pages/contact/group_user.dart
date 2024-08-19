@@ -2,6 +2,12 @@ import 'package:azlistview_plus/azlistview_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lpinyin/lpinyin.dart';
+import 'package:qim/common/keys.dart';
+import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/contact_group.dart';
+import 'package:qim/controller/user.dart';
+import 'package:qim/utils/cache.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/widget/custom_search_field.dart';
 
 class UserModel extends ISuspensionBean {
@@ -12,6 +18,7 @@ class UserModel extends ISuspensionBean {
   String? remark;
   String? tagIndex; // 这个字段就是tag
   String? namePinyin;
+  int? isContact;
 
   @override
   String getSuspensionTag() => tagIndex!;
@@ -46,27 +53,58 @@ class GroupUserPage extends StatefulWidget {
 
 class _GroupUserPageState extends State<GroupUserPage> {
   final TextEditingController inputController = TextEditingController();
+  final UserController userController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
 
-  final List<UserModel> _userArr = [];
+  int uid = 0;
+  Map userInfo = {};
+
+  Map talkObj = {};
+  List<UserModel> _userArr = [];
 
   @override
   void initState() {
-    super.initState();
-
-    for (var item in Get.arguments) {
-      UserModel chat = UserModel();
-      chat.uid = item['uid'];
-      chat.name = item['username'];
-      chat.icon = item['avatar'];
-      chat.info = item['info'];
-      chat.remark = item['remark'];
-      chat.namePinyin = PinyinHelper.getPinyin(item['username']);
-      String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
-      chat.tagIndex = firstLetter.toUpperCase();
-      _userArr.add(chat);
+    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+    uid = userInfo['uid'] ?? "";
+    if (Get.arguments != null) {
+      talkObj = Get.arguments;
     }
+    _formatData();
+    super.initState();
+  }
 
-    _userArr.sort((a, b) => a.tagIndex!.compareTo(b.tagIndex!));
+  void _formatData() {
+    logPrint("_formatData");
+    final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
+    _userArr.clear();
+    for (var item in contactGroups) {
+      Map userObj = userController.getOneUser(item['fromId'])!;
+      Map? contactFriendObj = contactFriendController.getOneContactFriend(uid, item['fromId']);
+      logPrint(userObj['nickname']);
+      if (userObj['nickname'].contains(inputController.text) ||
+          item['remark'].contains(inputController.text) ||
+          item['fromId'].toString().contains(inputController.text)) {
+        logPrint("contains: ${userObj['nickname']}");
+
+        UserModel chat = UserModel();
+        chat.uid = item['fromId'];
+        chat.name = userObj['nickname'];
+        chat.icon = userObj['avatar'];
+        chat.info = userObj['info'];
+        chat.remark = item['remark'];
+        chat.isContact = contactFriendObj == null ? 0 : 1;
+        chat.namePinyin = PinyinHelper.getPinyin(item['remark'] != '' ? item['remark'] : userObj['nickname']);
+        String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
+        chat.tagIndex = firstLetter.toUpperCase();
+        _userArr.add(chat);
+      }
+    }
+    setState(() {
+      _userArr = _userArr;
+    });
+
+    SuspensionUtil.sortListBySuspensionTag(_userArr);
     SuspensionUtil.setShowSuspensionStatus(_userArr);
   }
 
@@ -83,8 +121,8 @@ class _GroupUserPageState extends State<GroupUserPage> {
             expands: false,
             maxHeight: 40,
             minHeight: 40,
-            onTap: () {
-              // 处理点击事件的逻辑
+            onSubmitted: (val) {
+              _formatData();
             },
           ),
         ),
@@ -104,21 +142,36 @@ class _GroupUserPageState extends State<GroupUserPage> {
                     backgroundImage: NetworkImage(_userArr[index].icon!),
                   ),
                   title: Text('${_userArr[index].remark != "" ? _userArr[index].remark : _userArr[index].name}'),
-                  trailing: TextButton(
-                    onPressed: () {},
-                    style: ButtonStyle(
-                      shape: WidgetStateProperty.all<OutlinedBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(2.0), // 设置按钮的圆角
-                          side: const BorderSide(color: Colors.grey), // 设置按钮的边框颜色和宽度
-                        ),
-                      ),
-                    ),
-                    child: const Text(
-                      "添加",
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
+                  trailing: _userArr[index].uid == uid
+                      ? const Text("自己")
+                      : _userArr[index].isContact == 0
+                          ? TextButton(
+                              onPressed: () {
+                                Map userObj = {};
+                                userObj['uid'] = _userArr[index].uid;
+                                userObj['nickname'] = _userArr[index].name;
+                                userObj['avatar'] = _userArr[index].icon;
+                                userObj['info'] = _userArr[index].info;
+                                Navigator.pushNamed(
+                                  context,
+                                  '/add-contact-friend-do',
+                                  arguments: userObj,
+                                );
+                              },
+                              style: ButtonStyle(
+                                shape: WidgetStateProperty.all<OutlinedBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(2.0), // 设置按钮的圆角
+                                    side: const BorderSide(color: Colors.grey), // 设置按钮的边框颜色和宽度
+                                  ),
+                                ),
+                              ),
+                              child: const Text(
+                                "添加",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            )
+                          : const Text(""),
                   onTap: () {},
                 ),
               ),

@@ -45,6 +45,7 @@ class AddContactGroupDoPage extends StatefulWidget {
 class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
   final TextEditingController _inputReasonController = TextEditingController();
   final TextEditingController _inputRemarkController = TextEditingController();
+  final TextEditingController _inputInfoController = TextEditingController();
 
   Map groupObj = {};
   int uid = 0;
@@ -58,7 +59,7 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
     }
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
-    _inputReasonController.text = "我是${userInfo['username']}";
+    _inputReasonController.text = "我是${userInfo['nickname']}";
     super.initState();
   }
 
@@ -68,6 +69,7 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
       'toId': groupObj['groupId'],
       'reason': _inputReasonController.text,
       'remark': _inputRemarkController.text,
+      'info': _inputInfoController.text,
     };
     ContactGroupApi.joinContactGroup(params, onSuccess: (res) {
       setState(() {});
@@ -107,8 +109,8 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
                 hintText: '',
                 expands: true,
                 maxHeight: 160,
-                minHeight: 120,
-                maxLines: 5,
+                minHeight: 80,
+                maxLines: 3,
               ),
             ],
           ),
@@ -129,6 +131,26 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
                 maxHeight: 160,
                 minHeight: 40,
                 maxLines: 1,
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(15, 0, 15, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "入群后在群聊中发送进群介绍(选填)",
+                style: TextStyle(height: 2),
+              ),
+              CustomTextField(
+                controller: _inputInfoController,
+                hintText: '',
+                expands: true,
+                maxHeight: 160,
+                minHeight: 40,
+                maxLines: 4,
               ),
             ],
           ),

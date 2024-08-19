@@ -268,7 +268,7 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
                           radius: 20,
                           backgroundImage: NetworkImage(_userArr[index]['avatar']),
                         ),
-                        title: Text(_userArr[index]['username']),
+                        title: Text(_userArr[index]['nickname']),
                         subtitle: Text(
                           _userArr[index]['info'],
                           maxLines: 1,

@@ -38,3 +38,9 @@ Future<void> delDbContactGroup(int fromId, int toId) async {
     ['toId', '=', toId]
   ]);
 }
+
+Future<void> delDbContactGroupByGroupId(int toId) async {
+  await DBHelper.deleteData('contact_group', [
+    ['toId', '=', toId]
+  ]);
+}

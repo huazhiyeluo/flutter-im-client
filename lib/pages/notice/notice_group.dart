@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:qim/api/apply.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/apply.dart';
+import 'package:qim/dbdata/deldbdata.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/db.dart';
 import 'package:qim/utils/tips.dart';
@@ -16,6 +17,13 @@ class NoticeGroup extends StatefulWidget {
 }
 
 class _NoticeGroupState extends State<NoticeGroup> {
+  final ApplyController applyController = Get.find();
+
+  void _clearApply() {
+    applyController.clearApply(2);
+    delDbApply(2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +32,9 @@ class _NoticeGroupState extends State<NoticeGroup> {
         backgroundColor: Colors.grey[100],
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              _clearApply();
+            },
             child: const Text("清空"),
           ),
         ],
@@ -57,6 +67,11 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
     uid = userInfo['uid'] ?? "";
     _fetchData();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   void _fetchData() async {

@@ -1,15 +1,13 @@
 import 'dart:convert';
-
 import 'package:qim/utils/db.dart';
 
-//1-1、保存user
-void saveDbUser(Map data) {
+// 1-1、保存user
+Future<void> saveDbUser(Map data) async {
   Map<String, dynamic> user = {};
 
-  // 需要保存的字段列表
   List<String> fields = [
     'uid',
-    'username',
+    'nickname',
     'email',
     'phone',
     'avatar',
@@ -19,43 +17,43 @@ void saveDbUser(Map data) {
     'exp',
     'createTime',
   ];
-  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
+
   for (var field in fields) {
     if (data[field] != null) {
       user[field] = data[field];
     }
   }
-  DBHelper.upsertData('user', user, [
+
+  await DBHelper.upsertData('user', user, [
     ["uid", "=", user['uid']]
   ]);
 }
 
-//1-2、保存用户组
-void saveDbFriendGroup(Map data) {
+// 1-2、保存用户组
+Future<void> saveDbFriendGroup(Map data) async {
   Map<String, dynamic> friendGroup = {};
 
-  // 需要保存的字段列表
   List<String> fields = [
     'friendGroupId',
     'ownerUid',
     'name',
   ];
-  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
+
   for (var field in fields) {
     if (data[field] != null) {
       friendGroup[field] = data[field];
     }
   }
-  DBHelper.upsertData('friend_group', friendGroup, [
+
+  await DBHelper.upsertData('friend_group', friendGroup, [
     ["friendGroupId", "=", friendGroup['friendGroupId']]
   ]);
 }
 
-//1-3、保存联系人好友
-void saveDbContactFriend(Map data) {
+// 1-3、保存联系人好友
+Future<void> saveDbContactFriend(Map data) async {
   Map<String, dynamic> contactFriend = {};
 
-  // 需要保存的字段列表
   List<String> fields = [
     'fromId',
     'toId',
@@ -69,23 +67,23 @@ void saveDbContactFriend(Map data) {
     'joinTime',
     'isOnline'
   ];
-  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
+
   for (var field in fields) {
     if (data[field] != null) {
       contactFriend[field] = data[field];
     }
   }
-  DBHelper.upsertData('contact_friend', contactFriend, [
+
+  await DBHelper.upsertData('contact_friend', contactFriend, [
     ["fromId", "=", contactFriend['fromId']],
     ["toId", "=", contactFriend['toId']]
   ]);
 }
 
-//2-1、保存群组
-void saveDbGroup(Map data) {
+// 2-1、保存群组
+Future<void> saveDbGroup(Map data) async {
   Map<String, dynamic> group = {};
 
-  // 需要保存的字段列表
   List<String> fields = [
     'groupId',
     'ownerUid',
@@ -97,23 +95,21 @@ void saveDbGroup(Map data) {
     'createTime',
   ];
 
-  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
   for (var field in fields) {
     if (data[field] != null) {
       group[field] = data[field];
     }
   }
 
-  DBHelper.upsertData('group', group, [
+  await DBHelper.upsertData('group', group, [
     ["groupId", "=", group['groupId']]
   ]);
 }
 
-//2-2、保存联系群
-void saveDbContactGroup(Map data) {
+// 2-2、保存联系群
+Future<void> saveDbContactGroup(Map data) async {
   Map<String, dynamic> contactGroup = {};
 
-  // 需要保存的字段列表
   List<String> fields = [
     'fromId',
     'toId',
@@ -127,24 +123,22 @@ void saveDbContactGroup(Map data) {
     'joinTime',
   ];
 
-  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
   for (var field in fields) {
     if (data[field] != null) {
       contactGroup[field] = data[field];
     }
   }
 
-  DBHelper.upsertData('contact_group', contactGroup, [
+  await DBHelper.upsertData('contact_group', contactGroup, [
     ["fromId", "=", contactGroup['fromId']],
     ["toId", "=", contactGroup['toId']]
   ]);
 }
 
-//3、保存chat
-void saveDbChat(Map data) {
+// 3、保存chat
+Future<void> saveDbChat(Map data) async {
   Map<String, dynamic> chat = {};
 
-  // 需要保存的字段列表
   List<String> fields = [
     'objId',
     'type',
@@ -161,7 +155,6 @@ void saveDbChat(Map data) {
     'content',
   ];
 
-  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
   for (var field in fields) {
     if (data[field] != null) {
       if (field == 'content') {
@@ -172,17 +165,16 @@ void saveDbChat(Map data) {
     }
   }
 
-  DBHelper.upsertData('chat', chat, [
+  await DBHelper.upsertData('chat', chat, [
     ["objId", "=", chat['objId']],
     ["type", "=", chat['type']]
   ]);
 }
 
-//4、保存message
-void saveDbMessage(Map data) {
+// 4、保存message
+Future<void> saveDbMessage(Map data) async {
   Map<String, dynamic> message = {};
 
-  // 需要保存的字段列表
   List<String> fields = [
     'fromId',
     'toId',
@@ -193,7 +185,6 @@ void saveDbMessage(Map data) {
     'createTime',
   ];
 
-  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
   for (var field in fields) {
     if (data[field] != null) {
       if (field == 'content') {
@@ -203,14 +194,14 @@ void saveDbMessage(Map data) {
       }
     }
   }
-  DBHelper.insertData('message', message);
+
+  await DBHelper.insertData('message', message);
 }
 
-//5、保存apply
-void saveDbApply(Map data) {
+// 5、保存apply
+Future<void> saveDbApply(Map data) async {
   Map<String, dynamic> apply = {};
 
-  // 需要保存的字段列表
   List<String> fields = [
     'id',
     'fromId',
@@ -225,13 +216,13 @@ void saveDbApply(Map data) {
     'operateTime',
   ];
 
-  // 遍历字段列表，检查是否存在于数据中，并将其添加到用户信息中
   for (var field in fields) {
     if (data[field] != null) {
       apply[field] = data[field];
     }
   }
-  DBHelper.upsertData('apply', apply, [
+
+  await DBHelper.upsertData('apply', apply, [
     ["id", "=", apply['id']],
   ]);
 }

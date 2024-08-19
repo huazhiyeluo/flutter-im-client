@@ -1,22 +1,26 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:get/get.dart';
+import 'package:qim/api/contact_group.dart';
 import 'package:qim/controller/apply.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/contact_group.dart';
-import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
+import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/deldbdata.dart';
-import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
+import 'package:qim/utils/date.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/play.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:mime/mime.dart';
+import 'package:qim/utils/tips.dart';
 
 String getKey({int msgType = 1, int fromId = 1, int toId = 1}) {
   String key = '';
@@ -66,7 +70,7 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
       Map userObj = userController.getOneUser(objId)!;
       Map contactFriendObj = contactFriendController.getOneContactFriend(uid, objId)!;
 
-      chatData['name'] = userObj['username'];
+      chatData['name'] = userObj['nickname'];
       chatData['info'] = userObj['info'];
       chatData['icon'] = userObj['avatar'];
       chatData['remark'] = contactFriendObj['remark'];
@@ -101,7 +105,9 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
     chatData['tips'] = 0;
   } else {
     chatData['tips'] = (lastChat?['tips'] ?? 0) + 1;
-    await audioPlayerManager?.playSound("2.mp3");
+
+    audioPlayerManager ??= AudioPlayerManager();
+    await audioPlayerManager.playSound("2.mp3");
   }
 
   chatController.upsetChat(chatData);
@@ -116,12 +122,60 @@ Future<void> joinMessage(int uid, Map temp) async {
     Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
     msg['avatar'] = userInfo?['avatar'];
   } else {
-    final UserController userController = Get.find();
-    Map userObj = userController.getOneUser(msg['fromId'])!;
-    msg['avatar'] = userObj['avatar'];
+    if (msg['msgType'] == 1) {
+      final UserController userController = Get.find();
+      Map userObj = userController.getOneUser(msg['fromId'])!;
+      msg['avatar'] = userObj['avatar'];
+    }
+    if (msg['msgType'] == 2) {
+      final UserController userController = Get.find();
+      Map? userObj = userController.getOneUser(msg['fromId']);
+      if (userObj == null) {
+        await getGroupInfo(msg['toId']);
+        userObj = userController.getOneUser(msg['fromId']);
+        msg['avatar'] = userObj?['avatar'];
+      } else {
+        msg['avatar'] = userObj['avatar'];
+      }
+    }
   }
   messageController.addMessage(msg);
   saveDbMessage(msg);
+}
+
+Future<void> getGroupInfo(int groupId) async {
+  final UserController userController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
+
+  final Completer<void> completer = Completer<void>();
+  var params = {
+    'groupId': groupId,
+  };
+  ContactGroupApi.getContactGroupUser(params, onSuccess: (res) async {
+    List usersArr = [];
+    if (res['data']['users'] != null) {
+      usersArr = res['data']['users'];
+    }
+    for (var item in usersArr) {
+      userController.upsetUser(item);
+      await saveDbUser(item);
+    }
+
+    List contactGroupsArr = [];
+    if (res['data']['contactGroups'] != null) {
+      contactGroupsArr = res['data']['contactGroups'];
+    }
+    for (var item in contactGroupsArr) {
+      contactGroupController.upsetContactGroup(item);
+      await saveDbContactGroup(item);
+    }
+    // 完成异步任务
+    completer.complete();
+  }, onError: (res) {
+    TipHelper.instance.showToast(res['msg']);
+    completer.complete();
+  });
+  return completer.future;
 }
 
 bool isImageFile(String path) {
@@ -135,7 +189,7 @@ Map getTalkCommonObj(Map talkObj) {
     final UserController userController = Get.find();
     Map userObj = userController.getOneUser(talkObj['objId'])!;
     talkCommonObj['icon'] = userObj['avatar'];
-    talkCommonObj['name'] = userObj['username'];
+    talkCommonObj['name'] = userObj['nickname'];
   } else if (talkObj['type'] == 2) {
     final GroupController groupController = Get.find();
     Map? groupObj = groupController.getOneGroup(talkObj['objId'])!;
@@ -146,6 +200,7 @@ Map getTalkCommonObj(Map talkObj) {
 }
 
 Future<void> loadFriendManage(int uid, Map msg) async {
+  final WebSocketController webSocketController = Get.find();
   final UserController userController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
 
@@ -158,10 +213,29 @@ Future<void> loadFriendManage(int uid, Map msg) async {
   }
   //同意
   if ([22].contains(msg['msgMedia'])) {
-    userController.upsetUser(data['user']);
-    saveDbUser(data['user']);
-    contactFriendController.upsetContactFriend(data['contactFriend']);
-    saveDbContactFriend(data['contactFriend']);
+    if (data['user'] != null) {
+      userController.upsetUser(data['user']);
+      saveDbUser(data['user']);
+    }
+    if (data['contactFriend'] != null) {
+      contactFriendController.upsetContactFriend(data['contactFriend']);
+      saveDbContactFriend(data['contactFriend']);
+    }
+
+    if (data['apply'] != null) {
+      if (uid == data['apply']['fromId']) {
+        Map msg = {
+          'fromId': uid,
+          'toId': data['apply']['toId'],
+          'content': {"data": data['apply']['reason']},
+          'msgMedia': 1,
+          'msgType': 1
+        };
+        webSocketController.sendMessage(msg);
+        msg['createTime'] = getTime();
+        joinData(uid, msg);
+      }
+    }
   }
   //删除
   if ([24].contains(msg['msgMedia'])) {
@@ -174,29 +248,79 @@ Future<void> loadFriendManage(int uid, Map msg) async {
 }
 
 Future<void> loadGroupManage(int uid, Map msg) async {
-  // final GroupController groupController = Get.find();
-  // final ApplyController applyController = Get.find();
-  // final ChatController chatController = Get.find();
-  // Map data = json.decode(msg['content']['data']);
-  // if ([31, 32, 33].contains(msg['msgMedia'])) {
-  //   if (data['apply'] != null) {
-  //     applyController.upsetApply(data['apply']);
-  //     saveDbApply(data['apply']);
-  //   }
-  // }
+  final WebSocketController webSocketController = Get.find();
+  final UserController userController = Get.find();
+  final GroupController groupController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
 
-  // //同意
-  // if ([32].contains(msg['msgMedia'])) {
-  //   groupController.upsetGroup(data['group']);
-  //   saveDbFriend(data['group']);
-  // }
+  final ApplyController applyController = Get.find();
+  final ChatController chatController = Get.find();
+  Map data = json.decode(msg['content']['data']);
+  if ([31, 32, 33].contains(msg['msgMedia'])) {
+    if (data['apply'] != null) {
+      applyController.upsetApply(data['apply']);
+      saveDbApply(data['apply']);
+    }
+  }
 
-  // //退出
-  // if ([34].contains(msg['msgMedia'])) {
-  //   groupController.upsetGroup(data['group']);
-  //   saveDbGroup(data['group']);
+  //同意
+  if ([32].contains(msg['msgMedia'])) {
+    if (data['group'] != null) {
+      groupController.upsetGroup(data['group']);
+      saveDbGroup(data['group']);
+    }
+    if (data['contactGroup'] != null) {
+      contactGroupController.upsetContactGroup(data['contactGroup']);
+      saveDbContactGroup(data['contactGroup']);
+    }
+    if (data['user'] != null) {
+      userController.upsetUser(data['user']);
+      saveDbUser(data['user']);
+    }
+    if (data['apply'] != null) {
+      if (uid == data['apply']['fromId']) {
+        Map msg = {
+          'fromId': uid,
+          'toId': data['apply']['toId'],
+          'content': {"data": data['apply']['info']},
+          'msgMedia': 1,
+          'msgType': 2
+        };
+        webSocketController.sendMessage(msg);
+        msg['createTime'] = getTime();
+        joinData(uid, msg);
+      }
+    }
+  }
 
-  //   chatController.delChat(data['group']['groupId'], 2);
-  //   delDbChat(data['group']['groupId'], 2);
-  // }
+  //退出
+  if ([34].contains(msg['msgMedia'])) {
+    if (uid == data['user']['uid']) {
+      groupController.delGroup(data['group']['groupId']);
+      delDbGroup(data['group']['groupId']);
+
+      chatController.delChat(data['group']['groupId'], 2);
+      delDbChat(data['group']['groupId'], 2);
+
+      contactGroupController.delContactGroupByGroupId(data['group']['groupId']);
+      delDbContactGroupByGroupId(data['group']['groupId']);
+    } else {
+      groupController.upsetGroup(data['group']);
+      saveDbGroup(data['group']);
+      contactGroupController.delContactGroup(data['user']['uid'], data['group']['groupId']);
+      delDbContactGroup(data['user']['uid'], data['group']['groupId']);
+    }
+  }
+
+  //解散
+  if ([35].contains(msg['msgMedia'])) {
+    groupController.delGroup(data['group']['groupId']);
+    delDbGroup(data['group']['groupId']);
+
+    chatController.delChat(data['group']['groupId'], 2);
+    delDbChat(data['group']['groupId'], 2);
+
+    contactGroupController.delContactGroupByGroupId(data['group']['groupId']);
+    delDbContactGroupByGroupId(data['group']['groupId']);
+  }
 }

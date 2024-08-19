@@ -61,7 +61,7 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
     friendGroupObj = friendGroupController.getOneFriendGroup(0)!;
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
-    _inputReasonController.text = "我是${userInfo['username']}";
+    _inputReasonController.text = "我是${userInfo['nickname']}";
     super.initState();
   }
 
@@ -86,7 +86,7 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
     return Column(
       children: [
         ListTile(
-          title: Text(friendObj['username']),
+          title: Text(friendObj['nickname']),
           subtitle: Text(
             friendObj['info'],
             maxLines: 1,
@@ -112,7 +112,7 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
                 expands: true,
                 maxHeight: 160,
                 minHeight: 120,
-                maxLines: 5,
+                maxLines: 3,
               ),
             ],
           ),

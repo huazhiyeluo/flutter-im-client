@@ -7,7 +7,6 @@ class ChatController extends GetxController {
   void upsetChat(Map chat) {
     final objId = chat['objId'];
     final type = chat['type'];
-
     // 查找是否已经存在相同的数据
     final existingChatIndex = allChats.indexWhere((c) => c['objId'] == objId && c['type'] == type);
 
@@ -24,7 +23,6 @@ class ChatController extends GetxController {
       // 否则，将数据添加到列表中
       allChats.add(chat);
     }
-
     allChats.sort((a, b) {
       int compareWeight = b['isTop'].compareTo(a['isTop']);
       if (compareWeight != 0) {

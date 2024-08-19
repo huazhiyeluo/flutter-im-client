@@ -1,48 +1,78 @@
 import 'package:get/get.dart';
 
 class ContactGroupController extends GetxController {
-  final RxList<Map> allContactGroups = <Map>[].obs;
+  final RxMap<int, RxList<Map>> allContactGroups = <int, RxList<Map>>{}.obs;
 
   //1、更新
   void upsetContactGroup(Map contactGroup) {
     final fromId = contactGroup['fromId'];
     final toId = contactGroup['toId'];
 
-    // 查找是否已经存在相同的数据
-    final existingIndex = allContactGroups.indexWhere((c) => c['fromId'] == fromId && c['toId'] == toId);
+    if (allContactGroups.containsKey(toId)) {
+      final contactList = allContactGroups[toId]!;
+      final existingIndex = contactList.indexWhere(
+        (c) => c['fromId'] == fromId && c['toId'] == toId,
+      );
 
-    if (existingIndex != -1) {
-      // 如果已经存在相同的数据，则更新对应字段的值
-      final existingContactGroup = allContactGroups[existingIndex];
-      contactGroup.forEach((key, value) {
-        if (existingContactGroup.containsKey(key)) {
+      if (existingIndex != -1) {
+        final existingContactGroup = contactList[existingIndex];
+        contactGroup.forEach((key, value) {
           existingContactGroup[key] = value;
-        }
-      });
-      allContactGroups[existingIndex] = existingContactGroup;
+        });
+        contactList[existingIndex] = existingContactGroup;
+      } else {
+        contactList.add(contactGroup);
+      }
+      allContactGroups[toId] = contactList;
     } else {
-      // 否则，将数据添加到列表中
-      allContactGroups.add(contactGroup);
+      allContactGroups[toId] = RxList<Map>.from([contactGroup]);
     }
+
     update();
   }
 
   //2、删除
   void delContactGroup(int fromId, int toId) {
-    final existingIndex = allContactGroups.indexWhere((c) => c['fromId'] == fromId && c['toId'] == toId);
-    if (existingIndex != -1) {
-      allContactGroups.removeAt(existingIndex);
+    if (allContactGroups.containsKey(toId)) {
+      final contactList = allContactGroups[toId];
+
+      final existingIndex = contactList!.indexWhere(
+        (c) => c['fromId'] == fromId && c['toId'] == toId,
+      );
+
+      if (existingIndex != -1) {
+        contactList.removeAt(existingIndex);
+        if (contactList.isEmpty) {
+          allContactGroups.remove(toId);
+        }
+        update();
+      }
+    }
+  }
+
+  //2、删除
+  void delContactGroupByGroupId(int toId) {
+    if (allContactGroups.containsKey(toId)) {
+      allContactGroups.remove(toId);
       update();
     }
   }
 
   //3、获得单条记录
   Map? getOneContactGroup(int fromId, int toId) {
-    // 查找是否已经存在相同的数据
-    final existingIndex = allContactGroups.indexWhere((c) => c['fromId'] == fromId && c['toId'] == toId);
-    if (existingIndex != -1) {
-      return allContactGroups[existingIndex];
+    if (allContactGroups.containsKey(toId)) {
+      final existingIndex = allContactGroups[toId]!.indexWhere(
+        (c) => c['fromId'] == fromId && c['toId'] == toId,
+      );
+      if (existingIndex != -1) {
+        return allContactGroups[toId]![existingIndex];
+      }
     }
     return null;
+  }
+
+  // 4、组成员
+  RxList<Map> getMessages(int toId) {
+    return allContactGroups[toId] ?? <Map>[].obs;
   }
 }

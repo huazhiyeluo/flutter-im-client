@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/cache.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 
 class FriendDetailSettingRemark extends StatefulWidget {
@@ -19,6 +19,7 @@ class FriendDetailSettingRemark extends StatefulWidget {
 
 class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
   final TalkobjController talkobjController = Get.find();
+  final ChatController chatController = Get.find();
 
   final UserController userController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
@@ -59,6 +60,18 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
       Map data = {"fromId": uid, "toId": talkObj['objId'], "remark": remarkCtr.text, "desc": descCtr.text};
       contactFriendController.upsetContactFriend(data);
       saveDbContactFriend(data);
+
+      Map? chat = chatController.getOneChat(talkObj['objId'], 1);
+      if (chat != null) {
+        Map chatData = {};
+        chatData['objId'] = talkObj['objId'];
+        chatData['type'] = 1;
+        chatData['remark'] = remarkCtr.text;
+        chatData['desc'] = descCtr.text;
+        chatController.upsetChat(chatData);
+        saveDbChat(chatData);
+      }
+
       if (!mounted) return;
       setState(() {
         contactFriendObj = res['data'];

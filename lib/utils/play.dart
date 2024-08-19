@@ -1,16 +1,23 @@
 import 'package:audioplayers/audioplayers.dart';
 
 class AudioPlayerManager {
-  late AudioPlayer _audioPlayer;
+  late AudioPlayer? _audioPlayer;
+
+  void _initializePlayer() {
+    _audioPlayer = AudioPlayer();
+  }
 
   AudioPlayerManager() {
-    _audioPlayer = AudioPlayer();
-    _audioPlayer.audioCache = AudioCache(prefix: '');
+    _initializePlayer();
   }
 
   Future<void> playSound(String mp3) async {
     try {
-      await _audioPlayer.play(AssetSource('lib/assets/voices/$mp3'), mode: PlayerMode.mediaPlayer);
+      if (_audioPlayer == null) {
+        _initializePlayer(); // 如果未初始化，则初始化
+      }
+      _audioPlayer?.audioCache = AudioCache(prefix: '');
+      await _audioPlayer?.play(AssetSource('lib/assets/voices/$mp3'), mode: PlayerMode.mediaPlayer);
     } catch (e) {
       throw Exception('Failed to play sound: $e');
     }
@@ -18,7 +25,7 @@ class AudioPlayerManager {
 
   Future<void> stopSound() async {
     try {
-      await _audioPlayer.stop();
+      await _audioPlayer?.stop();
       _releaseResources();
     } catch (e) {
       throw Exception('Failed to stop sound: $e');
@@ -26,7 +33,7 @@ class AudioPlayerManager {
   }
 
   void _releaseResources() {
-    _audioPlayer.dispose();
+    _audioPlayer?.dispose();
   }
 
   void dispose() {

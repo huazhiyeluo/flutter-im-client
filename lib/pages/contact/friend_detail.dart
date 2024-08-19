@@ -86,10 +86,10 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
           fontSize: 24,
         ),
       ));
-      data.add(Text('用户名: ${userObj['username']}'));
+      data.add(Text('用户名: ${userObj['nickname']}'));
     } else {
       data.add(Text(
-        '${userObj['username']}',
+        '${userObj['nickname']}',
         style: const TextStyle(
           fontSize: 24,
         ),

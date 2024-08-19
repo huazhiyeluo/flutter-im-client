@@ -272,13 +272,13 @@ class _ContactPageState extends State<ContactPage> {
       Map? userObj = userController.getOneUser(contactFriendObj['toId'])!;
 
       chat.toId = contactFriendObj['toId'];
-      chat.name = userObj['username'];
+      chat.name = userObj['nickname'];
       chat.icon = userObj['avatar'];
       chat.info = userObj['info'];
       chat.remark = contactFriendObj['remark'];
       chat.isOnline = contactFriendObj['isOnline'];
       chat.namePinyin =
-          PinyinHelper.getPinyin(contactFriendObj['remark'] != "" ? contactFriendObj['remark'] : userObj['username']);
+          PinyinHelper.getPinyin(contactFriendObj['remark'] != "" ? contactFriendObj['remark'] : userObj['nickname']);
       String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
       chat.tagIndex = firstLetter.toUpperCase();
       _tabArr1.add(chat);
@@ -296,7 +296,7 @@ class _ContactPageState extends State<ContactPage> {
             friendGroupObj['children'] = [];
           }
           Map userObj = userController.getOneUser(contactFriendObj['toId'])!;
-          contactFriendObj['name'] = userObj['username'];
+          contactFriendObj['name'] = userObj['nickname'];
           contactFriendObj['icon'] = userObj['avatar'];
           contactFriendObj['info'] = userObj['info'];
           friendGroupObj['children'].add(contactFriendObj);
@@ -305,12 +305,12 @@ class _ContactPageState extends State<ContactPage> {
     }
 
     _tabArr3.clear();
-    _tabArr3 = List.from(contactGroupController.allContactGroups);
+    _tabArr3 = List.from(groupController.allGroups);
     for (var item in _tabArr3) {
-      Map? tempGroup = groupController.getOneGroup(item['toId']);
-      item['name'] = tempGroup?['name'];
-      item['icon'] = tempGroup?['icon'];
-      item['info'] = tempGroup?['info'];
+      Map? tempContactGroup = contactGroupController.getOneContactGroup(uid, item['groupId']);
+      item['fromId'] = uid;
+      item['toId'] = item['groupId'];
+      item['remark'] = tempContactGroup?['remark'];
     }
     if (!mounted) return;
     setState(() {

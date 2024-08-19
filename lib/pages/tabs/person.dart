@@ -23,10 +23,10 @@ class _PersonState extends State<Person> {
     return ListView(children: [
       ListTile(
         title: Text(
-          userInfo['username'],
+          userInfo['nickname'],
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
-        subtitle: Text(userInfo['info']),
+        subtitle: Text('QID: ${userInfo['uid']}'),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(20.0), // 必须与 Container 的 borderRadius 相同
           child: Image.network(

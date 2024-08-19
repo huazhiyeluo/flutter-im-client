@@ -46,7 +46,6 @@ class NoticeUserPage extends StatefulWidget {
 
 class _NoticeUserPageState extends State<NoticeUserPage> {
   final ApplyController applyController = Get.find();
-  final TextEditingController inputController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -55,23 +54,17 @@ class _NoticeUserPageState extends State<NoticeUserPage> {
 
   @override
   void initState() {
-    super.initState();
     ever(applyController.allFriendChats, (_) => _formatData());
     _formatData();
 
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
-    _fetchData();
+    super.initState();
   }
 
   @override
   void dispose() {
-    inputController.dispose();
     super.dispose();
-  }
-
-  void _fetchData() async {
-    await _getApplyList();
   }
 
   void _formatData() {
@@ -188,18 +181,6 @@ class _NoticeUserPageState extends State<NoticeUserPage> {
         )
       ],
     );
-  }
-
-  Future<void> _getApplyList() async {
-    if (applyController.allFriendChats.isEmpty) {
-      List applys = await DBHelper.getData('apply', [
-        ['type', '=', 1]
-      ]);
-      for (var item in applys) {
-        Map<String, dynamic> temp = Map.from(item);
-        applyController.upsetApply(temp);
-      }
-    }
   }
 
   Future<void> _operateApply(int id, int status) async {

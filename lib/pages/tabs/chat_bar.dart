@@ -11,7 +11,7 @@ final List<Map<String, dynamic>> items = [
 
 AppBar chatBar() {
   Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
-  String username = userInfo == null ? "" : userInfo['username'];
+  String nickname = userInfo == null ? "" : userInfo['nickname'];
   String avatar = userInfo == null ? "" : userInfo['avatar'];
   return AppBar(
       centerTitle: false,
@@ -24,7 +24,7 @@ AppBar chatBar() {
           ),
           const SizedBox(width: 8),
           Text(
-            username,
+            nickname,
             style: const TextStyle(
               fontSize: 20,
             ),

@@ -36,6 +36,8 @@ class ApplyController extends GetxController {
       return a['status'].compareTo(b['status']);
     });
 
+    showFriendRedPoint.value = false;
+    showGroupRedPoint.value = false;
     allApplys.where((c) => c['type'] == 1 && c['status'] == 0).forEach((element) {
       showFriendRedPoint.value = true;
     });
@@ -59,7 +61,13 @@ class ApplyController extends GetxController {
   void clearApply(int type) {
     allApplys.removeWhere((c) => c['type'] == type);
     allFriendChats.assignAll(allApplys.where((c) => c['type'] == 1).toList());
-    allGroupChats.assignAll(allApplys.where((c) => c['type'] == 1).toList());
+    allGroupChats.assignAll(allApplys.where((c) => c['type'] == 2).toList());
+    if (type == 1) {
+      showFriendRedPoint.value = false;
+    }
+    if (type == 2) {
+      showGroupRedPoint.value = false;
+    }
     update();
   }
 }

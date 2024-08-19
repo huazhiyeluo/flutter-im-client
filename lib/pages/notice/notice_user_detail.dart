@@ -52,7 +52,6 @@ class NoticeFriendDetailPage extends StatefulWidget {
 
 class _NoticeFriendDetailPageState extends State<NoticeFriendDetailPage> {
   final ApplyController applyController = Get.find();
-  final TextEditingController inputController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -66,15 +65,16 @@ class _NoticeFriendDetailPageState extends State<NoticeFriendDetailPage> {
 
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
-    _fetchData();
     super.initState();
   }
 
-  void _fetchData() async {
-    await _getApplyList();
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   void _formatData() {
+    if (!mounted) return;
     setState(() {
       _applys = applyController.allFriendChats;
     });
@@ -166,22 +166,6 @@ class _NoticeFriendDetailPageState extends State<NoticeFriendDetailPage> {
         ),
       ],
     );
-  }
-
-  Future<void> _getApplyList() async {
-    var params = {
-      'uid': uid,
-      'type': 1,
-    };
-    ApplyApi.getApplyList(params, onSuccess: (res) {
-      setState(() {
-        if (res['data'] != null) {
-          _applys = res['data'];
-        }
-      });
-    }, onError: (res) {
-      TipHelper.instance.showToast(res['msg']);
-    });
   }
 
   Future<void> _operateApply(int id, int status) async {
