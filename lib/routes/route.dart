@@ -15,10 +15,12 @@ import 'package:qim/pages/notice/notice_user.dart';
 import 'package:qim/pages/notice/notice_user_detail.dart';
 import 'package:qim/pages/contact/friend_chat_setting.dart';
 import 'package:qim/pages/home.dart';
+import 'package:qim/pages/person/info.dart';
 import 'package:qim/pages/person/setting.dart';
 import 'package:qim/pages/search.dart';
-import 'package:qim/pages/entry.dart';
 import 'package:qim/pages/user/login.dart';
+import 'package:qim/pages/user/login_code.dart';
+import 'package:qim/pages/user/register.dart';
 import 'package:qim/pages/user/register_one.dart';
 import 'package:qim/pages/user/register_two.dart';
 import 'package:qim/pages/user/register_three.dart';
@@ -31,12 +33,13 @@ import '../pages/contact/friend_detail_setting_group.dart';
 class AppPage {
   static final routes = [
     GetPage(name: "/", page: () => const Home(), middlewares: [HomeMiddleware()]),
-    GetPage(name: "/entry", page: () => const Entry()),
     GetPage(name: "/login", page: () => const Login()),
+    GetPage(name: "/login-code", page: () => const LoginCode()),
+    GetPage(name: "/repasswd", page: () => const Repasswd()),
+    GetPage(name: "/register", page: () => const Register()),
     GetPage(name: "/register-one", page: () => const RegisterOne()),
     GetPage(name: "/register-two", page: () => const RegisterTwo()),
     GetPage(name: "/register-three", page: () => const RegisterThree()),
-    GetPage(name: "/repasswd", page: () => const Repasswd()),
     GetPage(name: "/search", page: () => const Search()),
     GetPage(name: "/talk", page: () => const Talk()),
     GetPage(name: "/friend-detail", page: () => const FriendDetail()),
@@ -50,6 +53,7 @@ class AppPage {
     GetPage(name: "/notice-friend-detail", page: () => const NoticeFriendDetail()),
     GetPage(name: "/notice-group", page: () => const NoticeGroup()),
     GetPage(name: "/person-setting", page: () => const Setting()),
+    GetPage(name: "/person-info", page: () => const PersonInfo()),
     GetPage(name: "/add-contact", page: () => const AddContact()),
     GetPage(name: "/add-contact-friend-do", page: () => const AddContactFriendDo()),
     GetPage(name: "/add-contact-group-do", page: () => const AddContactGroupDo()),
@@ -62,12 +66,7 @@ Future<String> initialRoute() async {
     await initialDb(userInfo['uid']);
     return "/";
   } else {
-    bool? entryPage = CacheHelper.getBoolData(Keys.entryPage);
-    if (entryPage == true) {
-      return '/login';
-    } else {
-      return '/entry';
-    }
+    return '/login';
   }
 }
 

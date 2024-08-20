@@ -95,7 +95,6 @@ class _HomeState extends State<Home> {
         if (msg['msgMedia'] == 10) {
           TipHelper.instance.showToast("你的账号在另外一台设备上登录，请检查");
           CacheHelper.remove(Keys.userInfo);
-          CacheHelper.remove(Keys.entryPage);
           String initialRouteData = await initialRoute();
           Get.offAllNamed(initialRouteData);
         }

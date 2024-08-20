@@ -8,46 +8,42 @@ import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 
-class Repasswd extends StatefulWidget {
-  const Repasswd({super.key});
+class LoginCode extends StatefulWidget {
+  const LoginCode({super.key});
 
   @override
-  State<Repasswd> createState() => _RepasswdState();
+  State<LoginCode> createState() => _LoginCodeState();
 }
 
-class _RepasswdState extends State<Repasswd> {
+class _LoginCodeState extends State<LoginCode> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 243, 243, 243),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 243, 243, 243),
-        title: const Text("重置密码"),
       ),
-      body: const RepasswdPage(),
+      body: const LoginCodePage(),
     );
   }
 }
 
-class RepasswdPage extends StatefulWidget {
-  const RepasswdPage({super.key});
+class LoginCodePage extends StatefulWidget {
+  const LoginCodePage({super.key});
 
   @override
-  State<RepasswdPage> createState() => _RepasswdPageState();
+  State<LoginCodePage> createState() => _LoginCodePageState();
 }
 
-class _RepasswdPageState extends State<RepasswdPage> {
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+class _LoginCodePageState extends State<LoginCodePage> {
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController codeController = TextEditingController();
 
   final FocusNode _focusNode1 = FocusNode();
   final FocusNode _focusNode2 = FocusNode();
 
   bool _isFocusNode1 = false;
   bool _isFocusNode2 = false;
-
-  bool _obscureText = true; // 用于控制密码是否显示
-  bool _isDelayed = false;
 
   @override
   void initState() {
@@ -79,27 +75,6 @@ class _RepasswdPageState extends State<RepasswdPage> {
     });
   }
 
-  void _togglePasswordVisibility() {
-    setState(() {
-      _obscureText = !_obscureText; // 切换密码可见性
-    });
-
-    if (!_obscureText) {
-      // 如果密码显示状态，设置3秒后恢复为隐藏
-      setState(() {
-        _isDelayed = true;
-      });
-      Future.delayed(const Duration(seconds: 2), () {
-        if (_isDelayed) {
-          setState(() {
-            _obscureText = true; // 恢复为密码模式
-            _isDelayed = false;
-          });
-        }
-      });
-    }
-  }
-
   @override
   void dispose() {
     // 确保在不再需要时清理 FocusNode
@@ -114,19 +89,26 @@ class _RepasswdPageState extends State<RepasswdPage> {
       padding: const EdgeInsets.all(20),
       children: [
         const SizedBox(height: 30),
+        Row(
+          children: [
+            const Text(
+              "验证码登录",
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+            Expanded(child: Container()),
+          ],
+        ),
+        const SizedBox(height: 20),
         SizedBox(
           height: 50, // 设置TextField的高度
           child: TextField(
             focusNode: _focusNode1,
-            controller: usernameController, // 用户名控制器
-            keyboardType: TextInputType.text,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')), // 只允许字母和数字
-            ],
+            controller: phoneController, // 用户名控制器
+            keyboardType: TextInputType.phone,
             decoration: InputDecoration(
-              hintText: '请输入用户名',
+              hintText: '请输入手机号',
               prefixIcon: Icon(
-                Icons.person,
+                Icons.phone,
                 color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
               ),
               border: UnderlineInputBorder(
@@ -155,24 +137,32 @@ class _RepasswdPageState extends State<RepasswdPage> {
         ),
         const SizedBox(height: 20),
         SizedBox(
-          height: 50, // 设置TextField的高度
+          height: 50, //
           child: TextField(
             focusNode: _focusNode2,
-            controller: passwordController, // 用户名控制器
-            obscureText: _obscureText,
-            keyboardType: TextInputType.text,
+            controller: codeController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // 数字
+            ],
             decoration: InputDecoration(
-              hintText: '请输入密码',
+              hintText: '请输入验证码',
               prefixIcon: Icon(
-                Icons.lock,
+                Icons.code,
                 color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
               ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: const Color.fromARGB(199, 171, 175, 169),
-                ),
-                onPressed: _togglePasswordVisibility,
+              suffixIcon: Column(
+                children: [
+                  CustomButton(
+                    borderRadius: const BorderRadius.all(Radius.circular(0)),
+                    onPressed: () {},
+                    text: "获取验证码",
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color.fromARGB(255, 60, 183, 21),
+                    padding: const EdgeInsets.fromLTRB(30, 6, 30, 6),
+                    borderSide: const BorderSide(color: Color.fromARGB(255, 60, 183, 21), width: 1),
+                  )
+                ],
               ),
               border: UnderlineInputBorder(
                 borderSide: const BorderSide(
@@ -201,9 +191,9 @@ class _RepasswdPageState extends State<RepasswdPage> {
         const SizedBox(height: 20),
         CustomButton(
           onPressed: () {
-            _repasswdAction();
+            _loginCodeAction();
           },
-          text: "重置",
+          text: "登录",
           backgroundColor: const Color.fromARGB(255, 60, 183, 21),
           foregroundColor: Colors.white,
           borderRadius: BorderRadius.circular(2),
@@ -213,8 +203,8 @@ class _RepasswdPageState extends State<RepasswdPage> {
     );
   }
 
-  _repasswdAction() async {
-    var params = {'username': usernameController.text, 'password': passwordController.text};
+  _loginCodeAction() async {
+    var params = {'username': phoneController.text, 'password': codeController.text};
     LoginApi.login(params, onSuccess: (res) async {
       CacheHelper.saveData(Keys.userInfo, res['data']);
       String initialRouteData = await initialRoute();

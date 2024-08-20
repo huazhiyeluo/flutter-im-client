@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/routes/route.dart';
 import 'package:qim/utils/cache.dart';
@@ -113,16 +114,12 @@ class _SettingPageState extends State<SettingPage> {
             child: CustomButton(
               onPressed: () async {
                 CacheHelper.remove(Keys.userInfo);
-                CacheHelper.remove(Keys.entryPage);
                 String initialRouteData = await initialRoute();
+                if (!mounted) return;
                 setState(() {
                   _initialRoute = initialRouteData;
                 });
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  _initialRoute!,
-                  (route) => false,
-                );
+                Get.offAllNamed(initialRouteData);
               },
               text: "退出登录",
               backgroundColor: Colors.red,

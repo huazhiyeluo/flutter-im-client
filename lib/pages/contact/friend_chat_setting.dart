@@ -61,130 +61,133 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'] ?? "";
 
-    userObj = userController.getOneUser(talkObj['objId'])!;
-    contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        ListTile(
-          title: Text(contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname']),
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(userObj['avatar'] ?? ''),
-          ),
-          onTap: () {
-            Map talkobj = {
-              "objId": talkObj['objId'],
-              "type": 1,
-            };
-            Navigator.pushNamed(
-              context,
-              '/friend-detail',
-              arguments: talkobj,
-            );
-          },
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          child: const Divider(),
-        ),
-        ListTile(
-          title: const Text('查找聊天记录'),
-          trailing: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('图片、视频、文件'),
-              Icon(Icons.chevron_right),
-            ],
-          ),
-          onTap: () {},
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          child: const Divider(),
-        ),
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-          title: const Text("设为置顶"),
-          trailing: Switch(
-            value: contactFriendObj['isTop'] == 1 ? true : false,
-            onChanged: (bool val) {
-              int v = val == true ? 1 : 0;
-              _actContact('isTop', v);
-            },
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          child: const Divider(),
-        ),
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-          title: const Text("隐藏会话"),
-          trailing: Switch(
-            value: contactFriendObj['isHidden'] == 1 ? true : false,
-            onChanged: (bool val) {
-              int v = val == true ? 1 : 0;
-              _actContact('isHidden', v);
-            },
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          child: const Divider(),
-        ),
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-          title: const Text("消息免打扰"),
-          trailing: Switch(
-            value: contactFriendObj['isQuiet'] == 1 ? true : false,
-            onChanged: (bool val) {
-              int v = val == true ? 1 : 0;
-              _actContact('isQuiet', v);
-            },
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          child: const Divider(),
-        ),
-        ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-          title: const Text("删除聊天记录"),
-          onTap: _delMessage,
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          child: const Divider(),
-        ),
-        Row(
+    return Obx(
+      () {
+        userObj = userController.getOneUser(talkObj['objId'])!;
+        contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+        return ListView(
           children: [
-            const SizedBox(width: 20),
-            Expanded(
-              child: CustomButton(
-                onPressed: () {
-                  _delContact();
+            ListTile(
+              title: Text(contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname']),
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(userObj['avatar'] ?? ''),
+              ),
+              onTap: () {
+                Map talkobj = {
+                  "objId": talkObj['objId'],
+                  "type": 1,
+                };
+                Navigator.pushNamed(
+                  context,
+                  '/friend-detail',
+                  arguments: talkobj,
+                );
+              },
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: const Divider(),
+            ),
+            ListTile(
+              title: const Text('查找聊天记录'),
+              trailing: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('图片、视频、文件'),
+                  Icon(Icons.chevron_right),
+                ],
+              ),
+              onTap: () {},
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: const Divider(),
+            ),
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
+              title: const Text("设为置顶"),
+              trailing: Switch(
+                value: contactFriendObj['isTop'] == 1 ? true : false,
+                onChanged: (bool val) {
+                  int v = val == true ? 1 : 0;
+                  _actContact('isTop', v);
                 },
-                text: "删除好友",
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.red,
               ),
             ),
-            const SizedBox(width: 20),
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: const Divider(),
+            ),
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
+              title: const Text("隐藏会话"),
+              trailing: Switch(
+                value: contactFriendObj['isHidden'] == 1 ? true : false,
+                onChanged: (bool val) {
+                  int v = val == true ? 1 : 0;
+                  _actContact('isHidden', v);
+                },
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: const Divider(),
+            ),
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
+              title: const Text("消息免打扰"),
+              trailing: Switch(
+                value: contactFriendObj['isQuiet'] == 1 ? true : false,
+                onChanged: (bool val) {
+                  int v = val == true ? 1 : 0;
+                  _actContact('isQuiet', v);
+                },
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: const Divider(),
+            ),
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
+              title: const Text("删除聊天记录"),
+              onTap: _delMessage,
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: const Divider(),
+            ),
+            Row(
+              children: [
+                const SizedBox(width: 20),
+                Expanded(
+                  child: CustomButton(
+                    onPressed: () {
+                      _delContact();
+                    },
+                    text: "删除好友",
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.red,
+                  ),
+                ),
+                const SizedBox(width: 20),
+              ],
+            ),
+            TextButton(
+              onPressed: () {},
+              child: const Text(
+                '被骚扰了？举报该用户',
+                style: TextStyle(fontSize: 12),
+              ),
+            ),
           ],
-        ),
-        TextButton(
-          onPressed: () {},
-          child: const Text(
-            '被骚扰了？举报该用户',
-            style: TextStyle(fontSize: 12),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 

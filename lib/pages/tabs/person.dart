@@ -23,7 +23,7 @@ class _PersonState extends State<Person> {
     return ListView(children: [
       ListTile(
         title: Text(
-          userInfo['nickname'],
+          userInfo['username'],
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         subtitle: Text('QID: ${userInfo['uid']}'),
@@ -39,7 +39,12 @@ class _PersonState extends State<Person> {
         trailing: const Icon(
           Icons.chevron_right,
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            '/person-info',
+          );
+        },
       ),
       Container(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),

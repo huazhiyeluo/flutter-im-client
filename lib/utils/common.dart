@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qim/api/contact_group.dart';
 import 'package:qim/controller/apply.dart';
 import 'package:qim/common/keys.dart';
@@ -16,11 +19,11 @@ import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/deldbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/date.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/play.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:mime/mime.dart';
 import 'package:qim/utils/tips.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart' as imgcompress;
 
 String getKey({int msgType = 1, int fromId = 1, int toId = 1}) {
   String key = '';
@@ -323,4 +326,20 @@ Future<void> loadGroupManage(int uid, Map msg) async {
     contactGroupController.delContactGroupByGroupId(data['group']['groupId']);
     delDbContactGroupByGroupId(data['group']['groupId']);
   }
+}
+
+Future<XFile> compressImage(XFile pickedFile) async {
+  final dir = await getTemporaryDirectory();
+
+  String fileName = pickedFile.name;
+  String fileExtension = fileName.split('.').last;
+
+  final targetPath = '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
+
+  final result = await imgcompress.FlutterImageCompress.compressAndGetFile(
+    File(pickedFile.path).absolute.path,
+    targetPath,
+    quality: 70,
+  );
+  return result ?? pickedFile;
 }

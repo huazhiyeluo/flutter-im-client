@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:qim/api/common.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/contact_friend.dart';
@@ -30,7 +27,6 @@ import 'package:dio/dio.dart' as dio;
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:qim/pages/chat/talk/chat_message.dart';
 import 'package:extended_text_field/extended_text_field.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart' as imgcompress;
 
 class Talk extends StatefulWidget {
   const Talk({super.key});
@@ -60,18 +56,6 @@ class _TalkState extends State<Talk> {
     talkObj = talkobjController.talkObj;
     Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
     uid = userInfo == null ? "" : userInfo['uid'];
-
-    if (talkObj['type'] == 1) {
-      Map userObj = userController.getOneUser(talkObj['objId'])!;
-      Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
-      iconObj = userObj['avatar'];
-      textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname'];
-    } else if (talkObj['type'] == 2) {
-      Map? groupObj = groupController.getOneGroup(talkObj['objId'])!;
-      Map contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId'])!;
-      iconObj = groupObj['icon'];
-      textObj = "${contactGroupObj['remark'] != '' ? contactGroupObj['remark'] : groupObj['name']}(${groupObj['num']})";
-    }
   }
 
   @override
@@ -90,21 +74,35 @@ class _TalkState extends State<Talk> {
             Navigator.pop(context); // Navigate back to previous route
           },
         ),
-        title: Row(
-          children: [
-            CircleAvatar(
-              radius: 15,
-              backgroundImage: NetworkImage(iconObj),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              textObj,
-              style: const TextStyle(
-                fontSize: 20,
+        title: Obx(() {
+          if (talkObj['type'] == 1) {
+            Map userObj = userController.getOneUser(talkObj['objId'])!;
+            Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+            iconObj = userObj['avatar'];
+            textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname'];
+          } else if (talkObj['type'] == 2) {
+            Map? groupObj = groupController.getOneGroup(talkObj['objId'])!;
+            Map contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId'])!;
+            iconObj = groupObj['icon'];
+            textObj =
+                "${contactGroupObj['remark'] != '' ? contactGroupObj['remark'] : groupObj['name']}(${groupObj['num']})";
+          }
+          return Row(
+            children: [
+              CircleAvatar(
+                radius: 15,
+                backgroundImage: NetworkImage(iconObj),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: 8),
+              Text(
+                textObj,
+                style: const TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+            ],
+          );
+        }),
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert),
@@ -496,7 +494,7 @@ class _TalkPageState extends State<TalkPage> {
     }
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
-      XFile compressedFile = await _compressImage(pickedFile);
+      XFile compressedFile = await compressImage(pickedFile);
       dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) {
         setState(() {
@@ -517,7 +515,7 @@ class _TalkPageState extends State<TalkPage> {
 
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      XFile compressedFile = await _compressImage(pickedFile);
+      XFile compressedFile = await compressImage(pickedFile);
       dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) {
         setState(() {
@@ -559,22 +557,6 @@ class _TalkPageState extends State<TalkPage> {
         TipHelper.instance.showToast(res['msg']);
       });
     }
-  }
-
-  Future<XFile> _compressImage(XFile pickedFile) async {
-    final dir = await getTemporaryDirectory();
-
-    String fileName = pickedFile.name;
-    String fileExtension = fileName.split('.').last;
-
-    final targetPath = '${dir.path}/${DateTime.now().millisecondsSinceEpoch}.$fileExtension';
-
-    final result = await imgcompress.FlutterImageCompress.compressAndGetFile(
-      File(pickedFile.path).absolute.path,
-      targetPath,
-      quality: 70,
-    );
-    return result ?? pickedFile;
   }
 
   //----------------------------------------------------------------通话----------------------------------------------------------------

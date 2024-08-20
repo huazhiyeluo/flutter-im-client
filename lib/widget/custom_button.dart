@@ -9,6 +9,7 @@ class CustomButton extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final TextStyle textStyle;
   final BorderRadiusGeometry borderRadius;
+  final BorderSide borderSide;
 
   const CustomButton({
     super.key,
@@ -19,6 +20,7 @@ class CustomButton extends StatelessWidget {
     this.padding = const EdgeInsets.fromLTRB(10, 10, 10, 10),
     this.textStyle = const TextStyle(fontSize: 18),
     this.borderRadius = const BorderRadius.all(Radius.circular(20)),
+    this.borderSide = BorderSide.none,
   });
 
   @override
@@ -35,7 +37,8 @@ class CustomButton extends StatelessWidget {
             borderRadius: borderRadius,
           ),
         ),
-        minimumSize: WidgetStateProperty.all(const Size(50, 30)),
+        side: WidgetStateProperty.all<BorderSide>(borderSide),
+        minimumSize: WidgetStateProperty.all(const Size(50, 20)),
       ),
       child: Text(text),
     );

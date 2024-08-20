@@ -33,7 +33,7 @@ class RegisterThreePage extends StatefulWidget {
 class _RegisterThreePageState extends State<RegisterThreePage> {
   @override
   Widget build(BuildContext context) {
-    final TextEditingController nicknameController = TextEditingController();
+    final TextEditingController usernameController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
     return Container(
@@ -56,7 +56,7 @@ class _RegisterThreePageState extends State<RegisterThreePage> {
           SizedBox(
               height: 50, // 设置TextField的高度
               child: TextField(
-                controller: nicknameController, // 用户名控制器
+                controller: usernameController, // 用户名控制器
                 keyboardType: TextInputType.name,
                 decoration: InputDecoration(
                   labelText: '用户名',

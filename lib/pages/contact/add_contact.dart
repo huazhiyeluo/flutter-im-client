@@ -45,34 +45,42 @@ class _AddContactDetailState extends State<AddContact> with SingleTickerProvider
             controller: _tabController,
             tabs: [
               Container(
-                width: 75,
+                width: 80,
                 height: 35,
+                padding: EdgeInsets.zero,
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.black, // 未选中标签的边框颜色
                     width: 1.0,
                   ),
                 ),
-                child: const Tab(text: "找人"),
+                child: const Center(child: Text("找人")),
               ),
               Container(
-                width: 75,
+                width: 80,
                 height: 35,
+                padding: EdgeInsets.zero,
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.black, // 未选中标签的边框颜色
                     width: 1.0,
                   ),
                 ),
-                child: const Tab(text: "找群"),
+                child: const Center(child: Text("找群")),
               ),
             ],
             labelColor: Colors.white,
             unselectedLabelColor: Colors.black,
-            dividerHeight: 0,
-            indicator: const BoxDecoration(
+            dividerHeight: 1,
+            indicator: BoxDecoration(
               color: Colors.black, // 选中标签的背景色
+              border: Border.all(
+                color: Colors.black, // 选中标签的边框颜色
+                width: 1,
+              ),
             ),
+            indicatorWeight: 0,
+            indicatorSize: TabBarIndicatorSize.label,
             indicatorPadding: EdgeInsets.zero,
             labelPadding: EdgeInsets.zero,
           ),
