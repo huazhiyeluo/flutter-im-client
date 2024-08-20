@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:qim/api/common.dart';
+import 'package:qim/api/user.dart';
 import 'package:qim/common/keys.dart';
-import 'package:qim/routes/route.dart';
 import 'package:qim/utils/cache.dart';
-import 'package:qim/widget/custom_button.dart';
+import 'package:qim/utils/common.dart';
+import 'package:qim/utils/permission.dart';
+import 'package:qim/utils/tips.dart';
+import 'package:dio/dio.dart' as dio;
 
 class PersonInfo extends StatefulWidget {
   const PersonInfo({super.key});
@@ -12,12 +17,9 @@ class PersonInfo extends StatefulWidget {
 }
 
 class _PersonInfoState extends State<PersonInfo> {
-  Map userInfo = {};
-
   @override
   void initState() {
     super.initState();
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
   }
 
   @override
@@ -39,11 +41,16 @@ class PersonInfoPage extends StatefulWidget {
 }
 
 class _PersonInfoPageState extends State<PersonInfoPage> {
+  int uid = 0;
   Map userInfo = {};
+
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+    uid = userInfo['uid'] ?? "";
   }
 
   @override
@@ -51,7 +58,10 @@ class _PersonInfoPageState extends State<PersonInfoPage> {
     return ListView(children: [
       const SizedBox(height: 20),
       ListTile(
-        title: const Text("头像"),
+        leading: const Text(
+          "头像",
+          style: TextStyle(fontSize: 16),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -67,14 +77,19 @@ class _PersonInfoPageState extends State<PersonInfoPage> {
             const Icon(Icons.chevron_right),
           ],
         ),
-        onTap: () {},
+        onTap: () {
+          _uploadAvatar();
+        },
       ),
       Container(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: const Divider(),
       ),
       ListTile(
-        title: const Text("昵称"),
+        leading: const Text(
+          "昵称",
+          style: TextStyle(fontSize: 16),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -92,7 +107,10 @@ class _PersonInfoPageState extends State<PersonInfoPage> {
         child: const Divider(),
       ),
       ListTile(
-        title: const Text("用户名"),
+        leading: const Text(
+          "用户名",
+          style: TextStyle(fontSize: 16),
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -110,15 +128,21 @@ class _PersonInfoPageState extends State<PersonInfoPage> {
         child: const Divider(),
       ),
       ListTile(
-        title: const Text("个性签名"),
-        trailing: Row(
+        leading: const Text(
+          "个性签名",
+          style: TextStyle(fontSize: 16),
+        ),
+        subtitle: Text(
+          userInfo['info'],
+          style: const TextStyle(fontSize: 16),
+          maxLines: 5,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.end,
+        ),
+        trailing: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              userInfo['info'],
-              style: const TextStyle(fontSize: 16),
-            ),
-            const Icon(Icons.chevron_right),
+            Icon(Icons.chevron_right),
           ],
         ),
         onTap: () {},
@@ -129,5 +153,33 @@ class _PersonInfoPageState extends State<PersonInfoPage> {
       ),
       const SizedBox(height: 20),
     ]);
+  }
+
+  Future<void> _uploadAvatar() async {
+    var isGrantedStorage = await PermissionUtil.requestStoragePermission();
+    if (!isGrantedStorage) {
+      TipHelper.instance.showToast("未允许存储读写权限");
+      return;
+    }
+    final XFile? imageFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (imageFile != null) {
+      XFile compressedFile = await compressImage(imageFile);
+      dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
+      CommonApi.upload({'file': file}, onSuccess: (res) {
+        var params = {
+          'avatar': res['data'],
+          'uid': uid,
+        };
+        UserApi.actUser(params, onSuccess: (res) async {
+          userInfo['avatar'] = params['avatar'];
+          setState(() {
+            userInfo = userInfo;
+          });
+          CacheHelper.saveData(Keys.userInfo, userInfo);
+        }, onError: (res) {
+          TipHelper.instance.showToast(res['msg']);
+        });
+      });
+    }
   }
 }

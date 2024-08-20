@@ -23,7 +23,7 @@ class _PersonState extends State<Person> {
     return ListView(children: [
       ListTile(
         title: Text(
-          userInfo['username'],
+          userInfo['nickname'],
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         subtitle: Text('QID: ${userInfo['uid']}'),

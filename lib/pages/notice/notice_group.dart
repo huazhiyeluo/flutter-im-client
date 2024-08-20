@@ -79,6 +79,7 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
   }
 
   void _formatData() {
+    if (!mounted) return;
     setState(() {
       _applys = applyController.allGroupChats;
     });
