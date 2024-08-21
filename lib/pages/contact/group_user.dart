@@ -2,11 +2,10 @@ import 'package:azlistview_plus/azlistview_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lpinyin/lpinyin.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/user.dart';
-import 'package:qim/utils/cache.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/utils/functions.dart';
 import 'package:qim/widget/custom_search_field.dart';
 
@@ -53,6 +52,7 @@ class GroupUserPage extends StatefulWidget {
 
 class _GroupUserPageState extends State<GroupUserPage> {
   final TextEditingController inputController = TextEditingController();
+  final UserInfoController userInfoController = Get.find();
   final UserController userController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
@@ -65,8 +65,8 @@ class _GroupUserPageState extends State<GroupUserPage> {
 
   @override
   void initState() {
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }

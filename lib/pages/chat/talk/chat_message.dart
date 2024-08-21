@@ -3,10 +3,9 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
-import 'package:qim/utils/cache.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/db.dart';
@@ -28,6 +27,7 @@ class ChatMessage extends StatefulWidget {
 class _ChatMessageState extends State<ChatMessage> {
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
+  final UserInfoController userInfoController = Get.find();
 
   final ScrollController _scrollController = ScrollController();
 
@@ -39,9 +39,9 @@ class _ChatMessageState extends State<ChatMessage> {
   @override
   void initState() {
     super.initState();
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     key = getKey(msgType: talkObj['type'], fromId: uid, toId: talkObj['objId']);
     _initData();
   }

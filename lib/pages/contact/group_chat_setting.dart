@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_group.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/user.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/dbdata/savedbdata.dart';
-import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/db.dart';
 import 'package:qim/utils/tips.dart';
@@ -45,6 +44,7 @@ class GroupChatSettingPage extends StatefulWidget {
 
 class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
   final TalkobjController talkobjController = Get.find();
+  final UserInfoController userInfoController = Get.find();
   final ChatController chatController = Get.find();
   final MessageController messageController = Get.find();
   final GroupController groupController = Get.find();
@@ -61,8 +61,8 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
   @override
   void initState() {
     talkObj = talkobjController.talkObj;
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
 
     groupObj = groupController.getOneGroup(talkObj['objId'])!;
     contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId'])!;

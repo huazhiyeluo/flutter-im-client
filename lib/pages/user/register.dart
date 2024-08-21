@@ -354,6 +354,7 @@ class _RegisterPageState extends State<RegisterPage> {
         const SizedBox(height: 10),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Checkbox(
               value: _isChecked,
@@ -362,17 +363,19 @@ class _RegisterPageState extends State<RegisterPage> {
                   _isChecked = value!;
                 });
               },
-            ),
-            Expanded(
-              child: Row(
-                children: [
-                  const Text("我已阅读并同意"),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text("《QIM软件许可及服务协议》"),
-                  ),
-                ],
+              visualDensity: const VisualDensity(
+                horizontal: 0,
+                vertical: 0,
               ),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            const Text("我已阅读并同意"),
+            TextButton(
+              onPressed: () {},
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 0), // 设置水平内边距
+              ),
+              child: const Text("《QIM软件许可及服务协议》"),
             ),
           ],
         ),

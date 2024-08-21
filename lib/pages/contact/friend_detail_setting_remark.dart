@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/dbdata/savedbdata.dart';
-import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
 
 class FriendDetailSettingRemark extends StatefulWidget {
@@ -19,6 +18,7 @@ class FriendDetailSettingRemark extends StatefulWidget {
 
 class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
   final TalkobjController talkobjController = Get.find();
+  final UserInfoController userInfoController = Get.find();
   final ChatController chatController = Get.find();
 
   final UserController userController = Get.find();
@@ -36,8 +36,8 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
   @override
   void initState() {
     super.initState();
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     if (Get.arguments != null) {
       talkObj = Get.arguments;
 

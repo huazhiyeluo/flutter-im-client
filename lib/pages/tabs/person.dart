@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qim/common/keys.dart';
-import 'package:qim/utils/cache.dart';
+import 'package:get/get.dart';
+import 'package:qim/controller/userinfo.dart';
 
 class Person extends StatefulWidget {
   const Person({super.key});
@@ -10,83 +10,88 @@ class Person extends StatefulWidget {
 }
 
 class _PersonState extends State<Person> {
+  final UserInfoController userInfoController = Get.find();
+
+  int uid = 0;
   Map userInfo = {};
 
   @override
   void initState() {
     super.initState();
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(children: [
-      ListTile(
-        title: Text(
-          userInfo['nickname'],
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text('QID: ${userInfo['uid']}'),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(20.0), // 必须与 Container 的 borderRadius 相同
-          child: Image.network(
-            userInfo['avatar'], // 替换为你的图片URL
-            width: 60.0,
-            height: 60.0,
-            fit: BoxFit.cover,
+    return Obx(() {
+      userInfo = userInfoController.userInfo;
+      return ListView(children: [
+        ListTile(
+          title: Text(
+            userInfo['nickname'],
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
+          subtitle: Text('QID: ${userInfo['uid']}'),
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(20.0), // 必须与 Container 的 borderRadius 相同
+            child: Image.network(
+              userInfo['avatar'], // 替换为你的图片URL
+              width: 60.0,
+              height: 60.0,
+              fit: BoxFit.cover,
+            ),
+          ),
+          trailing: const Icon(
+            Icons.chevron_right,
+          ),
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/person-info',
+            );
+          },
         ),
-        trailing: const Icon(
-          Icons.chevron_right,
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: const Divider(),
         ),
-        onTap: () {
-          Navigator.pushNamed(
-            context,
-            '/person-info',
-          );
-        },
-      ),
-      Container(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: const Divider(),
-      ),
-      ListTile(
-        title: const Text("朋友圈"),
-        leading: const Icon(Icons.photo),
-        trailing: const Icon(
-          Icons.chevron_right,
+        ListTile(
+          title: const Text("朋友圈"),
+          leading: const Icon(Icons.photo),
+          trailing: const Icon(
+            Icons.chevron_right,
+          ),
+          onTap: () {},
         ),
-        onTap: () {},
-      ),
-      Container(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: const Divider(),
-      ),
-      ListTile(
-        title: const Text("收藏"),
-        leading: const Icon(Icons.collections),
-        trailing: const Icon(
-          Icons.chevron_right,
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: const Divider(),
         ),
-        onTap: () {},
-      ),
-      Container(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: const Divider(),
-      ),
-      ListTile(
-        title: const Text("设置"),
-        leading: const Icon(Icons.settings),
-        trailing: const Icon(
-          Icons.chevron_right,
+        ListTile(
+          title: const Text("收藏"),
+          leading: const Icon(Icons.collections),
+          trailing: const Icon(
+            Icons.chevron_right,
+          ),
+          onTap: () {},
         ),
-        onTap: () {
-          Navigator.pushNamed(
-            context,
-            '/person-setting',
-          );
-        },
-      ),
-    ]);
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: const Divider(),
+        ),
+        ListTile(
+          title: const Text("设置"),
+          leading: const Icon(Icons.settings),
+          trailing: const Icon(
+            Icons.chevron_right,
+          ),
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/person-setting',
+            );
+          },
+        ),
+      ]);
+    });
   }
 }

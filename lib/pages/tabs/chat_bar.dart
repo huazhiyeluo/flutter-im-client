@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/common/keys.dart';
-import 'package:qim/utils/cache.dart';
+import 'package:qim/controller/userinfo.dart';
 
 final List<Map<String, dynamic>> items = [
   {"val": 1, "label": "创建群聊", "icon": Icons.wechat},
@@ -10,9 +9,10 @@ final List<Map<String, dynamic>> items = [
 ];
 
 AppBar chatBar() {
-  Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
-  String nickname = userInfo == null ? "" : userInfo['nickname'];
-  String avatar = userInfo == null ? "" : userInfo['avatar'];
+  final UserInfoController userInfoController = Get.find();
+  Map userInfo = userInfoController.userInfo;
+  String nickname = userInfo['nickname'];
+  String avatar = userInfo['avatar'];
   return AppBar(
       centerTitle: false,
       title: Row(

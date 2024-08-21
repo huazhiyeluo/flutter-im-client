@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/friend_group.dart';
-import 'package:qim/utils/cache.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:qim/widget/custom_text_field.dart';
@@ -44,6 +43,7 @@ class AddContactFriendDoPage extends StatefulWidget {
 
 class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
   final FriendGroupController friendGroupController = Get.find();
+  final UserInfoController userInfoController = Get.find();
 
   final TextEditingController _inputReasonController = TextEditingController();
   final TextEditingController _inputRemarkController = TextEditingController();
@@ -59,8 +59,8 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
       friendObj = Get.arguments;
     }
     friendGroupObj = friendGroupController.getOneFriendGroup(0)!;
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     _inputReasonController.text = "我是${userInfo['nickname']}";
     super.initState();
   }

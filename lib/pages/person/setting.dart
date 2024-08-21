@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/routes/route.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/widget/custom_button.dart';
@@ -13,12 +14,13 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> {
+  final UserInfoController userInfoController = Get.find();
   Map userInfo = {};
 
   @override
   void initState() {
     super.initState();
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+    userInfo = userInfoController.userInfo;
   }
 
   @override
@@ -40,7 +42,6 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  String? _initialRoute;
   @override
   Widget build(BuildContext context) {
     return ListView(children: [
@@ -115,10 +116,6 @@ class _SettingPageState extends State<SettingPage> {
               onPressed: () async {
                 CacheHelper.remove(Keys.userInfo);
                 String initialRouteData = await initialRoute();
-                if (!mounted) return;
-                setState(() {
-                  _initialRoute = initialRouteData;
-                });
                 Get.offAllNamed(initialRouteData);
               },
               text: "退出登录",

@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:qim/api/login.dart';
-import 'package:qim/common/keys.dart';
-import 'package:qim/routes/route.dart';
-import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 
@@ -204,12 +200,8 @@ class _LoginCodePageState extends State<LoginCodePage> {
   }
 
   _loginCodeAction() async {
-    var params = {'username': phoneController.text, 'password': codeController.text};
-    LoginApi.login(params, onSuccess: (res) async {
-      CacheHelper.saveData(Keys.userInfo, res['data']);
-      String initialRouteData = await initialRoute();
-      Get.offAndToNamed(initialRouteData);
-    }, onError: (res) {
+    var params = {'phone': phoneController.text, 'code': codeController.text};
+    LoginApi.login(params, onSuccess: (res) async {}, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
   }

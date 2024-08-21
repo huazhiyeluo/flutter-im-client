@@ -38,7 +38,7 @@ class CustomButton extends StatelessWidget {
           ),
         ),
         side: WidgetStateProperty.all<BorderSide>(borderSide),
-        minimumSize: WidgetStateProperty.all(const Size(50, 20)),
+        minimumSize: WidgetStateProperty.all(const Size(50, 30)),
       ),
       child: Text(text),
     );

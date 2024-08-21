@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/dbdata/savedbdata.dart';
-import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/dialog_confirm.dart';
 
@@ -19,6 +18,7 @@ class FriendDetailSettingGroup extends StatefulWidget {
 
 class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
   final TalkobjController talkobjController = Get.find();
+  final UserInfoController userInfoController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
   final TextEditingController nameCtr = TextEditingController();
@@ -31,8 +31,8 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
 
   @override
   void initState() {
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     if (Get.arguments != null) {
       talkObj = Get.arguments;
       contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;

@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/apply.dart';
 import 'package:qim/controller/apply.dart';
-import 'package:qim/common/keys.dart';
-import 'package:qim/utils/cache.dart';
-import 'package:qim/utils/db.dart';
-import 'package:qim/utils/functions.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 
@@ -46,6 +43,7 @@ class NoticeUserPage extends StatefulWidget {
 
 class _NoticeUserPageState extends State<NoticeUserPage> {
   final ApplyController applyController = Get.find();
+  final UserInfoController userInfoController = Get.find();
 
   int uid = 0;
   Map userInfo = {};
@@ -57,8 +55,8 @@ class _NoticeUserPageState extends State<NoticeUserPage> {
     ever(applyController.allFriendChats, (_) => _formatData());
     _formatData();
 
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     super.initState();
   }
 

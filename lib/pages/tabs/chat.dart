@@ -3,13 +3,12 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
 import 'package:qim/api/contact_group.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/dbdata/deldbdata.dart';
-import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/tips.dart';
@@ -60,6 +59,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TalkobjController talkobjController = Get.find();
+  final UserInfoController userInfoController = Get.find();
   final ChatController chatController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
@@ -69,8 +69,8 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
   }
 
   @override

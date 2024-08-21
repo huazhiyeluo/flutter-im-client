@@ -125,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
         const SizedBox(height: 20),
-        Image.asset("lib/assets/images/logo.png", width: 80, height: 80),
+        Image.asset("lib/assets/images/person.png", width: 80, height: 80),
         const SizedBox(height: 25),
         SizedBox(
           height: 50, // 设置TextField的高度

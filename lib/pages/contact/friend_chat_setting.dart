@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/dbdata/savedbdata.dart';
-import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/db.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
@@ -47,6 +46,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
   final ChatController chatController = Get.find();
   final UserController userController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
+  final UserInfoController userInfoController = Get.find();
 
   Map talkObj = {};
   int uid = 0;
@@ -58,8 +58,8 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
   @override
   void initState() {
     talkObj = talkobjController.talkObj;
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
 
     super.initState();
   }

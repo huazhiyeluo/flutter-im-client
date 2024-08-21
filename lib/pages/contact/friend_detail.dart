@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
-import 'package:qim/utils/cache.dart';
+import 'package:qim/controller/userinfo.dart';
 
 class FriendDetail extends StatefulWidget {
   const FriendDetail({super.key});
@@ -56,6 +55,7 @@ class FriendDetailPage extends StatefulWidget {
 
 class _FriendDetailPageState extends State<FriendDetailPage> {
   final TalkobjController talkobjController = Get.find();
+  final UserInfoController userInfoController = Get.find();
 
   final UserController userController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
@@ -70,8 +70,8 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
   @override
   void initState() {
     super.initState();
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }

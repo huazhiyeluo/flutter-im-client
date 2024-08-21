@@ -4,6 +4,6 @@ class TalkobjController extends GetxController {
   final RxMap talkObj = {}.obs;
 
   void setTalkObj(Map obj) {
-    talkObj.value = obj;
+    talkObj.value = obj.obs;
   }
 }

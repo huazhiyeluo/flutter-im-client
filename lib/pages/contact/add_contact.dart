@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/group.dart';
 import 'package:qim/api/user.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/group.dart';
-import 'package:qim/utils/cache.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_search_field.dart';
@@ -107,6 +106,7 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
   final ScrollController _scrollGroupController = ScrollController();
   final TextEditingController _inputUserController = TextEditingController();
   final TextEditingController _inputGroupController = TextEditingController();
+  final UserInfoController userInfoController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
   final GroupController groupController = Get.find();
 
@@ -132,8 +132,8 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
   @override
   void initState() {
     super.initState();
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
 
     _myFriendArr = contactFriendController.allContactFriends;
     _myGroupArr = groupController.allGroups;

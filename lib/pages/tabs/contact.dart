@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/apply.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/friend_group.dart';
@@ -8,7 +7,7 @@ import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
-import 'package:qim/utils/cache.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:azlistview_plus/azlistview_plus.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:qim/widget/custom_search_field.dart';
@@ -230,6 +229,7 @@ class ContactPage extends StatefulWidget {
 
 class _ContactPageState extends State<ContactPage> {
   final TalkobjController talkobjController = Get.find();
+  final UserInfoController userInfoController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
@@ -243,12 +243,13 @@ class _ContactPageState extends State<ContactPage> {
 
   Map isExpandeds = {}; // 初始化展开状态
   int uid = 0;
+  Map userInfo = {};
 
   @override
   void initState() {
     super.initState();
-    Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
-    uid = userInfo == null ? "" : userInfo['uid'];
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
 
     // 监听 friendController 和 friendGroupController 的数据变化
     ever(friendGroupController.allFriendGroups, (_) => _formatData());

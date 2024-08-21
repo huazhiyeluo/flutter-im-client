@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/common/keys.dart';
-import 'package:qim/utils/cache.dart';
+import 'package:qim/controller/userinfo.dart';
 
 AppBar contactBar() {
-  Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
-  String avatar = userInfo == null ? "" : userInfo['avatar'];
+  final UserInfoController userInfoController = Get.find();
+  Map userInfo = userInfoController.userInfo;
+  String avatar = userInfo['avatar'];
   return AppBar(
     centerTitle: false,
     title: Row(

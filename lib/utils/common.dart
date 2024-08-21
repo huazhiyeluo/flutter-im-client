@@ -15,6 +15,7 @@ import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/deldbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
@@ -122,8 +123,9 @@ Future<void> joinMessage(int uid, Map temp) async {
   final MessageController messageController = Get.find();
   bool isSelf = uid == msg['fromId'] ? true : false;
   if (isSelf) {
-    Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
-    msg['avatar'] = userInfo?['avatar'];
+    final UserInfoController userInfoController = Get.find();
+    Map userInfo = userInfoController.userInfo;
+    msg['avatar'] = userInfo['avatar'];
   } else {
     if (msg['msgType'] == 1) {
       final UserController userController = Get.find();

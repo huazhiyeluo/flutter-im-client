@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_group.dart';
-import 'package:qim/common/keys.dart';
-import 'package:qim/controller/group.dart';
-import 'package:qim/utils/cache.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:qim/widget/custom_text_field.dart';
@@ -47,6 +45,8 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
   final TextEditingController _inputRemarkController = TextEditingController();
   final TextEditingController _inputInfoController = TextEditingController();
 
+  final UserInfoController userInfoController = Get.find();
+
   Map groupObj = {};
   int uid = 0;
   Map userInfo = {};
@@ -57,8 +57,8 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
     if (Get.arguments != null) {
       groupObj = Get.arguments;
     }
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     _inputReasonController.text = "我是${userInfo['nickname']}";
     super.initState();
   }

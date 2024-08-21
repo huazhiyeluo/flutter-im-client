@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/apply.dart';
 import 'package:qim/api/contact_friend.dart';
 import 'package:qim/api/contact_group.dart';
 import 'package:qim/common/apis.dart';
@@ -15,6 +14,7 @@ import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/user.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
@@ -51,6 +51,7 @@ class _HomeState extends State<Home> {
   final ChatController chatController = Get.put(ChatController());
   final TalkobjController talkobjController = Get.put(TalkobjController());
   final ApplyController applyController = Get.put(ApplyController());
+  final UserInfoController userInfoController = Get.put(UserInfoController());
 
   int _currentIndex = 0;
   late AudioPlayerManager _audioPlayerManager;
@@ -66,7 +67,9 @@ class _HomeState extends State<Home> {
     _audioPlayerManager = AudioPlayerManager();
 
     Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
-    uid = userInfo == null ? "" : userInfo['uid'];
+    uid = userInfo == null ? 0 : userInfo['uid'];
+    userInfoController.setUserInfo(userInfo!);
+
     webSocketController = Get.put(WebSocketController(uid, Apis.socketUrl));
     _initOnReceive();
 

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/common.dart';
-import 'package:qim/common/keys.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/user.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/pages/chat/talk/emoji_list.dart';
 import 'package:qim/pages/chat/talk/phone_from.dart';
@@ -15,7 +15,6 @@ import 'package:qim/pages/chat/talk/phone_ing.dart';
 import 'package:qim/pages/chat/talk/phone_to.dart';
 import 'package:qim/pages/chat/talk/plus_list.dart';
 import 'package:qim/utils/Signaling.dart';
-import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/utils/functions.dart';
@@ -42,6 +41,7 @@ class _TalkState extends State<Talk> {
 
   final ContactFriendController contactFriendController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
+  final UserInfoController userInfoController = Get.find();
 
   Map talkObj = {};
   Map userInfo = {};
@@ -54,8 +54,8 @@ class _TalkState extends State<Talk> {
   void initState() {
     super.initState();
     talkObj = talkobjController.talkObj;
-    Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
-    uid = userInfo == null ? "" : userInfo['uid'];
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
   }
 
   @override
@@ -140,6 +140,7 @@ class _TalkPageState extends State<TalkPage> {
   final WebSocketController webSocketController = Get.find();
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
+  final UserInfoController userInfoController = Get.find();
   final TextEditingController _inputController = TextEditingController();
 
   double keyboardHeight = 270.0;
@@ -161,9 +162,9 @@ class _TalkPageState extends State<TalkPage> {
   void initState() {
     super.initState();
 
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
     talkObj = talkobjController.talkObj;
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     talkCommonObj = getTalkCommonObj(talkObj);
 
     _focusNode.addListener(() {

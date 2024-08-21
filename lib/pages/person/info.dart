@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qim/api/common.dart';
 import 'package:qim/api/user.dart';
 import 'package:qim/common/keys.dart';
+import 'package:qim/controller/userinfo.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/permission.dart';
@@ -41,118 +43,138 @@ class PersonInfoPage extends StatefulWidget {
 }
 
 class _PersonInfoPageState extends State<PersonInfoPage> {
-  int uid = 0;
-  Map userInfo = {};
+  final UserInfoController userInfoController = Get.find();
 
   final ImagePicker _picker = ImagePicker();
 
+  int uid = 0;
+  Map userInfo = {};
+
   @override
   void initState() {
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     super.initState();
-    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
-    uid = userInfo['uid'] ?? "";
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(children: [
-      const SizedBox(height: 20),
-      ListTile(
-        leading: const Text(
-          "头像",
-          style: TextStyle(fontSize: 16),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20.0), // 必须与 Container 的 borderRadius 相同
-              child: Image.network(
-                userInfo['avatar'], // 替换为你的图片URL
-                width: 60.0,
-                height: 60.0,
-                fit: BoxFit.cover,
+    return Obx(() {
+      userInfo = userInfoController.userInfo;
+      return ListView(children: [
+        const SizedBox(height: 20),
+        ListTile(
+          leading: const Text(
+            "头像",
+            style: TextStyle(fontSize: 16),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20.0), // 必须与 Container 的 borderRadius 相同
+                child: Image.network(
+                  userInfo['avatar'], // 替换为你的图片URL
+                  width: 60.0,
+                  height: 60.0,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            const Icon(Icons.chevron_right),
-          ],
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {
+            _uploadAvatar();
+          },
         ),
-        onTap: () {
-          _uploadAvatar();
-        },
-      ),
-      Container(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: const Divider(),
-      ),
-      ListTile(
-        leading: const Text(
-          "昵称",
-          style: TextStyle(fontSize: 16),
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: const Divider(),
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              userInfo['nickname'],
-              style: const TextStyle(fontSize: 16),
-            ),
-            const Icon(Icons.chevron_right),
-          ],
+        ListTile(
+          leading: const Text(
+            "昵称",
+            style: TextStyle(fontSize: 16),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                userInfo['nickname'],
+                style: const TextStyle(fontSize: 16),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/person-info-nickname',
+            );
+          },
         ),
-        onTap: () {},
-      ),
-      Container(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: const Divider(),
-      ),
-      ListTile(
-        leading: const Text(
-          "用户名",
-          style: TextStyle(fontSize: 16),
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: const Divider(),
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              userInfo['username'],
-              style: const TextStyle(fontSize: 16),
-            ),
-            const Icon(Icons.chevron_right),
-          ],
+        ListTile(
+          leading: const Text(
+            "用户名",
+            style: TextStyle(fontSize: 16),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                userInfo['username'],
+                style: const TextStyle(fontSize: 16),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/person-info-username',
+            );
+          },
         ),
-        onTap: () {},
-      ),
-      Container(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: const Divider(),
-      ),
-      ListTile(
-        leading: const Text(
-          "个性签名",
-          style: TextStyle(fontSize: 16),
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: const Divider(),
         ),
-        subtitle: Text(
-          userInfo['info'],
-          style: const TextStyle(fontSize: 16),
-          maxLines: 5,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.end,
+        ListTile(
+          leading: const Text(
+            "个性签名",
+            style: TextStyle(fontSize: 16),
+          ),
+          subtitle: Text(
+            userInfo['info'],
+            style: const TextStyle(fontSize: 16),
+            maxLines: 5,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
+          ),
+          trailing: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/person-info-info',
+            );
+          },
         ),
-        trailing: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.chevron_right),
-          ],
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: const Divider(),
         ),
-        onTap: () {},
-      ),
-      Container(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-        child: const Divider(),
-      ),
-      const SizedBox(height: 20),
-    ]);
+        const SizedBox(height: 20),
+      ]);
+    });
   }
 
   Future<void> _uploadAvatar() async {
@@ -171,11 +193,8 @@ class _PersonInfoPageState extends State<PersonInfoPage> {
           'uid': uid,
         };
         UserApi.actUser(params, onSuccess: (res) async {
-          userInfo['avatar'] = params['avatar'];
-          setState(() {
-            userInfo = userInfo;
-          });
-          CacheHelper.saveData(Keys.userInfo, userInfo);
+          userInfoController.setUserInfo({...userInfoController.userInfo, 'avatar': params['avatar']});
+          CacheHelper.saveData(Keys.userInfo, userInfoController.userInfo);
         }, onError: (res) {
           TipHelper.instance.showToast(res['msg']);
         });
