@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:qim/controller/websocket.dart';
+import 'package:qim/utils/functions.dart';
 
 class Session {
   Session({required this.fromId, required this.toId});
@@ -85,6 +86,7 @@ class Signaling {
 
   //创建session
   Future<Session> createSession(Session? session, int fromId, int toId) async {
+    await logPrint("createSession");
     Session newSession = session ?? Session(fromId: fromId, toId: toId);
     _localStream = await createStream();
 
@@ -117,6 +119,7 @@ class Signaling {
 
   //创建流
   Future<MediaStream> createStream() async {
+    await logPrint("createStream");
     MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     onLocalStream?.call(stream);
     return stream;
@@ -124,6 +127,7 @@ class Signaling {
 
   //创建offer
   Future<void> createOffer(Session session) async {
+    await logPrint("createOffer");
     try {
       RTCSessionDescription s = await session.pc!.createOffer(offerOptions);
       await session.pc!.setLocalDescription(_fixSdp(s));
@@ -132,11 +136,14 @@ class Signaling {
         'type': s.type,
       };
       onSendMsg?.call(session.fromId, session.toId, 4, 4, json.encode(offerMap));
-    } catch (e) {}
+    } catch (e) {
+      await logPrint("createOffer: error ,$e");
+    }
   }
 
   //创建answer
   Future<void> createAnswer(Session session) async {
+    await logPrint("createAnswer");
     try {
       RTCSessionDescription s = await session.pc!.createAnswer();
       await session.pc!.setLocalDescription(_fixSdp(s));
@@ -145,11 +152,14 @@ class Signaling {
         'type': s.type,
       };
       onSendMsg?.call(session.fromId, session.toId, 4, 5, json.encode(answerMap));
-    } catch (e) {}
+    } catch (e) {
+      await logPrint("createAnswer: error ,$e");
+    }
   }
 
   //关闭所有的留
   Future<void> cleanSessions() async {
+    await logPrint("cleanSessions");
     if (_localStream != null) {
       _localStream!.getTracks().forEach((MediaStreamTrack track) async {
         await track.stop();
@@ -164,6 +174,7 @@ class Signaling {
   }
 
   Future<void> closeSession(Session session) async {
+    await logPrint("closeSession");
     if (_localStream != null) {
       _localStream?.getTracks().forEach((MediaStreamTrack track) async {
         await track.stop();
@@ -193,6 +204,7 @@ class Signaling {
 
   //邀请通话
   void invite(int fromId, int toId) async {
+    await logPrint("invite");
     Session session = await createSession(null, fromId, toId);
     _sessions[fromId] = session;
 
@@ -203,6 +215,7 @@ class Signaling {
 
   //接通通话
   Future<void> accept(int fromId, int toId) async {
+    await logPrint("accept");
     var session = _sessions[fromId];
     if (session == null) {
       return;
@@ -211,7 +224,8 @@ class Signaling {
   }
 
   //拒接通话
-  void reject(int fromId, int toId) {
+  Future<void> reject(int fromId, int toId) async {
+    await logPrint("reject");
     var session = _sessions[fromId];
     if (session == null) {
       return;
@@ -220,7 +234,8 @@ class Signaling {
   }
 
   //结束通话
-  void bye(int fromId, int toId) {
+  Future<void> bye(int fromId, int toId) async {
+    await logPrint("bye");
     onSendMsg?.call(fromId, toId, 4, 1, "");
     var session = _sessions[fromId];
     if (session != null) {

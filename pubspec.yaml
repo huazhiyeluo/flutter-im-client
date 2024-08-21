@@ -64,8 +64,9 @@ dependencies:
   video_player: ^2.9.1
   chewie: ^1.8.1
   url_launcher: ^6.3.0
-  flutter_webrtc: ^0.11.6+hotfix.1
-  web_socket_channel: ^3.0.1
+  flutter_webrtc: ^0.10.6
+  web_socket_channel: ^3.0.0
+
   
 
 dev_dependencies:

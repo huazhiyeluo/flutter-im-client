@@ -444,10 +444,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_webrtc
-      sha256: "67faa07cf49392b50b1aa14590a83caa64d2109345fabd29899dcd8da8538348"
+      sha256: fd5f115a08dcdc00b988bea3003c956f1b60a78a61d899cbddfb44f5d0e44d4a
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.11.6+hotfix.1"
+    version: "0.10.8"
   fluttertoast:
     dependency: "direct main"
     description:
