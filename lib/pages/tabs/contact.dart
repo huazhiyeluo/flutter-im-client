@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/controller/apply.dart';
@@ -332,7 +333,7 @@ class _ContactPageState extends State<ContactPage> {
           return ListTile(
             leading: CircleAvatar(
               radius: 20,
-              backgroundImage: NetworkImage(itemFriend.icon!),
+              backgroundImage: CachedNetworkImageProvider(itemFriend.icon!),
             ),
             title: Text(
               '${itemFriend.remark != "" ? itemFriend.remark : itemFriend.name}',
@@ -430,7 +431,7 @@ class _ContactPageState extends State<ContactPage> {
                           ListTile(
                             leading: CircleAvatar(
                               radius: 20,
-                              backgroundImage: NetworkImage(itemFriend['icon']),
+                              backgroundImage: CachedNetworkImageProvider(itemFriend['icon']),
                             ),
                             title: Text(itemFriend['remark'] != "" ? itemFriend['remark'] : itemFriend['name']),
                             subtitle: Text(
@@ -471,7 +472,7 @@ class _ContactPageState extends State<ContactPage> {
               ListTile(
                 leading: CircleAvatar(
                   radius: 20,
-                  backgroundImage: NetworkImage(itemGroup['icon']),
+                  backgroundImage: CachedNetworkImageProvider(itemGroup['icon']),
                 ),
                 title: Text(itemGroup['remark'] != "" ? itemGroup['remark'] : itemGroup['name']),
                 subtitle: Text(

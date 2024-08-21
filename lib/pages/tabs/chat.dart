@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
@@ -172,9 +173,7 @@ class _ChatPageState extends State<ChatPage> {
                   ListTile(
                     leading: CircleAvatar(
                       radius: 20,
-                      backgroundImage: NetworkImage(
-                        temp["icon"],
-                      ),
+                      backgroundImage: CachedNetworkImageProvider(temp["icon"]),
                     ),
                     title: Text(temp["remark"] != '' ? temp["remark"] : temp["name"]),
                     subtitle: Text(

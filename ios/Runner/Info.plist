@@ -46,9 +46,9 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>We need access to the camera for video calls.</string>
+	<string>$(PRODUCT_NAME) Camera Usage!</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>We need access to the microphone for audio calls.</string>
+	<string>$(PRODUCT_NAME) Microphone Usage!</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library to upload files</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

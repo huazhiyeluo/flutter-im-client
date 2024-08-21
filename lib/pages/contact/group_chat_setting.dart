@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_group.dart';
@@ -134,7 +135,9 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                     children: [
                       CircleAvatar(
                         radius: 25,
-                        backgroundImage: NetworkImage(userObj['avatar']),
+                        backgroundImage: CachedNetworkImageProvider(
+                          userObj['avatar'],
+                        ),
                       ),
                       const SizedBox(
                         height: 1,

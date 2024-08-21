@@ -127,7 +127,7 @@ class _ChatMessageState extends State<ChatMessage> {
       child: CircleAvatar(
         // 聊天对象的头像
         radius: 25,
-        backgroundImage: NetworkImage(messageList[index]['avatar']),
+        backgroundImage: CachedNetworkImageProvider(messageList[index]['avatar']),
       ),
     );
   }
@@ -138,7 +138,7 @@ class _ChatMessageState extends State<ChatMessage> {
       child: CircleAvatar(
         // 聊天对象的头像
         radius: 25,
-        backgroundImage: NetworkImage(messageList[index]['avatar']),
+        backgroundImage: CachedNetworkImageProvider(messageList[index]['avatar']),
       ),
     );
   }

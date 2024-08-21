@@ -42,7 +42,6 @@ dependencies:
   fluttertoast: ^8.2.5
   shared_preferences: ^2.2.3
   synchronized: ^3.1.0+1
-  web_socket_channel: ^3.0.0
   path: ^1.9.0
   sqflite: ^2.3.3+1
   azlistview_plus: ^3.0.0
@@ -51,7 +50,6 @@ dependencies:
   image_picker: ^1.1.1
   permission_handler: ^11.3.1
   photo_view: ^0.15.0
-  flutter_webrtc: ^0.10.6
   sqflite_common_ffi: ^2.3.3
   sqflite_common_ffi_web: ^0.4.3+1
   extended_text_field: ^15.0.0
@@ -66,6 +64,8 @@ dependencies:
   video_player: ^2.9.1
   chewie: ^1.8.1
   url_launcher: ^6.3.0
+  flutter_webrtc: ^0.11.6+hotfix.1
+  web_socket_channel: ^3.0.1
   
 
 dev_dependencies:

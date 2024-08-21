@@ -1,4 +1,5 @@
 import 'package:azlistview_plus/azlistview_plus.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lpinyin/lpinyin.dart';
@@ -75,18 +76,14 @@ class _GroupUserPageState extends State<GroupUserPage> {
   }
 
   void _formatData() {
-    logPrint("_formatData");
     final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
     _userArr.clear();
     for (var item in contactGroups) {
       Map userObj = userController.getOneUser(item['fromId'])!;
       Map? contactFriendObj = contactFriendController.getOneContactFriend(uid, item['fromId']);
-      logPrint(userObj['nickname']);
       if (userObj['nickname'].contains(inputController.text) ||
           item['remark'].contains(inputController.text) ||
           item['fromId'].toString().contains(inputController.text)) {
-        logPrint("contains: ${userObj['nickname']}");
-
         UserModel chat = UserModel();
         chat.uid = item['fromId'];
         chat.name = userObj['nickname'];
@@ -139,7 +136,9 @@ class _GroupUserPageState extends State<GroupUserPage> {
                   leading: CircleAvatar(
                     // 聊天对象的头像
                     radius: 20,
-                    backgroundImage: NetworkImage(_userArr[index].icon!),
+                    backgroundImage: CachedNetworkImageProvider(
+                      _userArr[index].icon!,
+                    ),
                   ),
                   title: Text('${_userArr[index].remark != "" ? _userArr[index].remark : _userArr[index].name}'),
                   trailing: _userArr[index].uid == uid
