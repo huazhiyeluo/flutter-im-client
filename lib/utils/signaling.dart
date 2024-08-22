@@ -31,7 +31,7 @@ class Signaling {
 
   final Map<String, dynamic> configuration = {
     'iceServers': [
-      {'urls': 'turn:139.196.98.139:3478?transport=tcp', 'credential': 'liaoabc', 'nickname': 'liao'},
+      {'urls': 'turn:139.196.98.139:3478?transport=tcp', 'credential': 'liaoabc', 'username': 'liao'},
     ],
     'sdpSemantics': 'unified-plan'
   };

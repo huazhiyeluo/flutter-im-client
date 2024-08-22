@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
-import 'package:qim/middleware/homeMiddleware.dart';
+import 'package:qim/middleware/home_middleware.dart';
 import 'package:qim/pages/contact/add_contact.dart';
 import 'package:qim/pages/contact/add_contact_friend_do.dart';
 import 'package:qim/pages/contact/add_contact_group_do.dart';

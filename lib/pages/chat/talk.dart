@@ -645,7 +645,6 @@ class _TalkPageState extends State<TalkPage> {
           Navigator.of(context).pop(false);
           await _dialogUI(3);
           break;
-        case CallState.callStateRinging:
       }
     };
 

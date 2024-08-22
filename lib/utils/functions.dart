@@ -18,6 +18,8 @@ Future<void> logPrint(Object? content, {String filename = "log.txt"}) async {
     }
   } catch (e) {
     // 处理可能的错误
-    print("Error writing to log file: $e");
+    if (kDebugMode) {
+      print("Error writing to log file: $e");
+    }
   }
 }
