@@ -338,23 +338,6 @@ class _HomeState extends State<Home> {
   }
 
   void _getApplyList() async {
-    // var params = {
-    //   'uid': uid,
-    // };
-    // ApplyApi.getApplyList(params, onSuccess: (res) {
-    //   if (!mounted) return;
-    //   List applyArr = [];
-    //   if (res['data'] != null) {
-    //     applyArr = res['data'];
-    //   }
-    //   for (var item in applyArr) {
-    //     applyController.upsetApply(item);
-    //     saveDbApply(item);
-    //   }
-    // }, onError: (res) {
-    //   TipHelper.instance.showToast(res['msg']);
-    // });
-
     if (applyController.allApplys.isEmpty) {
       List applys = await DBHelper.getData('apply', []);
 
