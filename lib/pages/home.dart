@@ -16,7 +16,6 @@ import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
 import 'package:qim/controller/websocket.dart';
-import 'package:qim/dbdata/getdbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/routes/route.dart';
 import 'package:qim/utils/db.dart';
@@ -24,6 +23,7 @@ import 'package:qim/utils/play.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/functions.dart';
+import 'package:qim/controller/signaling.dart';
 import 'package:qim/utils/tips.dart';
 import 'tabs/chat.dart';
 import 'tabs/chat_bar.dart';
@@ -41,6 +41,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late WebSocketController webSocketController;
+  late SignalingController signalingController;
   final FriendGroupController friendGroupController = Get.put(FriendGroupController());
   final ContactFriendController contactFriendController = Get.put(ContactFriendController());
   final ContactGroupController contactGroupController = Get.put(ContactGroupController());
@@ -71,6 +72,9 @@ class _HomeState extends State<Home> {
     userInfoController.setUserInfo(userInfo!);
 
     webSocketController = Get.put(WebSocketController(uid, Apis.socketUrl));
+    signalingController =
+        Get.put(SignalingController(fromId: uid, context: context, webSocketController: webSocketController));
+
     _initOnReceive();
 
     _getFriendGroupList();
@@ -83,7 +87,8 @@ class _HomeState extends State<Home> {
   @override
   void dispose() {
     logPrint("home-dispose");
-    webSocketController.onClose();
+    webSocketController.dispose();
+    signalingController.close();
     _audioPlayerManager.dispose();
     super.dispose();
   }
@@ -119,25 +124,9 @@ class _HomeState extends State<Home> {
           loadGroupManage(uid, msg);
         }
       }
-
       //设置当前聊天Obj
-      if ([4].contains(msg['msgType']) && msg['msgMedia'] == 0) {
-        Map<String, dynamic>? objUser = await getDbOneUser(msg['fromId']);
-        if (objUser == null) {
-          return;
-        }
-
-        Map talkobj = {
-          "objId": msg['fromId'],
-          "type": 1,
-          "name": objUser['nickname'],
-          "icon": objUser['avatar'],
-          "info": objUser['info'],
-          "remark": objUser['remark'],
-        };
-        talkobjController.setTalkObj(talkobj);
-        //收到语音通话 - 请求
-        Get.toNamed('/talk');
+      if ([4].contains(msg['msgType'])) {
+        signalingController.handinvite(msg);
       }
     });
   }

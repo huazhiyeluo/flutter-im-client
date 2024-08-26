@@ -4,6 +4,8 @@ import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
+import 'package:qim/utils/common.dart';
+import 'package:qim/controller/signaling.dart';
 
 class FriendDetail extends StatefulWidget {
   const FriendDetail({super.key});
@@ -54,6 +56,7 @@ class FriendDetailPage extends StatefulWidget {
 }
 
 class _FriendDetailPageState extends State<FriendDetailPage> {
+  final SignalingController signalingController = Get.find();
   final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
 
@@ -65,6 +68,7 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
 
   Map talkObj = {};
   Map userObj = {};
+  Map talkCommonObj = {};
   Map contactFriendObj = {};
 
   @override
@@ -75,6 +79,8 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
+
+    talkCommonObj = getTalkCommonObj(talkObj);
   }
 
   List<Widget> _getTitle() {
@@ -98,6 +104,11 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
 
     data.add(Text('QID: ${userObj['uid']}'));
     return data;
+  }
+
+  //邀请
+  void _invite() async {
+    signalingController.invite(talkCommonObj);
   }
 
   @override
@@ -163,12 +174,7 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
           ),
           TextButton.icon(
             onPressed: () {
-              talkobjController.setTalkObj(talkObj);
-              Navigator.pushNamed(
-                context,
-                '/talk',
-                arguments: {"actionType": 1},
-              );
+              _invite();
             },
             label: const Text(
               "音视频通话",

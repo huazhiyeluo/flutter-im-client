@@ -10,20 +10,15 @@ import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
 import 'package:qim/controller/websocket.dart';
 import 'package:qim/pages/chat/talk/emoji_list.dart';
-import 'package:qim/pages/chat/talk/phone_from.dart';
-import 'package:qim/pages/chat/talk/phone_ing.dart';
-import 'package:qim/pages/chat/talk/phone_to.dart';
 import 'package:qim/pages/chat/talk/plus_list.dart';
-import 'package:qim/utils/Signaling.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/permission.dart';
+import 'package:qim/controller/signaling.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart' as dio;
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:qim/pages/chat/talk/chat_message.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 
@@ -138,9 +133,11 @@ class TalkPage extends StatefulWidget {
 
 class _TalkPageState extends State<TalkPage> {
   final WebSocketController webSocketController = Get.find();
+  final SignalingController signalingController = Get.find();
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
+
   final TextEditingController _inputController = TextEditingController();
 
   double keyboardHeight = 270.0;
@@ -150,11 +147,6 @@ class _TalkPageState extends State<TalkPage> {
   Map talkCommonObj = {};
   int isShowEmoji = 0;
   int isShowPlus = 0;
-
-  final _localRenderer = webrtc.RTCVideoRenderer();
-  final _remoteRenderer = webrtc.RTCVideoRenderer();
-  Signaling? _signaling;
-  Session? _session;
 
   final FocusNode _focusNode = FocusNode();
 
@@ -173,20 +165,6 @@ class _TalkPageState extends State<TalkPage> {
         isShowPlus = 0;
       }
     });
-
-    initRenderers();
-    _connect(context);
-    if (Get.arguments != null) {
-      int actionType = Get.arguments['actionType'];
-      if (actionType == 1) {
-        _invite();
-      }
-    }
-  }
-
-  initRenderers() async {
-    await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
   }
 
   final ImagePicker _picker = ImagePicker();
@@ -194,9 +172,6 @@ class _TalkPageState extends State<TalkPage> {
   @override
   void dispose() {
     _inputController.dispose();
-    _signaling?.close();
-    _localRenderer.dispose();
-    _remoteRenderer.dispose();
     talkobjController.setTalkObj({"objId": 0});
     super.dispose();
   }
@@ -355,65 +330,6 @@ class _TalkPageState extends State<TalkPage> {
     );
   }
 
-  Future<bool?> _dialogUI(int ttype) async {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            insetPadding: EdgeInsets.zero, // 设置内容填充为零
-            child: Container(
-              width: MediaQuery.of(context).size.width, // 使用屏幕宽度作为内容宽度
-              height: MediaQuery.of(context).size.height, // 使用屏幕高度作为内容高度
-              color: const Color.fromARGB(125, 0, 0, 125), // 设置背景颜色
-              child: ttype == 1
-                  ? _phoneTo(context)
-                  : ttype == 2
-                      ? _phoneFrom(context)
-                      : _phoneIng(context),
-            ),
-          );
-        });
-  }
-
-  Widget _phoneIng(BuildContext context) {
-    return PhoneIng(
-      remoteRenderer: _remoteRenderer,
-      localRenderer: _localRenderer,
-      onPhoneQuit: (int num) {
-        Navigator.of(context).pop(false);
-        _cancel(num);
-      },
-      switchCamera: () {
-        _switchCamera();
-      },
-      turnCamera: (bool numted) {
-        _turnCamera(numted);
-      },
-    );
-  }
-
-  Widget _phoneTo(BuildContext context) {
-    return PhoneTo(
-      talkCommonObj: talkCommonObj,
-      onPhoneCancel: () {
-        Navigator.of(context).pop(false);
-        _reject();
-      },
-    );
-  }
-
-  Widget _phoneFrom(BuildContext context) {
-    return PhoneFrom(
-      talkCommonObj: talkCommonObj,
-      onPhoneQuit: () {
-        Navigator.of(context).pop(false);
-      },
-      onPhoneAccept: () {
-        Navigator.of(context).pop(true);
-      },
-    );
-  }
-
   void _sendText() async {
     if (_inputController.text == "") {
       TipHelper.instance.showToast("bu'd");
@@ -564,113 +480,6 @@ class _TalkPageState extends State<TalkPage> {
 
   //邀请
   void _invite() async {
-    if (_signaling != null) {
-      _signaling?.invite(uid, talkObj['objId']);
-    }
-  }
-
-  //接通
-  void _accept() async {
-    if (_session != null) {
-      _signaling?.onSendMsg!(uid, talkObj['objId'], 4, 2, "");
-      await _signaling?.accept(uid, talkObj['objId']);
-    }
-  }
-
-  //取消
-  void _reject() {
-    if (_session != null) {
-      _signaling?.onSendMsg!(uid, talkObj['objId'], 1, 13, "挂断电话");
-      _signaling?.reject(uid, talkObj['objId']);
-    }
-  }
-
-  //接通后取消
-  void _cancel(int num) {
-    if (_session != null) {
-      _signaling?.onSendMsg!(uid, talkObj['objId'], 1, 12, "$num");
-      _signaling?.bye(uid, talkObj['objId']);
-    }
-  }
-
-  //翻转镜头
-  void _switchCamera() {
-    _signaling?.switchCamera();
-  }
-
-  //关闭开启镜头
-  void _turnCamera(bool tnumted) {
-    _signaling?.turnCamera(tnumted);
-  }
-
-  void _connect(BuildContext context) async {
-    _signaling ??= Signaling()..connect(webSocketController);
-    _signaling?.onSignalingStateChange = (SignalingState state) {
-      switch (state) {
-        case SignalingState.connectionClosed:
-        case SignalingState.connectionError:
-        case SignalingState.connectionOpen:
-          break;
-      }
-    };
-    _signaling?.onCallStateChange = (Session session, CallState state) async {
-      logPrint("$state");
-      switch (state) {
-        case CallState.callStateNew:
-          setState(() {
-            _session = session;
-          });
-          break;
-        case CallState.callStateRinging:
-          bool? accept = await _dialogUI(2);
-          if (accept!) {
-            _accept();
-            await _dialogUI(3);
-          } else {
-            _reject();
-          }
-          break;
-        case CallState.callStateBye:
-          Navigator.of(context).pop(false);
-          setState(() {
-            _localRenderer.srcObject = null;
-            _remoteRenderer.srcObject = null;
-            _session = null;
-          });
-          break;
-        case CallState.callStateInvite:
-          await _dialogUI(1);
-          break;
-        case CallState.callStateConnected:
-          Navigator.of(context).pop(false);
-          await _dialogUI(3);
-          break;
-      }
-    };
-
-    _signaling?.onLocalStream = ((stream) {
-      _localRenderer.srcObject = stream;
-      setState(() {});
-    });
-
-    _signaling?.onRemoteStream = ((stream) {
-      _remoteRenderer.srcObject = stream;
-      setState(() {});
-    });
-
-    _signaling?.onSendMsg = ((int fromId, int toId, int msgType, int msgMedia, String data) {
-      Map msg = {
-        'content': {'data': data},
-        'fromId': fromId,
-        'toId': toId,
-        'msgType': msgType,
-        'msgMedia': msgMedia,
-      };
-      webSocketController.sendMessage(msg);
-      if (msgType == 1) {
-        msg['createTime'] = getTime();
-        joinData(fromId, msg);
-      }
-    });
+    signalingController.invite(talkCommonObj);
   }
 }

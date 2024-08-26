@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:qim/controller/websocket.dart';
 import 'package:qim/utils/functions.dart';
 
 class Session {
@@ -60,10 +59,8 @@ class Signaling {
     'offerToReceiveAudio': true,
     'offerToReceiveVideo': true,
   };
-
   final Map<int, Session> _sessions = {};
   MediaStream? _localStream;
-  late WebSocketController webSocketController;
 
   Function(SignalingState state)? onSignalingStateChange;
   Function(Session session, CallState state)? onCallStateChange;
@@ -79,9 +76,12 @@ class Signaling {
     return s;
   }
 
-  //连接监控
-  Future<void> connect(WebSocketController webSocketController) async {
-    onReceive(webSocketController);
+  //创建流
+  Future<MediaStream> createStream() async {
+    await logPrint("createStream");
+    MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    onLocalStream?.call(stream);
+    return stream;
   }
 
   //创建session
@@ -100,29 +100,13 @@ class Signaling {
       await pc.addTrack(track, _localStream!);
     });
 
-    pc.onIceCandidate = (RTCIceCandidate candidate) async {
-      await Future.delayed(const Duration(seconds: 1), () {
-        Map<String, dynamic> candidateMap = {
-          'sdpMLineIndex': candidate.sdpMLineIndex,
-          'sdpMid': candidate.sdpMid,
-          'candidate': candidate.candidate,
-        };
-        onSendMsg?.call(fromId, toId, 4, 3, json.encode(candidateMap));
-      });
+    pc.onIceCandidate = (RTCIceCandidate candidate) {
+      createIceCandidate(candidate, fromId, toId);
     };
-
     pc.onIceConnectionState = (RTCIceConnectionState state) {};
 
     newSession.pc = pc;
     return newSession;
-  }
-
-  //创建流
-  Future<MediaStream> createStream() async {
-    await logPrint("createStream");
-    MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    onLocalStream?.call(stream);
-    return stream;
   }
 
   //创建offer
@@ -135,7 +119,7 @@ class Signaling {
         'sdp': s.sdp,
         'type': s.type,
       };
-      onSendMsg?.call(session.fromId, session.toId, 4, 4, json.encode(offerMap));
+      onSendMsg?.call(session.fromId, session.toId, 4, 1, json.encode(offerMap));
     } catch (e) {
       await logPrint("createOffer: error ,$e");
     }
@@ -151,10 +135,22 @@ class Signaling {
         'sdp': s.sdp,
         'type': s.type,
       };
-      onSendMsg?.call(session.fromId, session.toId, 4, 5, json.encode(answerMap));
+      onSendMsg?.call(session.fromId, session.toId, 4, 2, json.encode(answerMap));
     } catch (e) {
       await logPrint("createAnswer: error ,$e");
     }
+  }
+
+  //创建IceCandidate
+  Future<void> createIceCandidate(RTCIceCandidate candidate, int fromId, int toId) async {
+    await Future.delayed(const Duration(seconds: 1), () {
+      Map<String, dynamic> candidateMap = {
+        'sdpMLineIndex': candidate.sdpMLineIndex,
+        'sdpMid': candidate.sdpMid,
+        'candidate': candidate.candidate,
+      };
+      onSendMsg?.call(fromId, toId, 4, 3, json.encode(candidateMap));
+    });
   }
 
   //关闭所有的留
@@ -236,41 +232,85 @@ class Signaling {
   //结束通话
   Future<void> bye(int fromId, int toId) async {
     await logPrint("bye");
-    onSendMsg?.call(fromId, toId, 4, 1, "");
+    onSendMsg?.call(fromId, toId, 4, 4, "");
     var session = _sessions[fromId];
     if (session != null) {
       closeSession(session);
     }
   }
 
-  void onReceive(WebSocketController webSocketController) {
-    webSocketController.message.listen((msg) async {
-      if ([4].contains(msg['msgType'])) {
-        if (msg['msgMedia'] == 1) {
-          Session? session = _sessions.remove(msg['toId']);
-          if (session != null) {
-            onCallStateChange?.call(session, CallState.callStateBye);
-            closeSession(session);
-          }
-        }
-        if (msg['msgMedia'] == 3) {
-          _handleIceCandidate(msg);
-        }
-        //收到offer代表有人邀请你通话
-        if (msg['msgMedia'] == 4) {
-          _handleOffer(msg);
-        }
+  void onReceive(msg) {
+    if ([4].contains(msg['msgType'])) {
+      //收到offer代表有人邀请你通话
+      if (msg['msgMedia'] == 1) {
+        _handleOffer(msg);
+      }
+      //收到answer代表对方接通 （接通后发送answer）
+      if (msg['msgMedia'] == 2) {
+        _handleAnswer(msg);
+      }
 
-        //收到answer代表对方接通 （接通后发送answer）
-        if (msg['msgMedia'] == 5) {
-          _handleAnswer(msg);
+      //收到IceCandidate （发送IceCandidate）
+      if (msg['msgMedia'] == 3) {
+        _handleIceCandidate(msg);
+      }
+
+      //挂断
+      if (msg['msgMedia'] == 4) {
+        Session? session = _sessions.remove(msg['toId']);
+        if (session != null) {
+          onCallStateChange?.call(session, CallState.callStateBye);
+          closeSession(session);
         }
       }
-    });
+    }
   }
 
-  //1-1、_handleIceCandidate
+  //1-1、_handleOffer
+  void _handleOffer(Map<dynamic, dynamic> msg) async {
+    await logPrint("_handleOffer");
+    try {
+      Session? session = _sessions[msg['toId']];
+      Session newSession = await createSession(session, msg['toId'], msg['fromId']);
+      _sessions[msg['toId']] = newSession;
+
+      Map offerMap = json.decode(msg['content']['data']);
+      RTCSessionDescription offer = RTCSessionDescription(offerMap['sdp'], offerMap['type']);
+
+      await newSession.pc?.setRemoteDescription(offer);
+
+      if (newSession.remoteCandidates.isNotEmpty) {
+        for (var candidate in newSession.remoteCandidates) {
+          await newSession.pc?.addCandidate(candidate);
+        }
+        newSession.remoteCandidates.clear();
+      }
+      onCallStateChange?.call(newSession, CallState.callStateNew);
+      onCallStateChange?.call(newSession, CallState.callStateRinging);
+    } catch (e) {
+      await logPrint("_handleOffer: error ,$e");
+    }
+  }
+
+  //1-2 _handleAnswer
+  void _handleAnswer(Map<dynamic, dynamic> msg) async {
+    await logPrint("_handleAnswer");
+    try {
+      Session? session = _sessions[msg['toId']];
+      Map answerMap = json.decode(msg['content']['data']);
+      RTCSessionDescription answer = RTCSessionDescription(answerMap['sdp'], answerMap['type']);
+
+      await session?.pc?.setRemoteDescription(answer);
+
+      onCallStateChange?.call(session!, CallState.callStateConnected);
+    } catch (e) {
+      await logPrint("_handleAnswer: error ,$e");
+    }
+  }
+
+  //1-3、_handleIceCandidate
   void _handleIceCandidate(Map<dynamic, dynamic> msg) async {
+    await logPrint("_handleIceCandidate");
     try {
       Session? session = _sessions[msg['toId']];
 
@@ -288,42 +328,8 @@ class Signaling {
         _sessions[msg['toId']] = Session(fromId: msg['toId'], toId: msg['fromId']);
         _sessions[msg['toId']]?.remoteCandidates.add(candidate);
       }
-    } catch (e) {}
-  }
-
-  //1-2、_handleOffer
-  void _handleOffer(Map<dynamic, dynamic> msg) async {
-    try {
-      Session? session = _sessions[msg['toId']];
-      Session newSession = await createSession(session, msg['toId'], msg['fromId']);
-      _sessions[msg['toId']] = newSession;
-
-      Map offerMap = json.decode(msg['content']['data']);
-      RTCSessionDescription offer = RTCSessionDescription(offerMap['sdp'], offerMap['type']);
-
-      await newSession.pc?.setRemoteDescription(offer);
-
-      if (newSession.remoteCandidates.isNotEmpty) {
-        newSession.remoteCandidates.forEach((candidate) async {
-          await newSession.pc?.addCandidate(candidate);
-        });
-        newSession.remoteCandidates.clear();
-      }
-      onCallStateChange?.call(newSession, CallState.callStateNew);
-      onCallStateChange?.call(newSession, CallState.callStateRinging);
-    } catch (e) {}
-  }
-
-  //1-3 _handleAnswer
-  void _handleAnswer(Map<dynamic, dynamic> msg) async {
-    try {
-      Session? session = _sessions[msg['toId']];
-      Map answerMap = json.decode(msg['content']['data']);
-      RTCSessionDescription answer = RTCSessionDescription(answerMap['sdp'], answerMap['type']);
-
-      await session?.pc?.setRemoteDescription(answer);
-
-      onCallStateChange?.call(session!, CallState.callStateConnected);
-    } catch (e) {}
+    } catch (e) {
+      await logPrint("_handleIceCandidate: error ,$e");
+    }
   }
 }

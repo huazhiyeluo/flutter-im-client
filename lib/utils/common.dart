@@ -188,6 +188,7 @@ bool isImageFile(String path) {
 
 Map getTalkCommonObj(Map talkObj) {
   Map talkCommonObj = {};
+  talkCommonObj['objId'] = talkObj['objId'];
   if (talkObj['type'] == 1) {
     final UserController userController = Get.find();
     Map userObj = userController.getOneUser(talkObj['objId'])!;
