@@ -87,7 +87,7 @@ class _HomeState extends State<Home> {
   @override
   void dispose() {
     logPrint("home-dispose");
-    webSocketController.dispose();
+    webSocketController.onClose();
     signalingController.close();
     _audioPlayerManager.dispose();
     super.dispose();

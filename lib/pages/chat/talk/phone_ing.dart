@@ -35,14 +35,12 @@ class _PhoneIngState extends State<PhoneIng> {
 
   @override
   void initState() {
-    // TODO: implement initState
     startSecond();
     super.initState();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _chatTimer?.cancel();
     super.dispose();
   }
@@ -187,7 +185,7 @@ class _PhoneIngState extends State<PhoneIng> {
     );
   }
 
-  StatelessWidget showRemoteRtc() {
+  Widget showRemoteRtc() {
     return widget.remoteRenderer.srcObject != null
         ? webrtc.RTCVideoView(
             widget.remoteRenderer,
@@ -197,7 +195,7 @@ class _PhoneIngState extends State<PhoneIng> {
         : const Text('Waiting for remote video...');
   }
 
-  StatelessWidget showLocalRtc() {
+  Widget showLocalRtc() {
     return widget.localRenderer.srcObject != null
         ? webrtc.RTCVideoView(
             widget.localRenderer,

@@ -41,6 +41,12 @@ class WebSocketController extends GetxController with WidgetsBindingObserver {
   }
 
   @override
+  void onClose() {
+    disconnect(); // 在控制器关闭时断开 WebSocket
+    super.onClose();
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
       logPrint("didChangeAppLifecycleState-paused");
