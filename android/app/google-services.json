@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "822705825488",
+    "project_id": "messagesend-e0b2d",
+    "storage_bucket": "messagesend-e0b2d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822705825488:android:1d2de3c129b1faa498a0d5",
+        "android_client_info": {
+          "package_name": "com.siyuwen.qim"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzQ7bJcej-PpjPEyfIDhmKmukG3L6m-a8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

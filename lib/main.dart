@@ -3,10 +3,16 @@ import 'package:flutter/services.dart';
 import 'routes/route.dart';
 import 'utils/cache.dart';
 import 'package:get/get.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   /// 确保初始化完成
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     systemNavigationBarColor: Color.fromRGBO(237, 237, 237, 1),
