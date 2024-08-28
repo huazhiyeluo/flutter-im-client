@@ -1061,22 +1061,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.3.2"
-  umeng_common_sdk:
-    dependency: transitive
-    description:
-      name: umeng_common_sdk
-      sha256: "60d7ac8093d42e236dbecb5fc8558b16644808a70d24514ad926be7ddf56d5e9"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.2.7"
-  umeng_push_sdk:
-    dependency: "direct main"
-    description:
-      name: umeng_push_sdk
-      sha256: "8bde27731f13eb72b1fff13e727bbedcb64c2e8f01963879bf62f42a2cfef68f"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.3.0"
   url_launcher:
     dependency: "direct main"
     description:

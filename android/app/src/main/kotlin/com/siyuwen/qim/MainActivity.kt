@@ -1,4 +1,4 @@
-package com.example.qim
+package com.siyuwen.qim
 
 import io.flutter.embedding.android.FlutterActivity
 
