@@ -66,6 +66,7 @@ dependencies:
   url_launcher: ^6.3.0
   flutter_webrtc: ^0.10.6
   web_socket_channel: ^3.0.0
+  firebase_core: ^3.4.0
 
   
 
