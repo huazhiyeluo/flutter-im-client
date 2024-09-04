@@ -16,7 +16,6 @@ class Apis {
   static const String register = '/user/register';
 
   //user
-  static const String editUser = '/user/editUser';
   static const String actUser = '/user/actUser';
   static const String searchUser = '/user/searchUser';
 

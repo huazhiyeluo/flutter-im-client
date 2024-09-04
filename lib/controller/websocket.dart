@@ -7,9 +7,8 @@ import 'package:qim/utils/functions.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/widgets.dart';
 
-class WebSocketController extends GetxController with WidgetsBindingObserver {
+class WebSocketController extends GetxController {
   final MessageController messageController = Get.put(MessageController());
   final String serverUrl;
   final int uid;
@@ -28,35 +27,18 @@ class WebSocketController extends GetxController with WidgetsBindingObserver {
 
   @override
   void onInit() {
+    logPrint("WebSocketController onInit");
     super.onInit();
-    WidgetsBinding.instance.addObserver(this);
+    _shouldReconnect = true;
     connect(); // 在控制器初始化时连接 WebSocket
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    disconnect(); // 断开 WebSocket 连接并释放资源
-    super.dispose();
-  }
-
-  @override
   void onClose() {
+    logPrint("WebSocketController onClose");
+    _shouldReconnect = false;
     disconnect(); // 在控制器关闭时断开 WebSocket
     super.onClose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
-      logPrint("didChangeAppLifecycleState-paused");
-      _shouldReconnect = false;
-      disconnect();
-    } else if (state == AppLifecycleState.resumed) {
-      logPrint("didChangeAppLifecycleState-resumed");
-      _shouldReconnect = true;
-      connect();
-    }
   }
 
   Future<void> connect() async {

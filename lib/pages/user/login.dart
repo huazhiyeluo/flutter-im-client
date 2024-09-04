@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -5,8 +6,11 @@ import 'package:qim/api/login.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/routes/route.dart';
 import 'package:qim/utils/cache.dart';
+import 'package:qim/utils/device_info.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -245,6 +249,15 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(fontSize: 16, color: Colors.black),
               ),
             ),
+            TextButton(
+              onPressed: () {
+                _signInWithGoogle();
+              },
+              child: const Text(
+                '谷歌登录',
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
+            ),
           ],
         ),
       ],
@@ -252,9 +265,51 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _loginAction() async {
-    var params = {'username': usernameController.text, 'password': passwordController.text};
+    DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
+    var params = {
+      'platform': "account",
+      "devname": deviceInfo.deviceName,
+      "deviceid": deviceInfo.deviceId,
+      'username': usernameController.text,
+      'password': passwordController.text
+    };
     LoginApi.login(params, onSuccess: (res) async {
-      CacheHelper.saveData(Keys.userInfo, res['data']);
+      CacheHelper.saveData(Keys.userInfo, res['data']['user']);
+      String initialRouteData = await initialRoute();
+      Get.offAndToNamed(initialRouteData);
+    }, onError: (res) {
+      TipHelper.instance.showToast(res['msg']);
+    });
+  }
+
+  _signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+    DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
+
+    logPrint(userCredential.additionalUserInfo);
+    var params = {
+      'platform': "google",
+      "devname": deviceInfo.deviceName,
+      "deviceid": deviceInfo.deviceId,
+      'avatar': userCredential.additionalUserInfo?.profile?["picture"],
+      'nickname': userCredential.additionalUserInfo?.profile?["name"],
+      "token": googleAuth?.accessToken,
+      'siteuid': userCredential.additionalUserInfo?.profile?["id"],
+    };
+    LoginApi.login(params, onSuccess: (res) async {
+      CacheHelper.saveData(Keys.userInfo, res['data']['user']);
       String initialRouteData = await initialRoute();
       Get.offAndToNamed(initialRouteData);
     }, onError: (res) {

@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:qim/api/common.dart';
 import 'package:qim/api/register.dart';
 import 'package:qim/utils/common.dart';
+import 'package:qim/utils/device_info.dart';
 import 'package:qim/utils/permission.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
@@ -461,8 +462,11 @@ class _RegisterPageState extends State<RegisterPage> {
     }
     XFile compressedFile = await compressImage(_imageFile!);
     dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
-    CommonApi.upload({'file': file}, onSuccess: (res) {
+    CommonApi.upload({'file': file}, onSuccess: (res) async {
+      DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
       var params = {
+        "devname": deviceInfo.deviceName,
+        "deviceid": deviceInfo.deviceId,
         'avatar': res['data'],
         'nickname': nicknameController.text,
         'username': usernameController.text,

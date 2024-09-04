@@ -39,7 +39,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with WidgetsBindingObserver {
   late WebSocketController webSocketController;
   late SignalingController signalingController;
   final FriendGroupController friendGroupController = Get.put(FriendGroupController());
@@ -64,6 +64,8 @@ class _HomeState extends State<Home> {
   void initState() {
     logPrint("home-initState");
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
 
     _audioPlayerManager = AudioPlayerManager();
 
@@ -91,6 +93,17 @@ class _HomeState extends State<Home> {
     signalingController.close();
     _audioPlayerManager.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      logPrint("didChangeAppLifecycleState-paused");
+      webSocketController.onClose();
+    } else if (state == AppLifecycleState.resumed) {
+      logPrint("didChangeAppLifecycleState-resumed");
+      webSocketController.onInit();
+    }
   }
 
   Future<void> _initOnReceive() async {
