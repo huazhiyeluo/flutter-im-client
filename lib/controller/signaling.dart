@@ -31,6 +31,15 @@ class SignalingController extends GetxController {
   late Map talkCommonObj;
   int toId = 0;
 
+  // 关闭连接
+  @override
+  void onClose() {
+    _signaling?.close();
+    _localRenderer.dispose();
+    _remoteRenderer.dispose();
+    super.onClose();
+  }
+
   // 初始化渲染器
   Future<void> initRenderers() async {
     await _localRenderer.initialize();
@@ -160,13 +169,6 @@ class SignalingController extends GetxController {
   // 关闭/开启镜头
   void _turnCamera(bool muted) {
     _signaling?.turnCamera(muted);
-  }
-
-  // 关闭连接
-  void close() {
-    _signaling?.close();
-    _localRenderer.dispose();
-    _remoteRenderer.dispose();
   }
 
   Future<void> _connect() async {

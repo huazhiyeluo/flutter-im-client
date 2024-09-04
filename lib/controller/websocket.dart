@@ -28,53 +28,62 @@ class WebSocketController extends GetxController {
   @override
   void onInit() {
     logPrint("WebSocketController onInit");
-    super.onInit();
     _shouldReconnect = true;
-    connect(); // 在控制器初始化时连接 WebSocket
+    if (!_isConnected) {
+      connect(); // 在控制器初始化时连接 WebSocket
+    }
+    super.onInit();
   }
 
   @override
   void onClose() {
     logPrint("WebSocketController onClose");
     _shouldReconnect = false;
-    disconnect(); // 在控制器关闭时断开 WebSocket
+    if (_isConnected) {
+      _disconnect(); // 在控制器关闭时断开 WebSocket
+    }
     super.onClose();
   }
 
   Future<void> connect() async {
     logPrint("WebSocketController connect");
-    DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
+    try {
+      DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
 
-    String url = "$serverUrl?uid=$uid";
-    Map<String, dynamic> headers = {HttpHeaders.cookieHeader: 'sessionKey=${deviceInfo.deviceId};'};
-    _channel = IOWebSocketChannel.connect(Uri.parse(url), headers: headers);
-    _isConnected = true;
+      String url = "$serverUrl?uid=$uid";
+      Map<String, dynamic> headers = {HttpHeaders.cookieHeader: 'sessionKey=${deviceInfo.deviceId};'};
+      _channel = IOWebSocketChannel.connect(Uri.parse(url), headers: headers);
+      _isConnected = true;
 
-    _channel?.stream.listen((str) async {
-      logPrint("WebSocketController receivedMessage: $str");
-      Map msg = json.decode(str);
-      message.value = msg;
-      // 在这里处理接收到的消息逻辑
-    }, onDone: () {
-      _isConnected = false;
-      if (_shouldReconnect) {
-        _reconnect();
-      }
-    }, onError: (error) {
-      _isConnected = false;
-      if (_shouldReconnect) {
-        _reconnect();
-      }
-    });
-    startHeartbeat(uid);
-    _flushMessageQueue();
+      logPrint(url);
+
+      _channel?.stream.listen((str) async {
+        logPrint("WebSocketController receivedMessage: $str");
+        Map msg = json.decode(str);
+        message.value = msg;
+        // 在这里处理接收到的消息逻辑
+      }, onDone: () {
+        _isConnected = false;
+        _handleDisconnect();
+      }, onError: (error) {
+        _isConnected = false;
+        _handleDisconnect();
+      });
+      _startHeartbeat(uid);
+      _flushMessageQueue();
+    } catch (e) {
+      logPrint("WebSocket connection failed: $e");
+      _handleDisconnect();
+    }
   }
 
   void _flushMessageQueue() {
     if (_isConnected) {
       while (_messageQueue.isNotEmpty) {
         String msg = _messageQueue.removeAt(0);
-        _sendMessage(msg);
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _sendMessage(msg);
+        });
       }
     }
   }
@@ -85,6 +94,14 @@ class WebSocketController extends GetxController {
       _reconnectTimer = Timer(const Duration(seconds: 5), () {
         connect();
       });
+    }
+  }
+
+  void _handleDisconnect() {
+    if (_shouldReconnect) {
+      _reconnect();
+    } else {
+      _disconnect(); // 完全断开连接时清理资源
     }
   }
 
@@ -104,7 +121,7 @@ class WebSocketController extends GetxController {
     }
   }
 
-  void disconnect() {
+  void _disconnect() {
     _reconnectTimer?.cancel();
     _heartBeatTimer?.cancel();
     _channel?.sink.close();
@@ -113,7 +130,7 @@ class WebSocketController extends GetxController {
     logPrint("WebSocketController disconnect");
   }
 
-  void startHeartbeat(int uid) {
+  void _startHeartbeat(int uid) {
     _heartBeatTimer?.cancel();
     _heartBeatTimer = Timer.periodic(const Duration(seconds: 20), (Timer t) {
       if (_isConnected) {
@@ -124,7 +141,7 @@ class WebSocketController extends GetxController {
           'MsgType': 0
         };
         _sendMessage(json.encode(msg));
-      } else if (_shouldReconnect) {
+      } else {
         _reconnect();
       }
     });
