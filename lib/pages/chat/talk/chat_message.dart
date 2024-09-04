@@ -77,7 +77,7 @@ class _ChatMessageState extends State<ChatMessage> {
                 mainAxisAlignment: isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  !isSentByMe ? _showRightPhoto(messageList, index) : Container(),
+                  !isSentByMe ? _showLeftPhoto(messageList, index) : Container(),
                   Flexible(
                     flex: 3,
                     child: Container(
@@ -108,7 +108,7 @@ class _ChatMessageState extends State<ChatMessage> {
                       ),
                     ),
                   ),
-                  isSentByMe ? _showLeftPhoto(messageList, index) : Container(),
+                  isSentByMe ? _showRightPhoto(messageList, index) : Container(),
                 ],
               ),
             );
@@ -124,10 +124,22 @@ class _ChatMessageState extends State<ChatMessage> {
   Padding _showLeftPhoto(List<Map<dynamic, dynamic>> messageList, int index) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
-      child: CircleAvatar(
-        // 聊天对象的头像
-        radius: 25,
-        backgroundImage: CachedNetworkImageProvider(messageList[index]['avatar']),
+      child: GestureDetector(
+        onTap: () {
+          Map talkobj = {
+            "objId": messageList[index]['fromId'],
+            "type": 1,
+          };
+          Navigator.pushNamed(
+            context,
+            '/friend-detail',
+            arguments: talkobj,
+          );
+        },
+        child: CircleAvatar(
+          radius: 24,
+          backgroundImage: CachedNetworkImageProvider(messageList[index]['avatar']),
+        ),
       ),
     );
   }
@@ -135,10 +147,22 @@ class _ChatMessageState extends State<ChatMessage> {
   Padding _showRightPhoto(List<Map<dynamic, dynamic>> messageList, int index) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
-      child: CircleAvatar(
-        // 聊天对象的头像
-        radius: 25,
-        backgroundImage: CachedNetworkImageProvider(messageList[index]['avatar']),
+      child: GestureDetector(
+        onTap: () {
+          Map talkobj = {
+            "objId": uid,
+            "type": 1,
+          };
+          Navigator.pushNamed(
+            context,
+            '/friend-detail',
+            arguments: talkobj,
+          );
+        },
+        child: CircleAvatar(
+          radius: 24,
+          backgroundImage: CachedNetworkImageProvider(messageList[index]['avatar']),
+        ),
       ),
     );
   }

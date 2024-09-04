@@ -260,7 +260,7 @@ class _TalkPageState extends State<TalkPage> {
               child: PlusList(
                 isShowPlus: isShowPlus,
                 keyboardHeight: keyboardHeight,
-                isneedphone: talkObj['type'] == 1,
+                isneedphone: talkObj['type'] == 1 && talkObj['objId'] != uid,
                 onPlus: (int index) {
                   setState(() {
                     _pick(index);

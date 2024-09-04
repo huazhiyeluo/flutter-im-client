@@ -172,16 +172,18 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: const Divider(),
           ),
-          TextButton.icon(
-            onPressed: () {
-              _invite();
-            },
-            label: const Text(
-              "音视频通话",
-              style: TextStyle(fontSize: 20),
-            ),
-            icon: const Icon(Icons.phone),
-          ),
+          talkObj['objId'] != uid
+              ? TextButton.icon(
+                  onPressed: () {
+                    _invite();
+                  },
+                  label: const Text(
+                    "音视频通话",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  icon: const Icon(Icons.phone),
+                )
+              : Container(),
         ],
       );
     });

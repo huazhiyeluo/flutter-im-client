@@ -40,6 +40,11 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void _doneAction(int friendGroupId) async {
     if (friendGroupId == contactFriendObj['friendGroupId']) {
       TipHelper.instance.showToast("已经在该分组中");

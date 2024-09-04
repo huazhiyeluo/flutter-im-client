@@ -69,9 +69,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
     _audioPlayerManager = AudioPlayerManager();
 
-    Map? userInfo = CacheHelper.getMapData(Keys.userInfo);
-    uid = userInfo == null ? 0 : userInfo['uid'];
-    userInfoController.setUserInfo(userInfo!);
+    userInfo = CacheHelper.getMapData(Keys.userInfo)!;
+    uid = userInfo['uid'];
+    userInfoController.setUserInfo(userInfo);
 
     webSocketController = Get.put(WebSocketController(uid, Apis.socketUrl));
     signalingController =

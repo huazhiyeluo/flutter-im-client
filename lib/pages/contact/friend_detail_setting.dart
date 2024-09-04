@@ -139,29 +139,33 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
               );
             },
           ),
-          Row(
-            children: [
-              const SizedBox(width: 20),
-              Expanded(
-                child: CustomButton(
-                  onPressed: () {
-                    _delContact();
-                  },
-                  text: "删除好友",
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.red,
-                ),
-              ),
-              const SizedBox(width: 20),
-            ],
-          ),
-          TextButton(
-            onPressed: () {},
-            child: const Text(
-              '被骚扰了？举报该用户',
-              style: TextStyle(fontSize: 12),
-            ),
-          ),
+          talkObj['objId'] != uid
+              ? Row(
+                  children: [
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: CustomButton(
+                        onPressed: () {
+                          _delContact();
+                        },
+                        text: "删除好友",
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.red,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                  ],
+                )
+              : Container(),
+          talkObj['objId'] != uid
+              ? TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    '被骚扰了？举报该用户',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                )
+              : Container(),
         ],
       );
     });
