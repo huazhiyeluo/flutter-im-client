@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
 import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/userinfo.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:qim/widget/custom_text_field.dart';
@@ -21,7 +22,6 @@ class _AddContactFriendDoState extends State<AddContactFriendDo> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text("添加好友"),
-        backgroundColor: Colors.grey[100],
         leading: TextButton(
           onPressed: () {
             Navigator.pop(context);
@@ -71,7 +71,7 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
       'toId': friendObj['uid'],
       'reason': _inputReasonController.text,
       'remark': _inputRemarkController.text,
-      'friendGroupId': 0,
+      'friendGroupId': friendGroupObj['friendGroupId'],
     };
     ContactFriendApi.addContactFriend(params, onSuccess: (res) {
       setState(() {});
@@ -79,6 +79,18 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
+  }
+
+  void _selectGroup() async {
+    final result = await Navigator.pushNamed(
+      context,
+      '/friend-detail-setting-group',
+    );
+    if (result != null && result is Map) {
+      setState(() {
+        friendGroupObj = friendGroupController.getOneFriendGroup(result['friendGroupId'])!;
+      });
+    }
   }
 
   @override
@@ -145,13 +157,7 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
               friendGroupObj['name'],
             ),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/friend-detail-setting-group',
-                // arguments: talkObj,
-              );
-            },
+            onTap: _selectGroup,
           ),
         ),
         Expanded(child: Container()),

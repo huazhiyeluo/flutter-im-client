@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/controller/userinfo.dart';
+import 'package:qim/controller/websocket.dart';
 import 'package:qim/routes/route.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/widget/custom_button.dart';
@@ -42,6 +43,9 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  final UserInfoController userInfoController = Get.find();
+  final WebSocketController webSocketController = Get.find();
+
   @override
   Widget build(BuildContext context) {
     return ListView(children: [
@@ -114,7 +118,9 @@ class _SettingPageState extends State<SettingPage> {
           Expanded(
             child: CustomButton(
               onPressed: () async {
+                webSocketController.onClose();
                 CacheHelper.remove(Keys.userInfo);
+                userInfoController.setUserInfo({});
                 String initialRouteData = await initialRoute();
                 Get.offAllNamed(initialRouteData);
               },

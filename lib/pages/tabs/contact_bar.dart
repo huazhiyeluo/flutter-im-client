@@ -24,7 +24,7 @@ AppBar contactBar() {
         ), // 聊天对象的名称
       ],
     ),
-    backgroundColor: Colors.grey[100],
+
     actions: [
       IconButton(
           onPressed: () {

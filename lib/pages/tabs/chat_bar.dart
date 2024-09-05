@@ -31,7 +31,6 @@ AppBar chatBar() {
           ),
         ],
       ),
-      backgroundColor: Colors.grey[100],
       actions: [
         PopupMenuButton<String>(
           onSelected: (value) {

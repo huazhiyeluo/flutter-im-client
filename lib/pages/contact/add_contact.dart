@@ -36,9 +36,8 @@ class _AddContactDetailState extends State<AddContact> with SingleTickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey[100],
         title: Container(
-          color: Colors.grey[100],
+          color: Colors.grey[200],
           child: TabBar(
             tabAlignment: TabAlignment.center,
             controller: _tabController,
@@ -147,7 +146,7 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
     });
     _scrollGroupController.addListener(() {
       if (_scrollGroupController.position.pixels == _scrollGroupController.position.maxScrollExtent) {
-        if (!_isUserLoading && _hasUserMore) {
+        if (!_isGroupLoading && _hasGroupMore) {
           _searchGroup();
         }
       }
@@ -169,7 +168,6 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
         _isUserLoading = false;
         _userTotal = res['data']['count'];
         List newData = res['data']['users'] ?? [];
-        logPrint(params);
         if (newData.isEmpty) {
           _hasUserMore = false;
         } else {
@@ -231,7 +229,7 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
             child: CustomSearchField(
               controller: _inputUserController,
-              hintText: 'QID/用户名',
+              hintText: 'QID/昵称',
               expands: false,
               maxHeight: 40,
               minHeight: 40,

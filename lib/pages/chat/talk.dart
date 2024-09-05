@@ -117,7 +117,6 @@ class _TalkState extends State<Talk> {
             },
           ),
         ],
-        backgroundColor: Colors.grey[100],
       ),
       body: const TalkPage(),
     );

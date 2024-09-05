@@ -29,11 +29,12 @@ class _ChatState extends State<Chat> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: Column(children: [
-          AppBar(
-            backgroundColor: Colors.white,
-            title: CustomSearchField(
+        preferredSize: const Size.fromHeight(65),
+        child: AppBar(
+          flexibleSpace: Container(
+            color: const Color.fromARGB(255, 255, 255, 255),
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+            child: CustomSearchField(
               controller: inputController,
               hintText: '搜索',
               expands: false,
@@ -44,7 +45,7 @@ class _ChatState extends State<Chat> {
               },
             ),
           ),
-        ]),
+        ),
       ),
       body: const ChatPage(),
     );

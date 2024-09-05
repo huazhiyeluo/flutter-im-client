@@ -87,7 +87,6 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("修改备注"),
-        backgroundColor: Colors.grey[100],
         actions: [
           TextButton(
             onPressed: _doneAction,

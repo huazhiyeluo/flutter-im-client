@@ -37,7 +37,6 @@ class _GroupUserState extends State<GroupUser> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("群聊成员"),
-        backgroundColor: Colors.grey[100],
       ),
       body: const GroupUserPage(),
     );

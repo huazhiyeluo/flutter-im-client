@@ -28,7 +28,6 @@ class _NoticeGroupState extends State<NoticeGroup> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("群通知"),
-        backgroundColor: Colors.grey[100],
         actions: [
           TextButton(
             onPressed: () {

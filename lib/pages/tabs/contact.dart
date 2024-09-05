@@ -81,16 +81,16 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.grey[200],
               pinned: false,
-              expandedHeight: 170,
+              expandedHeight: 168,
               flexibleSpace: FlexibleSpaceBar(
                 background: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
-                      height: 50,
-                      padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
                       child: CustomSearchField(
                         controller: inputController,
                         hintText: '搜索',
@@ -105,7 +105,8 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                     Container(
                       height: 45,
                       padding: EdgeInsets.zero,
-                      margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                      margin: const EdgeInsets.fromLTRB(0, 3, 0, 0),
                       child: InkWell(
                         onTap: () {
                           Navigator.pushNamed(
@@ -147,7 +148,8 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                     Container(
                       height: 45,
                       padding: EdgeInsets.zero,
-                      margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                      margin: const EdgeInsets.fromLTRB(0, 0, 0, 2),
                       child: InkWell(
                         onTap: () {
                           Navigator.pushNamed(

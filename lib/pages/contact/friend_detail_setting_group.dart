@@ -48,21 +48,8 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
   void _doneAction(int friendGroupId) async {
     if (friendGroupId == contactFriendObj['friendGroupId']) {
       TipHelper.instance.showToast("已经在该分组中");
-    } else {
-      contactFriendObj['friendGroupId'] = friendGroupId;
-      var params = {'fromId': uid, 'toId': talkObj['objId'], 'friendGroupId': friendGroupId};
-      ContactFriendApi.actContactFriend(params, onSuccess: (res) async {
-        Map data = {"fromId": uid, "toId": talkObj['objId'], "friendGroupId": friendGroupId};
-        contactFriendController.upsetContactFriend(data);
-        saveDbContactFriend(data);
-        setState(() {
-          contactFriendObj = res['data'];
-        });
-      }, onError: (res) {
-        TipHelper.instance.showToast(res['msg']);
-      });
     }
-    Navigator.pop(context);
+    Navigator.pop(context, {'friendGroupId': friendGroupId});
   }
 
   void _addGroup() {
@@ -95,7 +82,6 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("移至分组"),
-        backgroundColor: Colors.grey[100],
       ),
       body: Obx(
         () {

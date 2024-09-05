@@ -20,7 +20,6 @@ class _AddContactGroupDoState extends State<AddContactGroupDo> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text("申请加群"),
-        backgroundColor: Colors.grey[100],
         leading: TextButton(
           onPressed: () {
             Navigator.pop(context);

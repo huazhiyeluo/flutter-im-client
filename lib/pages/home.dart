@@ -98,12 +98,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
-      logPrint("didChangeAppLifecycleState-paused");
-      webSocketController.onClose();
-    } else if (state == AppLifecycleState.resumed) {
-      logPrint("didChangeAppLifecycleState-resumed");
-      webSocketController.onInit();
+    if (userInfoController.userInfo.isNotEmpty) {
+      if (state == AppLifecycleState.paused) {
+        print("didChangeAppLifecycleState-paused");
+        webSocketController.onClose();
+      } else if (state == AppLifecycleState.resumed) {
+        print("didChangeAppLifecycleState-resumed");
+        webSocketController.onInit();
+      }
     }
   }
 
@@ -116,7 +118,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       if ([3].contains(msg['msgType'])) {
         if (msg['msgMedia'] == 10) {
           TipHelper.instance.showToast("你的账号在另外一台设备上登录，请检查");
+          webSocketController.onClose();
           CacheHelper.remove(Keys.userInfo);
+          userInfoController.setUserInfo({});
           String initialRouteData = await initialRoute();
           Get.offAllNamed(initialRouteData);
         }

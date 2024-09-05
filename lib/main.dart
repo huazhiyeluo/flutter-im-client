@@ -55,10 +55,14 @@ class _MyAppState extends State<MyApp> {
       return GetMaterialApp(
         title: "QIM",
         theme: ThemeData(
-          scaffoldBackgroundColor: const Color.fromARGB(246, 255, 255, 255),
+          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
           hintColor: Colors.grey.withOpacity(0.3),
           splashColor: const Color.fromARGB(0, 37, 15, 15),
           canvasColor: Colors.transparent,
+          appBarTheme: AppBarTheme(
+            backgroundColor: Colors.grey[200], // 设置 AppBar 背景色
+            elevation: 1, // 如果你想要去掉 AppBar 的阴影，可以设置为 0
+          ),
         ),
         debugShowCheckedModeBanner: false,
         initialRoute: _initialRoute,

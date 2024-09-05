@@ -6,6 +6,7 @@ import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
+import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:qim/widget/dialog_confirm.dart';
@@ -23,7 +24,6 @@ class _FriendDetailSettingState extends State<FriendDetailSetting> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("设置"),
-        backgroundColor: Colors.grey[100],
       ),
       body: const FriendDetailSettingPage(),
     );
@@ -92,6 +92,24 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
     );
   }
 
+  void _selectGroup() async {
+    final result = await Navigator.pushNamed(
+      context,
+      '/friend-detail-setting-group',
+      arguments: talkObj,
+    );
+    if (result != null && result is Map) {
+      var params = {'fromId': uid, 'toId': talkObj['objId'], 'friendGroupId': result['friendGroupId']};
+      ContactFriendApi.actContactFriend(params, onSuccess: (res) async {
+        Map data = {"fromId": uid, "toId": talkObj['objId'], "friendGroupId": result['friendGroupId']};
+        contactFriendController.upsetContactFriend(data);
+        saveDbContactFriend(data);
+      }, onError: (res) {
+        TipHelper.instance.showToast(res['msg']);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -111,13 +129,7 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
                 const Icon(Icons.chevron_right),
               ],
             ),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/friend-detail-setting-remark',
-                arguments: talkObj,
-              );
-            },
+            onTap: () {},
           ),
           ListTile(
             title: const Text('分组'),
@@ -131,13 +143,7 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
                 const Icon(Icons.chevron_right),
               ],
             ),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/friend-detail-setting-group',
-                arguments: talkObj,
-              );
-            },
+            onTap: _selectGroup,
           ),
           talkObj['objId'] != uid
               ? Row(

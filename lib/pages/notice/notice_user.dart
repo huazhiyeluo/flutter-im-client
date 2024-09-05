@@ -19,7 +19,6 @@ class _NoticeUserState extends State<NoticeUser> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("新朋友"),
-        backgroundColor: Colors.grey[100],
         actions: [
           TextButton(
             onPressed: () {

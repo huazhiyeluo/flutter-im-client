@@ -27,7 +27,6 @@ class _NoticeFriendDetailState extends State<NoticeFriendDetail> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("好友通知"),
-        backgroundColor: Colors.grey[100],
         actions: [
           TextButton(
             onPressed: () {

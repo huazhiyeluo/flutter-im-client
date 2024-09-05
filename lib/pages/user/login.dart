@@ -286,6 +286,11 @@ class _LoginPageState extends State<LoginPage> {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
+    if (googleUser == null) {
+      TipHelper.instance.showToast("用户取消登录，请重试");
+      return;
+    }
+
     // Obtain the auth details from the request
     final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
     // Create a new credential
@@ -306,7 +311,7 @@ class _LoginPageState extends State<LoginPage> {
       'avatar': userCredential.additionalUserInfo?.profile?["picture"],
       'nickname': userCredential.additionalUserInfo?.profile?["name"],
       "token": googleAuth?.accessToken,
-      'siteuid': userCredential.additionalUserInfo?.profile?["id"],
+      'siteuid': userCredential.additionalUserInfo?.profile?["sub"],
     };
     LoginApi.login(params, onSuccess: (res) async {
       CacheHelper.saveData(Keys.userInfo, res['data']['user']);

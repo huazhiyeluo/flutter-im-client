@@ -29,7 +29,6 @@ class _GroupChatSettingState extends State<GroupChatSetting> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("群聊设置"),
-        backgroundColor: Colors.grey[100],
       ),
       body: const GroupChatSettingPage(),
     );

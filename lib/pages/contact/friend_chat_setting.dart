@@ -26,7 +26,6 @@ class _FriendSettingChatState extends State<FriendSettingChat> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("聊天设置"),
-        backgroundColor: Colors.grey[100],
       ),
       body: const FriendSettingChatPage(),
     );

@@ -21,20 +21,28 @@ class _PersonState extends State<Person> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Obx(() {
       userInfo = userInfoController.userInfo;
       return ListView(children: [
+        const SizedBox(
+          height: 10,
+        ),
         ListTile(
           title: Text(
-            userInfo['nickname'],
+            userInfo['nickname'] ?? "",
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
-          subtitle: Text('QID: ${userInfo['uid']}'),
+          subtitle: Text('QID: ${userInfo['uid'] ?? ""}'),
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(20.0), // 必须与 Container 的 borderRadius 相同
             child: Image.network(
-              userInfo['avatar'], // 替换为你的图片URL
+              userInfo['avatar'] ?? "", // 替换为你的图片URL
               width: 60.0,
               height: 60.0,
               fit: BoxFit.cover,
