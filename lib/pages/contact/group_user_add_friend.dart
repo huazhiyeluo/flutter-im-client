@@ -23,14 +23,14 @@ class UserModel extends ISuspensionBean {
   String getSuspensionTag() => tagIndex!;
 }
 
-class GroupUser extends StatefulWidget {
-  const GroupUser({super.key});
+class GroupUserAddFriend extends StatefulWidget {
+  const GroupUserAddFriend({super.key});
 
   @override
-  State<GroupUser> createState() => _GroupUserState();
+  State<GroupUserAddFriend> createState() => _GroupUserAddFriendState();
 }
 
-class _GroupUserState extends State<GroupUser> {
+class _GroupUserAddFriendState extends State<GroupUserAddFriend> {
   final UserInfoController userInfoController = Get.find();
 
   int uid = 0;
@@ -47,106 +47,25 @@ class _GroupUserState extends State<GroupUser> {
     super.initState();
   }
 
-  Future _operateList() {
-    return showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-            padding: const EdgeInsets.all(10.0),
-            height: 250,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: const Text(
-                    "批量添加好友",
-                    textAlign: TextAlign.center,
-                  ),
-                  visualDensity: const VisualDensity(vertical: -4),
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/group-user-add-friend',
-                      arguments: talkObj,
-                    );
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  title: const Text(
-                    "邀请新成员",
-                    textAlign: TextAlign.center,
-                  ),
-                  visualDensity: const VisualDensity(vertical: -4),
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/group-user-invite',
-                      arguments: talkObj,
-                    );
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  title: const Text(
-                    "删除群成员",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  visualDensity: const VisualDensity(vertical: -4),
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/group-user-delete',
-                      arguments: talkObj,
-                    );
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  title: const Text(
-                    "取消",
-                    textAlign: TextAlign.center,
-                  ),
-                  visualDensity: const VisualDensity(vertical: -4),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                const Divider(),
-              ],
-            ),
-          );
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("群聊成员"),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _operateList();
-            },
-            child: const Icon(Icons.more_horiz),
-          ),
-        ],
+        title: const Text("添加好友"),
       ),
-      body: const GroupUserPage(),
+      body: const GroupUserAddFriendPage(),
     );
   }
 }
 
-class GroupUserPage extends StatefulWidget {
-  const GroupUserPage({super.key});
+class GroupUserAddFriendPage extends StatefulWidget {
+  const GroupUserAddFriendPage({super.key});
 
   @override
-  State<GroupUserPage> createState() => _GroupUserPageState();
+  State<GroupUserAddFriendPage> createState() => _GroupUserAddFriendPageState();
 }
 
-class _GroupUserPageState extends State<GroupUserPage> {
+class _GroupUserAddFriendPageState extends State<GroupUserAddFriendPage> {
   final TextEditingController inputController = TextEditingController();
   final UserInfoController userInfoController = Get.find();
   final UserController userController = Get.find();

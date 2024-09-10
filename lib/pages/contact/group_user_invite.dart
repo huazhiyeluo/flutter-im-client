@@ -325,7 +325,6 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
         'msgMedia': 21,
         'msgType': 1
       };
-      webSocketController.sendMessage(msg);
       msg['createTime'] = getTime();
       joinData(uid, msg);
     }
