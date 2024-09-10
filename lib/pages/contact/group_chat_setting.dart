@@ -182,7 +182,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
             child: const Divider(),
           ),
           ListTile(
-            title: const Text("群公告"),
+            title: const Text("群介绍"),
             subtitle: Text(groupObj['info'] ?? ''),
             trailing: const Icon(
               Icons.chevron_right,

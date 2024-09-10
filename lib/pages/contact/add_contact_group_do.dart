@@ -80,7 +80,7 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return ListView(
       children: [
         ListTile(
           title: Text(groupObj['name']),

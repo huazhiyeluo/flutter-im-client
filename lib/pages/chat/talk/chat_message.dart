@@ -81,30 +81,19 @@ class _ChatMessageState extends State<ChatMessage> {
                   Flexible(
                     flex: 3,
                     child: Container(
-                      padding: const EdgeInsets.all(5),
+                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                      margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
                       constraints: BoxConstraints(
                         minWidth: MediaQuery.of(context).size.width * 0.1,
                         maxWidth: MediaQuery.of(context).size.width * 0.65,
                       ),
                       decoration: BoxDecoration(
-                        color: isSentByMe
-                            ? const Color.fromARGB(20, 169, 234, 122)
-                            : const Color.fromARGB(20, 255, 255, 255),
+                        color: isSentByMe ? const Color.fromARGB(255, 169, 233, 123) : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _getContent(isSentByMe, messageList[index]),
-                          const SizedBox(height: 4),
-                          Text(
-                            formatDate(messageList[index]['createTime'], customFormat: "MM-dd HH:mm"),
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isSentByMe ? Colors.black54 : Colors.black54,
-                            ),
-                          ),
-                        ],
+                        children: _getContentAll(isSentByMe, messageList[index]),
                       ),
                     ),
                   ),
@@ -121,9 +110,34 @@ class _ChatMessageState extends State<ChatMessage> {
     });
   }
 
+  List<Widget> _getContentAll(bool isSentByMe, Map data) {
+    List<Widget> lists = [];
+
+    if (data['msgType'] == 2) {
+      lists.add(Text(
+        data['nickname'],
+        style: const TextStyle(
+          fontSize: 13,
+        ),
+      ));
+    } else {
+      lists.add(const SizedBox(height: 4));
+    }
+    lists.add(const SizedBox(height: 4));
+    lists.add(_getContent(isSentByMe, data));
+    lists.add(Text(
+      formatDate(data['createTime'], customFormat: "MM-dd HH:mm"),
+      style: TextStyle(
+        fontSize: 13,
+        color: isSentByMe ? Colors.black54 : Colors.black54,
+      ),
+    ));
+    return lists;
+  }
+
   Padding _showLeftPhoto(List<Map<dynamic, dynamic>> messageList, int index) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8.0),
+      padding: const EdgeInsets.only(left: 2.0, top: 10),
       child: GestureDetector(
         onTap: () {
           Map talkobj = {
@@ -146,7 +160,7 @@ class _ChatMessageState extends State<ChatMessage> {
 
   Padding _showRightPhoto(List<Map<dynamic, dynamic>> messageList, int index) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: const EdgeInsets.only(right: 2.0, top: 10),
       child: GestureDetector(
         onTap: () {
           Map talkobj = {
@@ -169,7 +183,9 @@ class _ChatMessageState extends State<ChatMessage> {
 
   Widget _getContent(bool isSentByMe, Map data) {
     Widget item = const Text("");
+
     if ([1, 10, 11, 13].contains(data['msgMedia'])) {
+      //1 文本  //10 不在线 //11 未接通  //13 挂断电话
       item = Text(
         '${data['content']['data'] ?? ''}',
         style: TextStyle(
@@ -179,22 +195,8 @@ class _ChatMessageState extends State<ChatMessage> {
         softWrap: true,
         overflow: TextOverflow.visible,
       );
-    }
-    if ([12].contains(data['msgMedia'])) {
-      item = Text(
-        "通话时长：${formatSecondsToHMS(int.parse(data['content']['data']))}",
-        style: TextStyle(
-          fontSize: 16,
-          color: isSentByMe ? Colors.black54 : Colors.black54,
-        ),
-        softWrap: true,
-        overflow: TextOverflow.visible,
-      );
-    }
-    if (data['msgMedia'] == 6) {
-      item = Image.asset(data['content']['url']);
-    }
-    if (data['msgMedia'] == 2) {
+    } else if (data['msgMedia'] == 2) {
+      // 图片
       if (isImageFile(data['content']['url'])) {
         item = GestureDetector(
           onTap: () {
@@ -232,15 +234,14 @@ class _ChatMessageState extends State<ChatMessage> {
       } else {
         // item = Image.network(data['content']['url']);
       }
-    }
-    if (data['msgMedia'] == 3) {
+    } else if (data['msgMedia'] == 3) {
+      // 音频
       item = PlayAudio(data['content']['url']);
-    }
-    if (data['msgMedia'] == 4) {
+    } else if (data['msgMedia'] == 4) {
+      // 视频
       item = PlayVideo(data['content']['url']);
-    }
-
-    if (data['msgMedia'] == 5) {
+    } else if (data['msgMedia'] == 5) {
+      // 文件
       item = InkWell(
         onTap: () {
           _launchUrl(data['content']['url']);
@@ -255,6 +256,42 @@ class _ChatMessageState extends State<ChatMessage> {
               decoration: TextDecoration.underline,
             ),
           ),
+        ),
+      );
+    } else if (data['msgMedia'] == 6) {
+      // 表情
+      item = Image.asset(data['content']['url']);
+    } else if ([12].contains(data['msgMedia'])) {
+      // 通话时长
+      item = Text(
+        "通话时长：${formatSecondsToHMS(int.parse(data['content']['data']))}",
+        style: TextStyle(
+          fontSize: 16,
+          color: isSentByMe ? Colors.black54 : Colors.black54,
+        ),
+        softWrap: true,
+        overflow: TextOverflow.visible,
+      );
+    } else if ([21].contains(data['msgMedia'])) {
+      Map temp = json.decode(data['content']['data']);
+      // 邀请入群消息
+      item = GestureDetector(
+        onTap: () {
+          !isSentByMe
+              ? Navigator.pushNamed(context, '/group-join', arguments: temp['group'])
+              : Navigator.pushNamed(context, '/group-join-show', arguments: temp['group']);
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Text(
+              "邀请你加入群聊",
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 17),
+            ),
+            Text('"${data['nickname']}"邀请你加入群里群聊"${temp['group']['name']}",进入可查看详情'),
+          ],
         ),
       );
     }

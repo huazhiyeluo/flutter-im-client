@@ -301,13 +301,9 @@ class _LoginPageState extends State<LoginPage> {
 
     // Once signed in, return the UserCredential
     final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-    DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
-
     logPrint(userCredential.additionalUserInfo);
     var params = {
       'platform': "google",
-      "devname": deviceInfo.deviceName,
-      "deviceid": deviceInfo.deviceId,
       'avatar': userCredential.additionalUserInfo?.profile?["picture"],
       'nickname': userCredential.additionalUserInfo?.profile?["name"],
       "token": googleAuth?.accessToken,

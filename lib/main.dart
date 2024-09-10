@@ -62,6 +62,11 @@ class _MyAppState extends State<MyApp> {
           appBarTheme: AppBarTheme(
             backgroundColor: Colors.grey[200], // 设置 AppBar 背景色
             elevation: 1, // 如果你想要去掉 AppBar 的阴影，可以设置为 0
+            titleTextStyle: const TextStyle(
+              fontSize: 18, // 设置文字大小
+              fontWeight: FontWeight.normal,
+              color: Colors.black,
+            ),
           ),
         ),
         debugShowCheckedModeBanner: false,

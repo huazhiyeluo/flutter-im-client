@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:qim/common/apis.dart';
+import 'package:qim/utils/device_info.dart';
+import 'package:qim/utils/functions.dart';
 
 class RequestHelper {
   late final Dio _dio;
@@ -38,6 +42,9 @@ class RequestHelper {
 
       Response response;
       final mergedHeaders = headers ?? {'Content-Type': 'application/json'};
+      DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
+      mergedHeaders['devname'] = deviceInfo.deviceName;
+      mergedHeaders['deviceid'] = deviceInfo.deviceId;
 
       if (isUpload) {
         // 如果是文件上传请求
@@ -49,6 +56,7 @@ class RequestHelper {
           options: Options(),
         );
       } else {
+        logPrint(data);
         // 如果不是文件上传请求
         response = await _dio.request(
           endpoint,

@@ -95,7 +95,7 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return ListView(
       children: [
         ListTile(
           title: Text(friendObj['nickname']),

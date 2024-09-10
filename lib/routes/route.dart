@@ -5,11 +5,15 @@ import 'package:qim/pages/contact/add_contact.dart';
 import 'package:qim/pages/contact/add_contact_friend_do.dart';
 import 'package:qim/pages/contact/add_contact_group_do.dart';
 import 'package:qim/pages/contact/group_chat_setting.dart';
+import 'package:qim/pages/contact/group_join.dart';
+import 'package:qim/pages/contact/group_join_show.dart';
 import 'package:qim/pages/contact/group_user.dart';
+import 'package:qim/pages/contact/group_user_delete.dart';
 import 'package:qim/pages/chat/talk.dart';
 import 'package:qim/pages/contact/friend_detail.dart';
 import 'package:qim/pages/contact/friend_detail_setting.dart';
 import 'package:qim/pages/contact/friend_detail_setting_remark.dart';
+import 'package:qim/pages/contact/group_user_invite.dart';
 import 'package:qim/pages/notice/notice_group.dart';
 import 'package:qim/pages/notice/notice_user.dart';
 import 'package:qim/pages/notice/notice_user_detail.dart';
@@ -18,6 +22,7 @@ import 'package:qim/pages/home.dart';
 import 'package:qim/pages/person/info.dart';
 import 'package:qim/pages/person/info_info.dart';
 import 'package:qim/pages/person/info_username.dart';
+import 'package:qim/pages/person/info_username_bind.dart';
 import 'package:qim/pages/person/setting.dart';
 import 'package:qim/pages/person/info_nickname.dart';
 import 'package:qim/pages/search.dart';
@@ -52,6 +57,10 @@ class AppPage {
     GetPage(name: "/friend-chat-setting", page: () => const FriendSettingChat(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/group-chat-setting", page: () => const GroupChatSetting(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/group-user", page: () => const GroupUser(), middlewares: [HomeMiddleware()]),
+    GetPage(name: "/group-user-delete", page: () => const GroupUserDelete(), middlewares: [HomeMiddleware()]),
+    GetPage(name: "/group-user-invite", page: () => const GroupUserInvite(), middlewares: [HomeMiddleware()]),
+    GetPage(name: "/group-join", page: () => const GroupJoin(), middlewares: [HomeMiddleware()]),
+    GetPage(name: "/group-join-show", page: () => const GroupJoinShow(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/notice-user", page: () => const NoticeUser(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/notice-friend-detail", page: () => const NoticeFriendDetail(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/notice-group", page: () => const NoticeGroup(), middlewares: [HomeMiddleware()]),
@@ -59,6 +68,10 @@ class AppPage {
     GetPage(name: "/person-info", page: () => const PersonInfo(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/person-info-nickname", page: () => const PersonInfoNickname(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/person-info-username", page: () => const PersonInfoUsername(), middlewares: [HomeMiddleware()]),
+    GetPage(
+        name: "/person-info-username-bind",
+        page: () => const PersonInfoUsernameBind(),
+        middlewares: [HomeMiddleware()]),
     GetPage(name: "/person-info-info", page: () => const PersonInfoInfo(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/add-contact", page: () => const AddContact(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/add-contact-friend-do", page: () => const AddContactFriendDo(), middlewares: [HomeMiddleware()]),
@@ -87,7 +100,7 @@ Future<void> initialDb(int uid) async {
     'CREATE TABLE IF NOT EXISTS `contact_friend` (fromId INTEGER,toId INTEGER,friendGroupId INTEGER, level INTEGER, remark TEXT,desc TEXT,isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER, isOnline INTEGER);',
     'CREATE TABLE IF NOT EXISTS `group` (groupId INTEGER PRIMARY KEY, ownerUid INTEGER, name TEXT, icon TEXT, info TEXT, num INTEGER, exp INTEGER, createTime INTEGER)',
     'CREATE TABLE IF NOT EXISTS `contact_group` (fromId INTEGER,toId INTEGER,groupPower INTEGER, level INTEGER, remark TEXT, nickname TEXT, isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER);',
-    'CREATE TABLE IF NOT EXISTS `message` (id INTEGER PRIMARY KEY, fromId INTEGER, toId INTEGER, avatar TEXT, msgType INTEGER, msgMedia INTEGER, content TEXT,  createTime INTEGER)',
+    'CREATE TABLE IF NOT EXISTS `message` (id INTEGER PRIMARY KEY, fromId INTEGER, toId INTEGER, nickname TEXT,avatar TEXT, msgType INTEGER, msgMedia INTEGER, content TEXT,  createTime INTEGER)',
     'CREATE TABLE IF NOT EXISTS `chat` (id INTEGER PRIMARY KEY,objId INTEGER,type INTEGER, name TEXT, info TEXT,remark TEXT, icon TEXT, isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, tips INTEGER, operateTime INTEGER, msgMedia INTEGER, content TEXT)',
   ];
   await DBHelper.initDatabase(dbName, tableSQLs);

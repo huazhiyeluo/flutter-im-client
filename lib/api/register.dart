@@ -10,4 +10,13 @@ class RegisterApi {
       onError: onError,
     );
   }
+
+  static void bind(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.bind,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
 }

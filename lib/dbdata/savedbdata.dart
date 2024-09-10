@@ -178,6 +178,7 @@ Future<void> saveDbMessage(Map data) async {
   List<String> fields = [
     'fromId',
     'toId',
+    'nickname',
     'avatar',
     'msgType',
     'msgMedia',

@@ -126,17 +126,22 @@ class _PersonInfoPageState extends State<PersonInfoPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                userInfo['username'],
+                userInfo['username'] == '' ? '去绑定' : userInfo['username'],
                 style: const TextStyle(fontSize: 16),
               ),
               const Icon(Icons.chevron_right),
             ],
           ),
           onTap: () {
-            Navigator.pushNamed(
-              context,
-              '/person-info-username',
-            );
+            userInfo['username'] == ''
+                ? Navigator.pushNamed(
+                    context,
+                    '/person-info-username-bind',
+                  )
+                : Navigator.pushNamed(
+                    context,
+                    '/person-info-username',
+                  );
           },
         ),
         Container(

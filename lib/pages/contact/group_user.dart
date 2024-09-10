@@ -7,7 +7,6 @@ import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/widget/custom_search_field.dart';
 
 class UserModel extends ISuspensionBean {
@@ -32,11 +31,102 @@ class GroupUser extends StatefulWidget {
 }
 
 class _GroupUserState extends State<GroupUser> {
+  final UserInfoController userInfoController = Get.find();
+
+  int uid = 0;
+  Map userInfo = {};
+  Map talkObj = {};
+
+  @override
+  void initState() {
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
+    if (Get.arguments != null) {
+      talkObj = Get.arguments;
+    }
+    super.initState();
+  }
+
+  Future _operateList() {
+    return showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            padding: const EdgeInsets.all(10.0),
+            height: 250,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: const Text(
+                    "批量添加好友",
+                    textAlign: TextAlign.center,
+                  ),
+                  visualDensity: const VisualDensity(vertical: -4),
+                  onTap: () {},
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text(
+                    "邀请新成员",
+                    textAlign: TextAlign.center,
+                  ),
+                  visualDensity: const VisualDensity(vertical: -4),
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/group-user-invite',
+                      arguments: talkObj,
+                    );
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text(
+                    "删除群成员",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  visualDensity: const VisualDensity(vertical: -4),
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/group-user-delete',
+                      arguments: talkObj,
+                    );
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text(
+                    "取消",
+                    textAlign: TextAlign.center,
+                  ),
+                  visualDensity: const VisualDensity(vertical: -4),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                const Divider(),
+              ],
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("群聊成员"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              _operateList();
+            },
+            child: const Icon(Icons.more_horiz),
+          ),
+        ],
       ),
       body: const GroupUserPage(),
     );

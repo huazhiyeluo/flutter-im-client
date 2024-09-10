@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/controller/userinfo.dart';
@@ -40,9 +41,9 @@ class _PersonState extends State<Person> {
           ),
           subtitle: Text('QID: ${userInfo['uid'] ?? ""}'),
           leading: ClipRRect(
-            borderRadius: BorderRadius.circular(20.0), // 必须与 Container 的 borderRadius 相同
-            child: Image.network(
-              userInfo['avatar'] ?? "", // 替换为你的图片URL
+            borderRadius: BorderRadius.circular(20.0), // 设置圆角半径
+            child: Image(
+              image: CachedNetworkImageProvider(userInfo['avatar'] ?? ""), // 使用 CachedNetworkImageProvider
               width: 60.0,
               height: 60.0,
               fit: BoxFit.cover,

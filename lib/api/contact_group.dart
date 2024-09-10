@@ -47,6 +47,15 @@ class ContactGroupApi {
     );
   }
 
+  static void delContactGroup(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.delContactGroup,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
+
   static void actContactGroup(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
       Apis.actContactGroup,

@@ -129,7 +129,13 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
                 const Icon(Icons.chevron_right),
               ],
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/friend-detail-setting-remark',
+                arguments: talkObj,
+              );
+            },
           ),
           ListTile(
             title: const Text('分组'),

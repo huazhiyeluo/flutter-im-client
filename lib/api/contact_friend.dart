@@ -56,6 +56,15 @@ class ContactFriendApi {
     );
   }
 
+  static void inviteContactFriend(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.inviteContactFriend,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
+
   static void delContactFriend(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
       Apis.delContactFriend,

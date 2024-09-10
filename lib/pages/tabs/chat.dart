@@ -273,9 +273,6 @@ class _ChatPageState extends State<ChatPage> {
     if ([1, 10, 11, 13].contains(msgMedia)) {
       return content['data'];
     }
-    if (msgMedia == 6) {
-      return "[表情]";
-    }
 
     if (msgMedia == 2) {
       return "[图片]";
@@ -293,9 +290,17 @@ class _ChatPageState extends State<ChatPage> {
       return "[文件]";
     }
 
+    if (msgMedia == 6) {
+      return "[表情]";
+    }
+
     if (msgMedia == 12) {
       return "通话时长: ${formatSecondsToHMS(int.parse(content['data']))}";
     }
+    if (msgMedia == 21) {
+      return "邀请你加入群聊";
+    }
+
     return "";
   }
 }

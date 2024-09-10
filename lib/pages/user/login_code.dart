@@ -150,12 +150,12 @@ class _LoginCodePageState extends State<LoginCodePage> {
               suffixIcon: Column(
                 children: [
                   CustomButton(
-                    borderRadius: const BorderRadius.all(Radius.circular(0)),
+                    borderRadius: const BorderRadius.all(Radius.circular(2)),
                     onPressed: () {},
                     text: "获取验证码",
                     backgroundColor: Colors.white,
                     foregroundColor: const Color.fromARGB(255, 60, 183, 21),
-                    padding: const EdgeInsets.fromLTRB(30, 6, 30, 6),
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                     borderSide: const BorderSide(color: Color.fromARGB(255, 60, 183, 21), width: 1),
                   )
                 ],

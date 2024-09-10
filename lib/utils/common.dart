@@ -124,11 +124,13 @@ Future<void> joinMessage(int uid, Map temp) async {
     final UserInfoController userInfoController = Get.find();
     Map userInfo = userInfoController.userInfo;
     msg['avatar'] = userInfo['avatar'];
+    msg['nickname'] = userInfo['nickname'];
   } else {
     if (msg['msgType'] == 1) {
       final UserController userController = Get.find();
       Map userObj = userController.getOneUser(msg['fromId'])!;
       msg['avatar'] = userObj['avatar'];
+      msg['nickname'] = userObj['nickname'];
     }
     if (msg['msgType'] == 2) {
       final UserController userController = Get.find();
@@ -136,10 +138,9 @@ Future<void> joinMessage(int uid, Map temp) async {
       if (userObj == null) {
         await getGroupInfo(msg['toId']);
         userObj = userController.getOneUser(msg['fromId']);
-        msg['avatar'] = userObj?['avatar'];
-      } else {
-        msg['avatar'] = userObj['avatar'];
       }
+      msg['avatar'] = userObj?['avatar'];
+      msg['nickname'] = userObj?['nickname'];
     }
   }
   messageController.addMessage(msg);
