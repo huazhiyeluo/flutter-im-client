@@ -60,7 +60,9 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
 
   @override
   void initState() {
-    talkObj = talkobjController.talkObj;
+    if (Get.arguments != null) {
+      talkObj = Get.arguments;
+    }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 

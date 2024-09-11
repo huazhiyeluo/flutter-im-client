@@ -107,11 +107,13 @@ class _TalkState extends State<Talk> {
                 Navigator.pushNamed(
                   context,
                   '/friend-chat-setting',
+                  arguments: talkObj,
                 );
               } else if (talkObj['type'] == 2) {
                 Navigator.pushNamed(
                   context,
                   '/group-chat-setting',
+                  arguments: talkObj,
                 );
               }
             },

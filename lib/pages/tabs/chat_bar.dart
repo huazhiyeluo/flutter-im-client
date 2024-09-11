@@ -34,6 +34,9 @@ AppBar chatBar() {
       actions: [
         PopupMenuButton<String>(
           onSelected: (value) {
+            if (value == "1") {
+              Get.toNamed('/group-create');
+            }
             if (value == "2") {
               Get.toNamed('/add-contact');
             }

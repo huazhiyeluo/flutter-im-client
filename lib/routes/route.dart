@@ -15,6 +15,7 @@ import 'package:qim/pages/contact/friend_detail.dart';
 import 'package:qim/pages/contact/friend_detail_setting.dart';
 import 'package:qim/pages/contact/friend_detail_setting_remark.dart';
 import 'package:qim/pages/contact/group_user_invite.dart';
+import 'package:qim/pages/group/create.dart';
 import 'package:qim/pages/notice/notice_group.dart';
 import 'package:qim/pages/notice/notice_user.dart';
 import 'package:qim/pages/notice/notice_user_detail.dart';
@@ -63,6 +64,7 @@ class AppPage {
     GetPage(name: "/group-user-add-friend", page: () => const GroupUserAddFriend(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/group-join", page: () => const GroupJoin(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/group-join-show", page: () => const GroupJoinShow(), middlewares: [HomeMiddleware()]),
+    GetPage(name: "/group-create", page: () => const GroupCreate(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/notice-user", page: () => const NoticeUser(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/notice-friend-detail", page: () => const NoticeFriendDetail(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/notice-group", page: () => const NoticeGroup(), middlewares: [HomeMiddleware()]),

@@ -268,6 +268,22 @@ Future<void> loadGroupManage(int uid, Map msg) async {
     }
   }
 
+  //创建
+  if ([30].contains(msg['msgMedia'])) {
+    if (data['group'] != null) {
+      groupController.upsetGroup(data['group']);
+      saveDbGroup(data['group']);
+    }
+    if (data['contactGroup'] != null) {
+      contactGroupController.upsetContactGroup(data['contactGroup']);
+      saveDbContactGroup(data['contactGroup']);
+    }
+    if (data['user'] != null) {
+      userController.upsetUser(data['user']);
+      saveDbUser(data['user']);
+    }
+  }
+
   //同意
   if ([32].contains(msg['msgMedia'])) {
     if (data['group'] != null) {
