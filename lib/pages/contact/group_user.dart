@@ -32,18 +32,21 @@ class GroupUser extends StatefulWidget {
 
 class _GroupUserState extends State<GroupUser> {
   final UserInfoController userInfoController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
 
   int uid = 0;
   Map userInfo = {};
   Map talkObj = {};
+  Map contactGroupObj = {};
 
   @override
   void initState() {
-    userInfo = userInfoController.userInfo;
-    uid = userInfo['uid'];
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
+    contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
     super.initState();
   }
 
@@ -53,7 +56,7 @@ class _GroupUserState extends State<GroupUser> {
         builder: (BuildContext context) {
           return Container(
             padding: const EdgeInsets.all(10.0),
-            height: 250,
+            height: [1, 2].contains(contactGroupObj['groupPower']) ? 250 : 200,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -87,22 +90,24 @@ class _GroupUserState extends State<GroupUser> {
                   },
                 ),
                 const Divider(),
-                ListTile(
-                  title: const Text(
-                    "删除群成员",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  visualDensity: const VisualDensity(vertical: -4),
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/group-user-delete',
-                      arguments: talkObj,
-                    );
-                  },
-                ),
-                const Divider(),
+                [1, 2].contains(contactGroupObj['groupPower'])
+                    ? ListTile(
+                        title: const Text(
+                          "删除群成员",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.red),
+                        ),
+                        visualDensity: const VisualDensity(vertical: -4),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/group-user-delete',
+                            arguments: talkObj,
+                          );
+                        },
+                      )
+                    : Container(),
+                [1, 2].contains(contactGroupObj['groupPower']) ? const Divider() : Container(),
                 ListTile(
                   title: const Text(
                     "取消",
@@ -174,8 +179,8 @@ class _GroupUserPageState extends State<GroupUserPage> {
     final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
     _userArr.clear();
     for (var item in contactGroups) {
-      Map userObj = userController.getOneUser(item['fromId'])!;
-      Map? contactFriendObj = contactFriendController.getOneContactFriend(uid, item['fromId']);
+      Map userObj = userController.getOneUser(item['fromId']);
+      Map contactFriendObj = contactFriendController.getOneContactFriend(uid, item['fromId']);
       if (userObj['nickname'].contains(inputController.text) ||
           item['remark'].contains(inputController.text) ||
           item['fromId'].toString().contains(inputController.text)) {
@@ -185,7 +190,7 @@ class _GroupUserPageState extends State<GroupUserPage> {
         chat.icon = userObj['avatar'];
         chat.info = userObj['info'];
         chat.remark = item['remark'];
-        chat.isContact = contactFriendObj == null ? 0 : 1;
+        chat.isContact = contactFriendObj.isEmpty ? 0 : 1;
         chat.namePinyin = PinyinHelper.getPinyin(item['remark'] != '' ? item['remark'] : userObj['nickname']);
         String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
         chat.tagIndex = firstLetter.toUpperCase();

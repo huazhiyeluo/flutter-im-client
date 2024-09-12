@@ -59,7 +59,7 @@ class ContactGroupController extends GetxController {
   }
 
   //3、获得单条记录
-  Map? getOneContactGroup(int fromId, int toId) {
+  Map getOneContactGroup(int fromId, int toId) {
     if (allContactGroups.containsKey(toId)) {
       final existingIndex = allContactGroups[toId]!.indexWhere(
         (c) => c['fromId'] == fromId && c['toId'] == toId,
@@ -68,7 +68,7 @@ class ContactGroupController extends GetxController {
         return allContactGroups[toId]![existingIndex];
       }
     }
-    return null;
+    return {};
   }
 
   // 4、组成员

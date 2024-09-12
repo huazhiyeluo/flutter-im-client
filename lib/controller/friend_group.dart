@@ -25,12 +25,12 @@ class FriendGroupController extends GetxController {
     update();
   }
 
-  Map? getOneFriendGroup(int friendGroupId) {
+  Map getOneFriendGroup(int friendGroupId) {
     // 查找是否已经存在相同的数据
     final existingFriendGroupIndex = allFriendGroups.indexWhere((c) => c['friendGroupId'] == friendGroupId);
     if (existingFriendGroupIndex != -1) {
       return allFriendGroups[existingFriendGroupIndex];
     }
-    return null;
+    return {};
   }
 }

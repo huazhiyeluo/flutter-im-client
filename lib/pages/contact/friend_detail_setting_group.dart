@@ -35,7 +35,7 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
     uid = userInfo['uid'];
     if (Get.arguments != null) {
       talkObj = Get.arguments;
-      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
     }
     super.initState();
   }

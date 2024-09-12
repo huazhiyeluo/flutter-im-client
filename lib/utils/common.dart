@@ -67,7 +67,7 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
   chatData['content'] = msg['content'];
 
   Map? lastChat = chatController.getOneChat(objId, msg['msgType']);
-  if (lastChat == null) {
+  if (lastChat.isEmpty) {
     if ([1].contains(msg['msgType'])) {
       Map userObj = userController.getOneUser(objId)!;
       Map contactFriendObj = contactFriendController.getOneContactFriend(uid, objId)!;
@@ -82,8 +82,8 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
     }
 
     if (msg['msgType'] == 2) {
-      Map? groupObj = groupController.getOneGroup(objId)!;
-      Map contactGroupObj = contactGroupController.getOneContactGroup(uid, objId)!;
+      Map groupObj = groupController.getOneGroup(objId)!;
+      Map contactGroupObj = contactGroupController.getOneContactGroup(uid, objId);
       chatData['name'] = groupObj['name'];
       chatData['info'] = groupObj['info'];
       chatData['icon'] = groupObj['icon'];
@@ -134,13 +134,13 @@ Future<void> joinMessage(int uid, Map temp) async {
     }
     if (msg['msgType'] == 2) {
       final UserController userController = Get.find();
-      Map? userObj = userController.getOneUser(msg['fromId']);
-      if (userObj == null) {
+      Map userObj = userController.getOneUser(msg['fromId']);
+      if (userObj.isEmpty) {
         await getGroupInfo(msg['toId']);
         userObj = userController.getOneUser(msg['fromId']);
       }
-      msg['avatar'] = userObj?['avatar'];
-      msg['nickname'] = userObj?['nickname'];
+      msg['avatar'] = userObj['avatar'];
+      msg['nickname'] = userObj['nickname'];
     }
   }
   messageController.addMessage(msg);

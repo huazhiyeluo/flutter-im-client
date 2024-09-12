@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -320,7 +321,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                 ),
                 child: CircleAvatar(
                   radius: 30,
-                  backgroundImage: NetworkImage("http://img.siyuwen.com/godata/avatar/$index.jpg"),
+                  backgroundImage: CachedNetworkImageProvider("http://img.siyuwen.com/godata/avatar/$index.jpg"),
                 ),
               ),
             )
@@ -330,7 +331,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               },
               child: CircleAvatar(
                 radius: 30,
-                backgroundImage: NetworkImage("http://img.siyuwen.com/godata/avatar/$index.jpg"),
+                backgroundImage: CachedNetworkImageProvider("http://img.siyuwen.com/godata/avatar/$index.jpg"),
               ),
             );
     }

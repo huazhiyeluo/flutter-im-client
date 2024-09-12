@@ -58,6 +58,8 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
   Map groupObj = {};
   Map contactGroupObj = {};
 
+  int optShow = 1;
+
   @override
   void initState() {
     if (Get.arguments != null) {
@@ -66,8 +68,11 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 
-    groupObj = groupController.getOneGroup(talkObj['objId'])!;
-    contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId'])!;
+    groupObj = groupController.getOneGroup(talkObj['objId']);
+    contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
+    if ([1, 2].contains(contactGroupObj['groupPower'])) {
+      optShow = 2;
+    }
 
     _fetchData();
     super.initState();
@@ -81,6 +86,9 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
   Widget build(BuildContext context) {
     return Obx(() {
       final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
+      if (contactGroups.isEmpty) {
+        return const Center(child: Text(""));
+      }
       return ListView(
         children: [
           ListTile(
@@ -126,30 +134,102 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                 mainAxisSpacing: 10.0,
                 childAspectRatio: 1.0,
               ),
-              itemCount: contactGroups.length > 15 ? 15 : contactGroups.length,
+              itemCount: contactGroups.length > 15 - optShow ? 15 : contactGroups.length + optShow,
               itemBuilder: (BuildContext context, int index) {
-                Map userObj = userController.getOneUser(contactGroups[index]['fromId'])!;
-                return Container(
-                  height: 90,
-                  alignment: Alignment.center,
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 25,
-                        backgroundImage: CachedNetworkImageProvider(
-                          userObj['avatar'],
+                if (index >= contactGroups.length) {
+                  if (index == contactGroups.length) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/group-user-invite',
+                          arguments: talkObj,
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              size: 30,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 1,
+                          ),
+                          const Text(
+                            "邀请",
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (index == contactGroups.length + 1) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/group-user-delete',
+                          arguments: talkObj,
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.remove,
+                              size: 30,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 1,
+                          ),
+                          const Text(
+                            "移除",
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                } else {
+                  Map userObj = userController.getOneUser(contactGroups[index]['fromId'])!;
+                  return Container(
+                    height: 90,
+                    alignment: Alignment.center,
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 25,
+                          backgroundImage: CachedNetworkImageProvider(
+                            userObj['avatar'],
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 1,
-                      ), // 添加一个间距
-                      Text(
-                        contactGroups[index]['remark'] != "" ? contactGroups[index]['remark'] : userObj['nickname'],
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                );
+                        const SizedBox(
+                          height: 1,
+                        ), // 添加一个间距
+                        Text(
+                          contactGroups[index]['remark'] != "" ? contactGroups[index]['remark'] : userObj['nickname'],
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               },
             ),
           ),
@@ -302,7 +382,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                   onPressed: () {
                     _delContact();
                   },
-                  text: uid == groupObj['ownerUid'] ? "解散群聊" : "退出群聊",
+                  text: [2].contains(contactGroupObj['groupPower']) ? "解散群聊" : "退出群聊",
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.red,
                 ),
@@ -365,8 +445,8 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
         saveDbContactGroup(res['data']);
 
         if (["isTop", "isHidden", "isQuiet"].contains(field)) {
-          Map? chat = chatController.getOneChat(talkObj['objId'], 2);
-          if (chat != null) {
+          Map chat = chatController.getOneChat(talkObj['objId'], 2);
+          if (chat.isNotEmpty) {
             Map chatData = {};
             chatData['objId'] = talkObj['objId'];
             chatData['type'] = 2;
@@ -397,7 +477,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/',
-            (route) => false,
+            ModalRoute.withName('/'),
           );
         }, onError: (res) {
           TipHelper.instance.showToast(res['msg']);

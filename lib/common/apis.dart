@@ -14,13 +14,14 @@ class Apis {
 
   //register
   static const String register = '/user/register';
+  static const String bind = '/user/bind';
 
   //user
   static const String actUser = '/user/actUser';
   static const String searchUser = '/user/searchUser';
 
   //group
-  static const String editGroup = '/user/editGroup';
+  static const String createGroup = '/user/createGroup';
   static const String actGroup = '/user/actGroup';
   static const String searchGroup = '/user/searchGroup';
 
@@ -31,6 +32,7 @@ class Apis {
   static const String getContactFriendList = '/user/getContactFriendList';
   static const String getContactFriendOne = '/user/getContactFriendOne';
   static const String addContactFriend = '/user/addContactFriend';
+  static const String inviteContactFriend = '/user/inviteContactFriend';
   static const String delContactFriend = '/user/delContactFriend';
   static const String actContactFriend = '/user/actContactFriend';
 
@@ -39,6 +41,7 @@ class Apis {
   static const String getContactGroupOne = '/user/getContactGroupOne';
   static const String getContactGroupUser = '/user/getContactGroupUser';
   static const String joinContactGroup = '/user/joinContactGroup';
+  static const String delContactGroup = '/user/delContactGroup';
   static const String quitContactGroup = '/user/quitContactGroup';
   static const String actContactGroup = '/user/actContactGroup';
 

@@ -75,10 +75,11 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
           'toId': talkObj['objId'],
         };
         ContactFriendApi.delContactFriend(params, onSuccess: (res) {
+          talkobjController.setTalkObj({});
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/',
-            (route) => false,
+            ModalRoute.withName('/'),
           );
         }, onError: (res) {
           TipHelper.instance.showToast(res['msg']);
@@ -113,8 +114,17 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
-      friendGroupObj = friendGroupController.getOneFriendGroup(contactFriendObj['friendGroupId'])!;
+      if (talkObj.isEmpty) {
+        return const Center(child: Text(""));
+      }
+      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
+      if (contactFriendObj.isEmpty) {
+        return const Center(child: Text(""));
+      }
+      friendGroupObj = friendGroupController.getOneFriendGroup(contactFriendObj['friendGroupId']);
+      if (friendGroupObj.isEmpty) {
+        return const Center(child: Text(""));
+      }
       return ListView(
         children: [
           ListTile(

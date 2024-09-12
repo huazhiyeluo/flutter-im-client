@@ -74,6 +74,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     userInfoController.setUserInfo(userInfo);
 
     webSocketController = Get.put(WebSocketController(uid, Apis.socketUrl));
+
     signalingController =
         Get.put(SignalingController(fromId: uid, context: context, webSocketController: webSocketController));
 

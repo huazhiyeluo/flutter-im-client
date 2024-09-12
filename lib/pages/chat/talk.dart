@@ -71,13 +71,13 @@ class _TalkState extends State<Talk> {
         ),
         title: Obx(() {
           if (talkObj['type'] == 1) {
-            Map userObj = userController.getOneUser(talkObj['objId'])!;
-            Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+            Map userObj = userController.getOneUser(talkObj['objId']);
+            Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
             iconObj = userObj['avatar'];
             textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname'];
           } else if (talkObj['type'] == 2) {
-            Map? groupObj = groupController.getOneGroup(talkObj['objId'])!;
-            Map contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId'])!;
+            Map groupObj = groupController.getOneGroup(talkObj['objId']);
+            Map contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
             iconObj = groupObj['icon'];
             textObj =
                 "${contactGroupObj['remark'] != '' ? contactGroupObj['remark'] : groupObj['name']}(${groupObj['num']})";

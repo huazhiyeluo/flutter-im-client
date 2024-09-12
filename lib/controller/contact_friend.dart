@@ -37,12 +37,12 @@ class ContactFriendController extends GetxController {
   }
 
   //3、获得单条记录
-  Map? getOneContactFriend(int fromId, int toId) {
+  Map getOneContactFriend(int fromId, int toId) {
     // 查找是否已经存在相同的数据
     final existingIndex = allContactFriends.indexWhere((c) => c['fromId'] == fromId && c['toId'] == toId);
     if (existingIndex != -1) {
       return allContactFriends[existingIndex];
     }
-    return null;
+    return {};
   }
 }

@@ -35,12 +35,12 @@ class UserController extends GetxController {
   }
 
   //3、获得单条记录
-  Map? getOneUser(int uid) {
+  Map getOneUser(int uid) {
     // 查找是否已经存在相同的数据
     final existingUserIndex = allUsers.indexWhere((c) => c['uid'] == uid);
     if (existingUserIndex != -1) {
       return allUsers[existingUserIndex];
     }
-    return null;
+    return {};
   }
 }

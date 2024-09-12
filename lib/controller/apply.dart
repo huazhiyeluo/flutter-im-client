@@ -49,13 +49,13 @@ class ApplyController extends GetxController {
     update();
   }
 
-  Map? getOneApply(int id) {
+  Map getOneApply(int id) {
     // 查找是否已经存在相同的数据
     final existingApplyIndex = allApplys.indexWhere((c) => c['id'] == id);
     if (existingApplyIndex != -1) {
       return allApplys[existingApplyIndex];
     }
-    return null;
+    return {};
   }
 
   void clearApply(int type) {

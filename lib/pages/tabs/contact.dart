@@ -318,10 +318,10 @@ class _ContactPageState extends State<ContactPage> {
     _tabArr3.clear();
     _tabArr3 = List.from(groupController.allGroups);
     for (var item in _tabArr3) {
-      Map? tempContactGroup = contactGroupController.getOneContactGroup(uid, item['groupId']);
+      Map tempContactGroup = contactGroupController.getOneContactGroup(uid, item['groupId']);
       item['fromId'] = uid;
       item['toId'] = item['groupId'];
-      item['remark'] = tempContactGroup?['remark'];
+      item['remark'] = tempContactGroup['remark'];
     }
     if (!mounted) return;
     setState(() {

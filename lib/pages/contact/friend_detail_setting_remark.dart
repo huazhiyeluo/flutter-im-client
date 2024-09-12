@@ -41,7 +41,7 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
     if (Get.arguments != null) {
       talkObj = Get.arguments;
 
-      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
       remarkCtr.text = contactFriendObj['remark'];
       descCtr.text = contactFriendObj['desc'];
     }
@@ -61,8 +61,8 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
       contactFriendController.upsetContactFriend(data);
       saveDbContactFriend(data);
 
-      Map? chat = chatController.getOneChat(talkObj['objId'], 1);
-      if (chat != null) {
+      Map chat = chatController.getOneChat(talkObj['objId'], 1);
+      if (chat.isNotEmpty) {
         Map chatData = {};
         chatData['objId'] = talkObj['objId'];
         chatData['type'] = 1;

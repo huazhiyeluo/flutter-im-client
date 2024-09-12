@@ -154,22 +154,24 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
             ],
           ),
         ),
-        Expanded(child: Container()),
-        Row(
-          children: [
-            const SizedBox(width: 20),
-            Expanded(
-              child: CustomButton(
-                onPressed: () {
-                  _joinGroup();
-                },
-                text: "发送",
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Row(
+            children: [
+              const SizedBox(width: 20),
+              Expanded(
+                child: CustomButton(
+                  onPressed: () {
+                    _joinGroup();
+                  },
+                  text: "发送",
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
               ),
-            ),
-            const SizedBox(width: 20),
-          ],
+              const SizedBox(width: 20),
+            ],
+          ),
         ),
         const SizedBox(height: 30),
       ],

@@ -58,7 +58,7 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
     if (Get.arguments != null) {
       friendObj = Get.arguments;
     }
-    friendGroupObj = friendGroupController.getOneFriendGroup(0)!;
+    friendGroupObj = friendGroupController.getOneFriendGroup(0);
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     _inputReasonController.text = "我是${userInfo['nickname']}";
@@ -88,7 +88,7 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
     );
     if (result != null && result is Map) {
       setState(() {
-        friendGroupObj = friendGroupController.getOneFriendGroup(result['friendGroupId'])!;
+        friendGroupObj = friendGroupController.getOneFriendGroup(result['friendGroupId']);
       });
     }
   }
@@ -160,7 +160,6 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
             onTap: _selectGroup,
           ),
         ),
-        Expanded(child: Container()),
         Row(
           children: [
             const SizedBox(width: 20),

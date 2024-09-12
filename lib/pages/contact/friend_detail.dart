@@ -7,6 +7,7 @@ import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/controller/signaling.dart';
+import 'package:qim/utils/functions.dart';
 
 class FriendDetail extends StatefulWidget {
   const FriendDetail({super.key});
@@ -79,7 +80,6 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
-
     talkCommonObj = getTalkCommonObj(talkObj);
   }
 
@@ -114,8 +114,14 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      if (talkObj.isEmpty) {
+        return const Center(child: Text(""));
+      }
       userObj = userController.getOneUser(talkObj['objId'])!;
-      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
+      if (userObj.isEmpty || contactFriendObj.isEmpty) {
+        return const Center(child: Text(""));
+      }
       return ListView(
         children: [
           ListTile(

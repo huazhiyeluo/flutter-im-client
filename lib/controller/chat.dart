@@ -50,13 +50,13 @@ class ChatController extends GetxController {
     update();
   }
 
-  Map? getOneChat(int objId, int type) {
+  Map getOneChat(int objId, int type) {
     // 查找是否已经存在相同的数据
     final existingChatIndex = allChats.indexWhere((c) => c['objId'] == objId && c['type'] == type);
     if (existingChatIndex != -1) {
       return allChats[existingChatIndex];
     }
-    return null;
+    return {};
   }
 
   int getTipsTotalNum() {

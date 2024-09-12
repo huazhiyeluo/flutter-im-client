@@ -314,7 +314,7 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
     for (var map in _userSelectArrs) {
       toIds.add(map['toId']);
 
-      Map groupObj = groupController.getOneGroup(talkObj['objId'])!;
+      Map groupObj = groupController.getOneGroup(talkObj['objId']);
 
       Map data = {};
       data['group'] = groupObj;

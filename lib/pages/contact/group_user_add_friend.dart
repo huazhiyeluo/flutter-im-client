@@ -93,8 +93,8 @@ class _GroupUserAddFriendPageState extends State<GroupUserAddFriendPage> {
     final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
     _userArr.clear();
     for (var item in contactGroups) {
-      Map userObj = userController.getOneUser(item['fromId'])!;
-      Map? contactFriendObj = contactFriendController.getOneContactFriend(uid, item['fromId']);
+      Map userObj = userController.getOneUser(item['fromId']);
+      Map contactFriendObj = contactFriendController.getOneContactFriend(uid, item['fromId']);
       if (userObj['nickname'].contains(inputController.text) ||
           item['remark'].contains(inputController.text) ||
           item['fromId'].toString().contains(inputController.text)) {
@@ -104,7 +104,7 @@ class _GroupUserAddFriendPageState extends State<GroupUserAddFriendPage> {
         chat.icon = userObj['avatar'];
         chat.info = userObj['info'];
         chat.remark = item['remark'];
-        chat.isContact = contactFriendObj == null ? 0 : 1;
+        chat.isContact = contactFriendObj.isEmpty ? 0 : 1;
         chat.namePinyin = PinyinHelper.getPinyin(item['remark'] != '' ? item['remark'] : userObj['nickname']);
         String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
         chat.tagIndex = firstLetter.toUpperCase();

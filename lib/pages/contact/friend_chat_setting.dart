@@ -9,6 +9,7 @@ import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/db.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:qim/widget/dialog_confirm.dart';
@@ -69,8 +70,14 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
   Widget build(BuildContext context) {
     return Obx(
       () {
-        userObj = userController.getOneUser(talkObj['objId'])!;
-        contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId'])!;
+        if (talkObj.isEmpty) {
+          return const Center(child: Text(""));
+        }
+        userObj = userController.getOneUser(talkObj['objId']);
+        contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
+        if (userObj.isEmpty || contactFriendObj.isEmpty) {
+          return const Center(child: Text(""));
+        }
         return ListView(
           children: [
             ListTile(
@@ -235,8 +242,8 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
         saveDbContactFriend(res['data']);
 
         if (["isTop", "isHidden", "isQuiet"].contains(field)) {
-          Map? chat = chatController.getOneChat(talkObj['objId'], 1);
-          if (chat != null) {
+          Map chat = chatController.getOneChat(talkObj['objId'], 1);
+          if (chat.isNotEmpty) {
             Map chatData = {};
             chatData['objId'] = talkObj['objId'];
             chatData['type'] = 1;
@@ -264,10 +271,11 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
           'toId': talkObj['objId'],
         };
         ContactFriendApi.delContactFriend(params, onSuccess: (res) {
+          talkobjController.setTalkObj({});
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/',
-            (route) => false,
+            ModalRoute.withName('/'),
           );
         }, onError: (res) {
           TipHelper.instance.showToast(res['msg']);
