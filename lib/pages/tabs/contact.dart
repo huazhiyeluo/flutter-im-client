@@ -13,7 +13,6 @@ import 'package:azlistview_plus/azlistview_plus.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:qim/utils/functions.dart';
 import 'package:qim/widget/custom_search_field.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 class ChatModel extends ISuspensionBean {
   int? toId;
@@ -261,18 +260,12 @@ class _ContactPageState extends State<ContactPage> {
     ever(contactFriendController.allContactFriends, (_) => _formatData());
     ever(contactGroupController.allContactGroups, (_) => _formatData());
     _formatData();
-    _getFcm();
   }
 
   @override
   void dispose() {
     // 取消订阅
     super.dispose();
-  }
-
-  _getFcm() async {
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    logPrint(fcmToken);
   }
 
   void _formatData() {

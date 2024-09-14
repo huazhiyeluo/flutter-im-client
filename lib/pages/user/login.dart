@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/login.dart';
+import 'package:qim/api/user.dart';
 import 'package:qim/common/keys.dart';
 import 'package:qim/routes/route.dart';
 import 'package:qim/utils/cache.dart';
@@ -11,6 +12,7 @@ import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -233,10 +235,11 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 // 处理注册账号逻辑
                 // Navigator.pushNamed(context, '/register-one');
-                Get.toNamed("/login-code");
+                // Get.toNamed("/login-code");
+                _loginVisitorAction();
               },
               child: const Text(
-                '验证码登录',
+                '游客登录',
                 style: TextStyle(fontSize: 16, color: Colors.black),
               ),
             ),
@@ -274,6 +277,24 @@ class _LoginPageState extends State<LoginPage> {
       'password': passwordController.text
     };
     LoginApi.login(params, onSuccess: (res) async {
+      await _setFcm(res['data']['user']['uid']);
+      CacheHelper.saveData(Keys.userInfo, res['data']['user']);
+      String initialRouteData = await initialRoute();
+      Get.offAndToNamed(initialRouteData);
+    }, onError: (res) {
+      TipHelper.instance.showToast(res['msg']);
+    });
+  }
+
+  _loginVisitorAction() async {
+    DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
+    var params = {
+      'platform': "visitor",
+      "devname": deviceInfo.deviceName,
+      "deviceid": deviceInfo.deviceId,
+    };
+    LoginApi.login(params, onSuccess: (res) async {
+      await _setFcm(res['data']['user']['uid']);
       CacheHelper.saveData(Keys.userInfo, res['data']['user']);
       String initialRouteData = await initialRoute();
       Get.offAndToNamed(initialRouteData);
@@ -310,10 +331,24 @@ class _LoginPageState extends State<LoginPage> {
       'siteuid': userCredential.additionalUserInfo?.profile?["sub"],
     };
     LoginApi.login(params, onSuccess: (res) async {
+      _setFcm(res['data']['user']['uid']);
       CacheHelper.saveData(Keys.userInfo, res['data']['user']);
       String initialRouteData = await initialRoute();
       Get.offAndToNamed(initialRouteData);
     }, onError: (res) {
+      TipHelper.instance.showToast(res['msg']);
+    });
+  }
+
+  Future<void> _setFcm(int uid) async {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    final type = await DeviceInfo.getPlatformType();
+    var params = {
+      'uid': uid,
+      'token': fcmToken,
+      'type': type,
+    };
+    UserApi.actDeviceToken(params, onSuccess: (res) async {}, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
   }

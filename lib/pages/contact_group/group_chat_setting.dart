@@ -68,7 +68,6 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 
-    groupObj = groupController.getOneGroup(talkObj['objId']);
     contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
     if ([1, 2].contains(contactGroupObj['groupPower'])) {
       optShow = 2;
@@ -85,6 +84,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      groupObj = groupController.getOneGroup(talkObj['objId']);
       final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
       if (contactGroups.isEmpty) {
         return const Center(child: Text(""));
@@ -104,7 +104,9 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
             trailing: const Icon(
               Icons.chevron_right,
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/group-detail', arguments: talkObj);
+            },
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -207,7 +209,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                     );
                   }
                 } else {
-                  Map userObj = userController.getOneUser(contactGroups[index]['fromId'])!;
+                  Map userObj = userController.getOneUser(contactGroups[index]['fromId']);
                   return Container(
                     height: 90,
                     alignment: Alignment.center,
@@ -223,7 +225,9 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                           height: 1,
                         ), // 添加一个间距
                         Text(
-                          contactGroups[index]['remark'] != "" ? contactGroups[index]['remark'] : userObj['nickname'],
+                          contactGroups[index]['nickname'] != ""
+                              ? contactGroups[index]['nickname']
+                              : userObj['nickname'],
                           style: const TextStyle(fontSize: 12),
                         ),
                       ],
@@ -242,14 +246,16 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                 const Icon(Icons.chevron_right),
               ],
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/group-setting-name', arguments: talkObj);
+            },
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
             child: const Divider(),
           ),
           ListTile(
-            title: const Text("群号"),
+            title: const Text("群号和二维码"),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -257,7 +263,9 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                 const Icon(Icons.chevron_right),
               ],
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/group-info', arguments: talkObj);
+            },
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -269,7 +277,9 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
             trailing: const Icon(
               Icons.chevron_right,
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/group-setting-info', arguments: talkObj);
+            },
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -284,7 +294,9 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                 const Icon(Icons.chevron_right),
               ],
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/group-chat-setting-nickname', arguments: talkObj);
+            },
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -299,7 +311,9 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                 const Icon(Icons.chevron_right),
               ],
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/group-chat-setting-remark', arguments: talkObj);
+            },
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),

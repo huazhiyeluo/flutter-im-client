@@ -94,7 +94,7 @@ class _SettingPageState extends State<SettingPage> {
         child: const Divider(),
       ),
       ListTile(
-        title: const Text("关于微信"),
+        title: const Text("关于秋聊"),
         trailing: const Icon(
           Icons.chevron_right,
         ),

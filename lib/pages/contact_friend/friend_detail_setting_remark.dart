@@ -123,7 +123,8 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
                 child: TextField(
                   controller: descCtr,
                   textAlignVertical: TextAlignVertical.center,
-                  maxLines: 5,
+                  minLines: 1,
+                  maxLines: null,
                   decoration: const InputDecoration(
                     hintText: '填写描述',
                   ),

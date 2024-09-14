@@ -19,4 +19,13 @@ class UserApi {
       onError: onError,
     );
   }
+
+  static void actDeviceToken(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.actDeviceToken,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
 }

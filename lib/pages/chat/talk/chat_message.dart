@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/message.dart';
 import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/userinfo.dart';
@@ -28,6 +29,7 @@ class _ChatMessageState extends State<ChatMessage> {
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
 
   final ScrollController _scrollController = ScrollController();
 
@@ -339,5 +341,7 @@ class _ChatMessageState extends State<ChatMessage> {
         messageController.addMessage(modifiedItem);
       }
     }
+
+    contactGroupController.allContactGroups[talkObj['objId']];
   }
 }

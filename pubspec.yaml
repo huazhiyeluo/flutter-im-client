@@ -70,6 +70,7 @@ dependencies:
   firebase_messaging: ^15.1.0
   firebase_auth: ^5.2.0
   google_sign_in: ^6.2.1
+  qr_flutter: ^4.1.0
 
   
 

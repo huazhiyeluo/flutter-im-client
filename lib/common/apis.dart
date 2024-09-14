@@ -19,6 +19,7 @@ class Apis {
   //user
   static const String actUser = '/user/actUser';
   static const String searchUser = '/user/searchUser';
+  static const String actDeviceToken = '/user/actDeviceToken';
 
   //group
   static const String createGroup = '/user/createGroup';

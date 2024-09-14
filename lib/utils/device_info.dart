@@ -49,4 +49,14 @@ class DeviceInfo {
 
     return DeviceInfo(deviceId, deviceName);
   }
+
+  static Future<int> getPlatformType() async {
+    if (Platform.isAndroid) {
+      return 2;
+    } else if (Platform.isIOS) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
 }

@@ -207,11 +207,11 @@ class _ChatPageState extends State<ChatPage> {
                               )),
                     ]),
                     onTap: () {
-                      Map talkobj = {
+                      Map talkObj = {
                         "objId": temp["objId"],
                         "type": temp["type"],
                       };
-                      talkobjController.setTalkObj(talkobj);
+                      talkobjController.setTalkObj(talkObj);
 
                       Map chatData = {};
                       chatData['objId'] = temp["objId"];

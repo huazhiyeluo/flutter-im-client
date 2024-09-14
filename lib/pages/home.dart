@@ -291,7 +291,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         userController.upsetUser(item);
         saveDbUser(item);
       }
-
       List contactFriendsArr = [];
       if (res['data']['contactFriends'] != null) {
         contactFriendsArr = res['data']['contactFriends'];

@@ -186,7 +186,7 @@ class _GroupUserPageState extends State<GroupUserPage> {
           item['fromId'].toString().contains(inputController.text)) {
         UserModel chat = UserModel();
         chat.uid = item['fromId'];
-        chat.name = userObj['nickname'];
+        chat.name = item['nickname'] != "" ? item['nickname'] : userObj['nickname'];
         chat.icon = userObj['avatar'];
         chat.info = userObj['info'];
         chat.remark = item['remark'];

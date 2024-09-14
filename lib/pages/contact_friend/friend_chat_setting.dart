@@ -170,29 +170,33 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: const Divider(),
             ),
-            Row(
-              children: [
-                const SizedBox(width: 20),
-                Expanded(
-                  child: CustomButton(
-                    onPressed: () {
-                      _delContact();
-                    },
-                    text: "删除好友",
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.red,
-                  ),
-                ),
-                const SizedBox(width: 20),
-              ],
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text(
-                '被骚扰了？举报该用户',
-                style: TextStyle(fontSize: 12),
-              ),
-            ),
+            talkObj['objId'] != uid
+                ? Row(
+                    children: [
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: CustomButton(
+                          onPressed: () {
+                            _delContact();
+                          },
+                          text: "删除好友",
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.red,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                    ],
+                  )
+                : Container(),
+            talkObj['objId'] != uid
+                ? TextButton(
+                    onPressed: () {},
+                    child: const Text(
+                      '被骚扰了？举报该用户',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  )
+                : Container(),
           ],
         );
       },
