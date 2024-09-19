@@ -19,6 +19,7 @@ import 'package:qim/controller/websocket.dart';
 import 'package:qim/dbdata/deldbdata.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/date.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/play.dart';
 import 'package:mime/mime.dart';
 import 'package:qim/utils/tips.dart';
@@ -128,19 +129,26 @@ Future<void> joinMessage(int uid, Map temp) async {
   } else {
     if (msg['msgType'] == 1) {
       final UserController userController = Get.find();
-      Map userObj = userController.getOneUser(msg['fromId'])!;
+      final ContactFriendController contactFriendController = Get.find();
+      Map userObj = userController.getOneUser(msg['fromId']);
+      Map contactFriendObj = contactFriendController.getOneContactFriend(uid, msg['fromId']);
       msg['avatar'] = userObj['avatar'];
-      msg['nickname'] = userObj['nickname'];
+      msg['nickname'] = contactFriendObj['remark'] != "" ? contactFriendObj['remark'] : userObj['nickname'];
     }
     if (msg['msgType'] == 2) {
       final UserController userController = Get.find();
+      final ContactGroupController contactGroupController = Get.find();
       Map userObj = userController.getOneUser(msg['fromId']);
       if (userObj.isEmpty) {
         await getGroupInfo(msg['toId']);
         userObj = userController.getOneUser(msg['fromId']);
       }
+      Map contactGroupObj = contactGroupController.getOneContactGroup(msg['fromId'], msg['toId']);
+
       msg['avatar'] = userObj['avatar'];
-      msg['nickname'] = userObj['nickname'];
+      msg['nickname'] = contactGroupObj.isNotEmpty && contactGroupObj['nickname'] != ""
+          ? contactGroupObj['nickname']
+          : userObj['nickname'];
     }
   }
   messageController.addMessage(msg);
@@ -148,6 +156,7 @@ Future<void> joinMessage(int uid, Map temp) async {
 }
 
 Future<void> getGroupInfo(int groupId) async {
+  logPrint("_____$groupId");
   final UserController userController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
 
@@ -195,11 +204,13 @@ Map getTalkCommonObj(Map talkObj) {
     Map userObj = userController.getOneUser(talkObj['objId'])!;
     talkCommonObj['icon'] = userObj['avatar'];
     talkCommonObj['name'] = userObj['nickname'];
+    talkCommonObj['num'] = 1;
   } else if (talkObj['type'] == 2) {
     final GroupController groupController = Get.find();
     Map? groupObj = groupController.getOneGroup(talkObj['objId'])!;
     talkCommonObj['icon'] = groupObj['icon'];
     talkCommonObj['name'] = groupObj['name'];
+    talkCommonObj['num'] = groupObj['num'];
   }
   return talkCommonObj;
 }
@@ -236,6 +247,7 @@ Future<void> loadFriendManage(int uid, Map msg) async {
           'msgMedia': 1,
           'msgType': 1
         };
+        logPrint(msg);
         webSocketController.sendMessage(msg);
         msg['createTime'] = getTime();
         joinData(uid, msg);
@@ -249,6 +261,13 @@ Future<void> loadFriendManage(int uid, Map msg) async {
 
     chatController.delChat(data['user']['uid'], 1);
     delDbChat(data['user']['uid'], 1);
+
+    final TalkobjController talkobjController = Get.put(TalkobjController());
+    if (talkobjController.talkObj['objId'] == data['user']['uid']) {
+      talkobjController.setTalkObj({});
+      Get.until((route) => route.settings.name == '/');
+      Get.toNamed('/');
+    }
   }
 }
 

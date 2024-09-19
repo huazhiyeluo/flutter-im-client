@@ -277,7 +277,7 @@ class _LoginPageState extends State<LoginPage> {
       'password': passwordController.text
     };
     LoginApi.login(params, onSuccess: (res) async {
-      await _setFcm(res['data']['user']['uid']);
+      _setFcm(res['data']['user']['uid']);
       CacheHelper.saveData(Keys.userInfo, res['data']['user']);
       String initialRouteData = await initialRoute();
       Get.offAndToNamed(initialRouteData);
@@ -294,7 +294,7 @@ class _LoginPageState extends State<LoginPage> {
       "deviceid": deviceInfo.deviceId,
     };
     LoginApi.login(params, onSuccess: (res) async {
-      await _setFcm(res['data']['user']['uid']);
+      _setFcm(res['data']['user']['uid']);
       CacheHelper.saveData(Keys.userInfo, res['data']['user']);
       String initialRouteData = await initialRoute();
       Get.offAndToNamed(initialRouteData);
@@ -313,11 +313,11 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
     // Create a new credential
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
     );
 
     // Once signed in, return the UserCredential
@@ -327,7 +327,7 @@ class _LoginPageState extends State<LoginPage> {
       'platform': "google",
       'avatar': userCredential.additionalUserInfo?.profile?["picture"],
       'nickname': userCredential.additionalUserInfo?.profile?["name"],
-      "token": googleAuth?.accessToken,
+      "token": googleAuth.accessToken,
       'siteuid': userCredential.additionalUserInfo?.profile?["sub"],
     };
     LoginApi.login(params, onSuccess: (res) async {

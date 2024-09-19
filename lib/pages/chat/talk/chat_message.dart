@@ -117,7 +117,7 @@ class _ChatMessageState extends State<ChatMessage> {
 
     if (data['msgType'] == 2) {
       lists.add(Text(
-        data['nickname'],
+        data['nickname'] ?? '',
         style: const TextStyle(
           fontSize: 13,
         ),

@@ -66,6 +66,7 @@ class RequestHelper {
       }
 
       if (response.data.containsKey('code') && response.data['code'] == 0) {
+        logPrint(response);
         onSuccess?.call(response.data);
       } else {
         onError?.call(response.data);

@@ -9,7 +9,6 @@ import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/db.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:qim/widget/dialog_confirm.dart';

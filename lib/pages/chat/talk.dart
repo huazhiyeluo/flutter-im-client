@@ -13,6 +13,7 @@ import 'package:qim/pages/chat/talk/emoji_list.dart';
 import 'package:qim/pages/chat/talk/plus_list.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/permission.dart';
 import 'package:qim/controller/signaling.dart';
 import 'package:qim/utils/tips.dart';
@@ -138,6 +139,7 @@ class _TalkPageState extends State<TalkPage> {
   final MessageController messageController = Get.find();
   final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
 
   final TextEditingController _inputController = TextEditingController();
 
@@ -160,12 +162,23 @@ class _TalkPageState extends State<TalkPage> {
     uid = userInfo['uid'];
     talkCommonObj = getTalkCommonObj(talkObj);
 
+    final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
+    if (talkObj['type'] == 2) {
+      if (contactGroups.length != talkCommonObj['num']) {
+        _initData();
+      }
+    }
+
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
         isShowEmoji = 0;
         isShowPlus = 0;
       }
     });
+  }
+
+  void _initData() async {
+    await getGroupInfo(talkObj['objId']);
   }
 
   final ImagePicker _picker = ImagePicker();

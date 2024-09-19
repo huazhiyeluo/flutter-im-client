@@ -1,7 +1,7 @@
 class Apis {
   /// url 前缀
-  // static const String apiPrefix = 'http://127.0.0.1:8081';
-  // static const String socketUrl = 'ws://127.0.0.1:8081/chat';
+  // static const String apiPrefix = 'http://192.168.4.212:8081';
+  // static const String socketUrl = 'ws://192.168.4.212:8081/chat';
 
   // static const String apiPrefix = 'http://im-siyuwen.com/api';
   // static const String socketUrl = 'ws://im-siyuwen.com/chat';
