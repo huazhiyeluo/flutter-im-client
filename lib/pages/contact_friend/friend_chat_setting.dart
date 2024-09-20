@@ -70,17 +70,24 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
     return Obx(
       () {
         if (talkObj.isEmpty) {
-          return const Center(child: Text(""));
+          return const Center(child: Text("11111"));
         }
         userObj = userController.getOneUser(talkObj['objId']);
-        contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
-        if (userObj.isEmpty || contactFriendObj.isEmpty) {
-          return const Center(child: Text(""));
+        if (userObj.isEmpty) {
+          return Center(child: Text("${talkObj['objId']}"));
         }
+        contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
+        String textObj = "";
+        if (contactFriendObj.isNotEmpty) {
+          textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname'];
+        } else {
+          textObj = "${userObj['nickname']}(临时聊天)";
+        }
+
         return ListView(
           children: [
             ListTile(
-              title: Text(contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname']),
+              title: Text(textObj),
               leading: CircleAvatar(
                 backgroundImage: NetworkImage(userObj['avatar'] ?? ''),
               ),
@@ -169,7 +176,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: const Divider(),
             ),
-            talkObj['objId'] != uid
+            talkObj['objId'] != uid && contactFriendObj.isNotEmpty
                 ? Row(
                     children: [
                       const SizedBox(width: 20),

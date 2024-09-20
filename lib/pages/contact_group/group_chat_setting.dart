@@ -213,24 +213,37 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                   return Container(
                     height: 90,
                     alignment: Alignment.center,
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundImage: CachedNetworkImageProvider(
-                            userObj['avatar'],
+                    child: GestureDetector(
+                      onTap: () {
+                        Map talkobj = {
+                          "objId": contactGroups[index]['fromId'],
+                          "type": 1,
+                        };
+                        Navigator.pushNamed(
+                          context,
+                          '/friend-detail',
+                          arguments: talkobj,
+                        );
+                      },
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 25,
+                            backgroundImage: CachedNetworkImageProvider(
+                              userObj['avatar'],
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 1,
-                        ), // 添加一个间距
-                        Text(
-                          contactGroups[index]['nickname'] != ""
-                              ? contactGroups[index]['nickname']
-                              : userObj['nickname'],
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ],
+                          const SizedBox(
+                            height: 1,
+                          ), // 添加一个间距
+                          Text(
+                            contactGroups[index]['nickname'] != ""
+                                ? contactGroups[index]['nickname']
+                                : userObj['nickname'],
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }

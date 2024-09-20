@@ -16,32 +16,47 @@ class FriendDetail extends StatefulWidget {
 }
 
 class _FriendDetailState extends State<FriendDetail> {
+  final UserInfoController userInfoController = Get.find();
+  final ContactFriendController contactFriendController = Get.find();
+
+  int uid = 0;
+  Map userInfo = {};
   Map talkObj = {};
 
   @override
   void initState() {
     super.initState();
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
+  }
+
+  List<Widget> _getAction() {
+    List<Widget> list = [];
+    final contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
+    if (contactFriendObj.isNotEmpty) {
+      list.add(IconButton(
+        icon: const Icon(Icons.more_vert),
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            '/friend-detail-setting',
+            arguments: talkObj,
+          );
+        },
+      ));
+    }
+
+    return list;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                '/friend-detail-setting',
-                arguments: talkObj,
-              );
-            },
-          ),
-        ],
+        actions: _getAction(),
       ),
       body: const FriendDetailPage(),
     );
@@ -91,7 +106,7 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
           fontSize: 24,
         ),
       ));
-      data.add(Text('用户名: ${userObj['nickname']}'));
+      data.add(Text('昵称: ${userObj['nickname']}'));
     } else {
       data.add(Text(
         '${userObj['nickname']}',
@@ -100,7 +115,6 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
         ),
       ));
     }
-
     data.add(Text('QID: ${userObj['uid']}'));
     return data;
   }
@@ -163,10 +177,10 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
           ),
           TextButton.icon(
             onPressed: () {
-              talkobjController.setTalkObj(talkObj);
               Navigator.pushNamed(
                 context,
                 '/talk',
+                arguments: talkObj,
               );
             },
             label: const Text(
@@ -185,10 +199,32 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
                     _invite();
                   },
                   label: const Text(
-                    "音视频通话",
+                    "视频通话",
                     style: TextStyle(fontSize: 20),
                   ),
                   icon: const Icon(Icons.phone),
+                )
+              : Container(),
+          contactFriendObj.isEmpty && talkObj['objId'] != uid
+              ? Container(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  child: const Divider(),
+                )
+              : Container(),
+          contactFriendObj.isEmpty && talkObj['objId'] != uid
+              ? TextButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/add-contact-friend-do',
+                      arguments: userObj,
+                    );
+                  },
+                  label: const Text(
+                    "添加好友",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  icon: const Icon(Icons.person_add_alt),
                 )
               : Container(),
         ],

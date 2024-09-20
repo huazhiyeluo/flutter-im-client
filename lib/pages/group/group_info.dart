@@ -66,8 +66,6 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-
-    groupObj = groupController.getOneGroup(talkObj['objId']);
     logPrint(groupObj);
   }
 
@@ -90,6 +88,11 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
       if (talkObj.isEmpty) {
         return const Center(child: Text(""));
       }
+      groupObj = groupController.getOneGroup(talkObj['objId']);
+      Map result = {};
+      result['type'] = 2;
+      result['content'] = groupObj;
+
       return Column(
         children: [
           Container(
@@ -119,7 +122,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                   height: 10,
                 ),
                 QrImageView(
-                  data: jsonEncode(talkObj),
+                  data: jsonEncode(result),
                   version: QrVersions.auto,
                   size: screenSize.width * 0.75,
                   backgroundColor: Colors.white, // 设置二维码背景色

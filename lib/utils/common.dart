@@ -67,23 +67,38 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
   chatData['operateTime'] = msg['createTime'];
   chatData['content'] = msg['content'];
 
-  Map? lastChat = chatController.getOneChat(objId, msg['msgType']);
+  Map lastChat = chatController.getOneChat(objId, msg['msgType']);
   if (lastChat.isEmpty) {
     if ([1].contains(msg['msgType'])) {
-      Map userObj = userController.getOneUser(objId)!;
-      Map contactFriendObj = contactFriendController.getOneContactFriend(uid, objId)!;
+      Map userObj = userController.getOneUser(objId);
+      if (userObj.isEmpty) {
+        for (var group in groupController.allGroups) {
+          List contactGroups = contactGroupController.allContactGroups[group['groupId']] ?? RxList<Map>.from([]);
+          if (contactGroups.length != group['num']) {
+            await getGroupInfo(group['groupId']);
+          }
+        }
+        userObj = userController.getOneUser(msg['fromId']);
+      }
+      Map contactFriendObj = contactFriendController.getOneContactFriend(uid, objId);
 
       chatData['name'] = userObj['nickname'];
       chatData['info'] = userObj['info'];
       chatData['icon'] = userObj['avatar'];
-      chatData['remark'] = contactFriendObj['remark'];
-      chatData['isTop'] = contactFriendObj['isTop'];
-      chatData['isHidden'] = contactFriendObj['isHidden'];
-      chatData['isQuiet'] = contactFriendObj['isQuiet'];
+      if (contactFriendObj.isNotEmpty) {
+        chatData['remark'] = contactFriendObj['remark'];
+        chatData['isTop'] = contactFriendObj['isTop'];
+        chatData['isHidden'] = contactFriendObj['isHidden'];
+        chatData['isQuiet'] = contactFriendObj['isQuiet'];
+      } else {
+        chatData['remark'] = "";
+        chatData['isTop'] = 0;
+        chatData['isHidden'] = 0;
+        chatData['isQuiet'] = 0;
+      }
     }
-
-    if (msg['msgType'] == 2) {
-      Map groupObj = groupController.getOneGroup(objId)!;
+    if ([2].contains(msg['msgType'])) {
+      Map groupObj = groupController.getOneGroup(objId);
       Map contactGroupObj = contactGroupController.getOneContactGroup(uid, objId);
       chatData['name'] = groupObj['name'];
       chatData['info'] = groupObj['info'];
@@ -107,7 +122,7 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
   if (talkobjController.talkObj['objId'] == msg['fromId'] || talkobjController.talkObj['objId'] == msg['toId']) {
     chatData['tips'] = 0;
   } else {
-    chatData['tips'] = (lastChat?['tips'] ?? 0) + 1;
+    chatData['tips'] = (lastChat['tips'] ?? 0) + 1;
 
     audioPlayerManager ??= AudioPlayerManager();
     await audioPlayerManager.playSound("2.mp3");
@@ -120,6 +135,8 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
 Future<void> joinMessage(int uid, Map temp) async {
   Map msg = Map.from(temp);
   final MessageController messageController = Get.find();
+  final GroupController groupController = Get.find();
+  final ContactGroupController contactGroupController = Get.find();
   bool isSelf = uid == msg['fromId'] ? true : false;
   if (isSelf) {
     final UserInfoController userInfoController = Get.find();
@@ -131,9 +148,24 @@ Future<void> joinMessage(int uid, Map temp) async {
       final UserController userController = Get.find();
       final ContactFriendController contactFriendController = Get.find();
       Map userObj = userController.getOneUser(msg['fromId']);
+      if (userObj.isEmpty) {
+        for (var group in groupController.allGroups) {
+          List contactGroups = contactGroupController.allContactGroups[group['groupId']] ?? RxList<Map>.from([]);
+          if (contactGroups.length != group['num']) {
+            await getGroupInfo(group['groupId']);
+          }
+        }
+        userObj = userController.getOneUser(msg['fromId']);
+      }
+
       Map contactFriendObj = contactFriendController.getOneContactFriend(uid, msg['fromId']);
       msg['avatar'] = userObj['avatar'];
-      msg['nickname'] = contactFriendObj['remark'] != "" ? contactFriendObj['remark'] : userObj['nickname'];
+
+      if (contactFriendObj.isNotEmpty) {
+        msg['nickname'] = contactFriendObj['remark'] != "" ? contactFriendObj['remark'] : userObj['nickname'];
+      } else {
+        msg['nickname'] = userObj['nickname'];
+      }
     }
     if (msg['msgType'] == 2) {
       final UserController userController = Get.find();

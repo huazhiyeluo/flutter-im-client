@@ -33,6 +33,7 @@ import 'package:qim/pages/person/info_username.dart';
 import 'package:qim/pages/person/info_username_bind.dart';
 import 'package:qim/pages/person/setting.dart';
 import 'package:qim/pages/person/info_nickname.dart';
+import 'package:qim/pages/qrview.dart';
 import 'package:qim/pages/search.dart';
 import 'package:qim/pages/user/login.dart';
 import 'package:qim/pages/user/login_code.dart';
@@ -50,6 +51,7 @@ class AppPage {
     GetPage(name: "/repasswd", page: () => const Repasswd()),
     GetPage(name: "/register", page: () => const Register()),
     GetPage(name: "/search", page: () => const Search()),
+    GetPage(name: "/qrview", page: () => const QrView()),
     GetPage(name: "/", page: () => const Home(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/talk", page: () => const Talk(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/notice-user", page: () => const NoticeUser(), middlewares: [HomeMiddleware()]),

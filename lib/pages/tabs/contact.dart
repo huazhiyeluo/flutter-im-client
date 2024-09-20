@@ -5,13 +5,12 @@ import 'package:qim/controller/apply.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/group.dart';
-import 'package:qim/controller/talkobj.dart';
+import 'package:qim/controller/talkObj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
 import 'package:azlistview_plus/azlistview_plus.dart';
 import 'package:lpinyin/lpinyin.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/widget/custom_search_field.dart';
 
 class ChatModel extends ISuspensionBean {
@@ -232,7 +231,6 @@ class ContactPage extends StatefulWidget {
 }
 
 class _ContactPageState extends State<ContactPage> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
@@ -348,11 +346,11 @@ class _ContactPageState extends State<ContactPage> {
               overflow: TextOverflow.ellipsis,
             ),
             onTap: () {
-              Map talkobj = {
+              Map talkObj = {
                 "objId": itemFriend.toId,
                 "type": 1,
               };
-              Navigator.pushNamed(context, '/friend-detail', arguments: talkobj);
+              Navigator.pushNamed(context, '/friend-detail', arguments: talkObj);
             },
             contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
           );
@@ -442,14 +440,14 @@ class _ContactPageState extends State<ContactPage> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             onTap: () {
-                              Map talkobj = {
+                              Map talkObj = {
                                 "objId": itemFriend['toId'],
                                 "type": 1,
                               };
                               Navigator.pushNamed(
                                 context,
                                 '/friend-detail',
-                                arguments: talkobj,
+                                arguments: talkObj,
                               );
                             },
                           ),
@@ -483,14 +481,14 @@ class _ContactPageState extends State<ContactPage> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 onTap: () {
-                  Map talkobj = {
+                  Map talkObj = {
                     "objId": itemGroup['toId'],
                     "type": 2,
                   };
-                  talkobjController.setTalkObj(talkobj);
                   Navigator.pushNamed(
                     context,
                     '/talk',
+                    arguments: talkObj,
                   );
                 },
               ),

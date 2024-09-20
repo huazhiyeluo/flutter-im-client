@@ -60,7 +60,6 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final ChatController chatController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
@@ -211,7 +210,6 @@ class _ChatPageState extends State<ChatPage> {
                         "objId": temp["objId"],
                         "type": temp["type"],
                       };
-                      talkobjController.setTalkObj(talkObj);
 
                       Map chatData = {};
                       chatData['objId'] = temp["objId"];
@@ -223,6 +221,7 @@ class _ChatPageState extends State<ChatPage> {
                       Navigator.pushNamed(
                         context,
                         '/talk',
+                        arguments: talkObj,
                       );
                     },
                   ),

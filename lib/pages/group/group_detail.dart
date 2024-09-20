@@ -102,8 +102,6 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-
-    groupObj = groupController.getOneGroup(talkObj['objId']);
   }
 
   List<Widget> _getTitle() {
@@ -124,6 +122,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
       if (talkObj.isEmpty) {
         return const Center(child: Text(""));
       }
+      groupObj = groupController.getOneGroup(talkObj['objId']);
       return Column(
         children: [
           ListTile(

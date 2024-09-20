@@ -40,6 +40,9 @@ AppBar chatBar() {
             if (value == "2") {
               Get.toNamed('/add-contact');
             }
+            if (value == "3") {
+              Get.toNamed('/qrview');
+            }
           },
           position: PopupMenuPosition.under,
           itemBuilder: (BuildContext context) {

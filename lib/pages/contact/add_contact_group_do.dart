@@ -49,7 +49,6 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
   Map groupObj = {};
   int uid = 0;
   Map userInfo = {};
-  Map groupGroupObj = {};
 
   @override
   void initState() {
@@ -86,7 +85,7 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
           title: Text(groupObj['name']),
           subtitle: Text(
             groupObj['info'],
-            maxLines: 1,
+            maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
           leading: CircleAvatar(

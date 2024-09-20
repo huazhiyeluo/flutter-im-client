@@ -271,7 +271,17 @@ class _GroupUserPageState extends State<GroupUserPage> {
                               ),
                             )
                           : const Text(""),
-                  onTap: () {},
+                  onTap: () {
+                    Map talkobj = {
+                      "objId": _userArr[index].uid,
+                      "type": 1,
+                    };
+                    Navigator.pushNamed(
+                      context,
+                      '/friend-detail',
+                      arguments: talkobj,
+                    );
+                  },
                 ),
               ),
             ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/common.dart';
+import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/group.dart';
@@ -38,6 +39,7 @@ class _TalkState extends State<Talk> {
   final ContactFriendController contactFriendController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
   final UserInfoController userInfoController = Get.find();
+  final ChatController chatController = Get.find();
 
   Map talkObj = {};
   Map userInfo = {};
@@ -45,11 +47,16 @@ class _TalkState extends State<Talk> {
 
   String iconObj = '';
   String textObj = '';
+  String nickname = '';
 
   @override
   void initState() {
     super.initState();
-    talkObj = talkobjController.talkObj;
+
+    if (Get.arguments != null) {
+      talkObj = Get.arguments;
+      talkobjController.setTalkObj(talkObj);
+    }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
   }
@@ -73,9 +80,26 @@ class _TalkState extends State<Talk> {
         title: Obx(() {
           if (talkObj['type'] == 1) {
             Map userObj = userController.getOneUser(talkObj['objId']);
+            if (userObj.isEmpty) {
+              Map chat = chatController.getOneChat(talkObj['objId'], talkObj['type']);
+              iconObj = chat['icon'];
+              nickname = chat['name'];
+            } else {
+              iconObj = userObj['avatar'];
+              nickname = userObj['nickname'];
+            }
+
             Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
-            iconObj = userObj['avatar'];
-            textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname'];
+
+            if (contactFriendObj.isNotEmpty) {
+              textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : nickname;
+            } else {
+              if (talkObj['objId'] == uid) {
+                textObj = nickname;
+              } else {
+                textObj = "$nickname(临时聊天)";
+              }
+            }
           } else if (talkObj['type'] == 2) {
             Map groupObj = groupController.getOneGroup(talkObj['objId']);
             Map contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
