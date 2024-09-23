@@ -195,10 +195,10 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
               Expanded(
                 child: CustomButton(
                   onPressed: () {
-                    talkobjController.setTalkObj(talkObj);
                     Navigator.pushNamed(
                       context,
                       '/talk',
+                      arguments: talkObj,
                     );
                   },
                   text: "发消息",
