@@ -7,6 +7,7 @@ import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/widget/custom_search_field.dart';
 
 class UserModel extends ISuspensionBean {
@@ -240,7 +241,7 @@ class _GroupUserPageState extends State<GroupUserPage> {
                       _userArr[index].icon!,
                     ),
                   ),
-                  title: Text('${_userArr[index].remark != "" ? _userArr[index].remark : _userArr[index].name}'),
+                  title: Text('${_userArr[index].name}'),
                   trailing: _userArr[index].uid == uid
                       ? const Text("自己")
                       : _userArr[index].isContact == 0
@@ -251,6 +252,7 @@ class _GroupUserPageState extends State<GroupUserPage> {
                                 userObj['nickname'] = _userArr[index].name;
                                 userObj['avatar'] = _userArr[index].icon;
                                 userObj['info'] = _userArr[index].info;
+
                                 Navigator.pushNamed(
                                   context,
                                   '/add-contact-friend-do',

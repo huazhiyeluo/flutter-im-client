@@ -5,7 +5,6 @@ import 'package:qim/api/user.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/group.dart';
 import 'package:qim/controller/userinfo.dart';
-import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_search_field.dart';
 
@@ -181,7 +180,7 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
   }
 
   bool _checkUser(int uid) {
-    final existingFriendIndex = _myFriendArr.indexWhere((c) => c['uid'] == uid);
+    final existingFriendIndex = _myFriendArr.indexWhere((c) => c['toId'] == uid);
     return existingFriendIndex == -1;
   }
 
@@ -214,7 +213,6 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
 
   bool _checkGroup(int groupId) {
     final existingGroupIndex = _myGroupArr.indexWhere((c) => c['groupId'] == groupId);
-    logPrint(existingGroupIndex == -1);
     return existingGroupIndex == -1;
   }
 

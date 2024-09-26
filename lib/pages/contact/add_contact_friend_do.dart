@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
 import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/userinfo.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/utils/tips.dart';
 import 'package:qim/widget/custom_button.dart';
 import 'package:qim/widget/custom_text_field.dart';
@@ -57,7 +58,8 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
     if (Get.arguments != null) {
       friendObj = Get.arguments;
     }
-    friendGroupObj = friendGroupController.getOneFriendGroup(0);
+
+    friendGroupObj = friendGroupController.getOneDefaultFriendGroup();
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     _inputReasonController.text = "我是${userInfo['nickname']}";

@@ -322,7 +322,6 @@ class _LoginPageState extends State<LoginPage> {
 
     // Once signed in, return the UserCredential
     final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-    logPrint(userCredential.additionalUserInfo);
     var params = {
       'platform': "google",
       'avatar': userCredential.additionalUserInfo?.profile?["picture"],

@@ -29,7 +29,7 @@ Future<void> saveDbUser(Map data) async {
   ]);
 }
 
-// 1-2、保存用户组
+// 1-2、保存用户组-1
 Future<void> saveDbFriendGroup(Map data) async {
   Map<String, dynamic> friendGroup = {};
 
@@ -37,6 +37,8 @@ Future<void> saveDbFriendGroup(Map data) async {
     'friendGroupId',
     'ownerUid',
     'name',
+    'sort',
+    'isDefault',
   ];
 
   for (var field in fields) {
@@ -77,6 +79,24 @@ Future<void> saveDbContactFriend(Map data) async {
   await DBHelper.upsertData('contact_friend', contactFriend, [
     ["fromId", "=", contactFriend['fromId']],
     ["toId", "=", contactFriend['toId']]
+  ]);
+}
+
+Future<void> updateDbContactFriendByFriendGroupId(int friendGroupId, Map data) async {
+  Map<String, dynamic> contactFriend = {};
+
+  List<String> fields = [
+    'friendGroupId',
+  ];
+
+  for (var field in fields) {
+    if (data[field] != null) {
+      contactFriend[field] = data[field];
+    }
+  }
+
+  await DBHelper.upsertData('contact_friend', contactFriend, [
+    ["friendGroupId", "=", friendGroupId]
   ]);
 }
 

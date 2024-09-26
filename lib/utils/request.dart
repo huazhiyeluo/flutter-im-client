@@ -56,7 +56,7 @@ class RequestHelper {
           options: Options(),
         );
       } else {
-        logPrint(data);
+        logPrint("send:$data");
         // 如果不是文件上传请求
         response = await _dio.request(
           endpoint,
@@ -66,9 +66,10 @@ class RequestHelper {
       }
 
       if (response.data.containsKey('code') && response.data['code'] == 0) {
-        logPrint(response);
+        logPrint("response:$response");
         onSuccess?.call(response.data);
       } else {
+        logPrint("response:$response");
         onError?.call(response.data);
       }
     } on DioException catch (e) {

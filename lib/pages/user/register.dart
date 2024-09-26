@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qim/api/common.dart';
 import 'package:qim/api/register.dart';
@@ -371,7 +372,12 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             const Text("我已阅读并同意"),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.toNamed(
+                  '/term',
+                  arguments: {"title": "QIM软件许可及服务协议", "htmlFilePath": "lib/assets/term/register.html"},
+                );
+              },
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 0), // 设置水平内边距
               ),

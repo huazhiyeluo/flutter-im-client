@@ -66,7 +66,6 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    logPrint(groupObj);
   }
 
   List<Widget> _getTitle() {

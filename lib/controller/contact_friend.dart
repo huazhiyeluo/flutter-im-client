@@ -45,4 +45,30 @@ class ContactFriendController extends GetxController {
     }
     return {};
   }
+
+  void upsetContactFriendByFriendGroupId(int friendGroupId, Map contactFriend) {
+    // 查找是否已经存在相同的数据
+    final matchingIndexes = allContactFriends
+        .asMap()
+        .entries
+        .where((entry) => entry.value['friendGroupId'] == friendGroupId)
+        .map((entry) => entry.key)
+        .toList();
+
+    if (matchingIndexes.isNotEmpty) {
+      for (int index in matchingIndexes) {
+        final existingContactFriend = allContactFriends[index];
+        contactFriend.forEach((key, value) {
+          if (existingContactFriend.containsKey(key)) {
+            existingContactFriend[key] = value;
+          }
+        });
+        allContactFriends[index] = existingContactFriend; // 更新列表中的 Map
+      }
+    } else {
+      // 否则，将数据添加到列表中
+      allContactFriends.add(contactFriend);
+    }
+    update();
+  }
 }

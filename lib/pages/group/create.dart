@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -81,8 +82,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(15, 10, 15, 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: ListView(
         children: [
           const SizedBox(height: 10),
           Container(
@@ -227,18 +227,25 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
             controlAffinity: ListTileControlAffinity.leading, // 勾选框在前面
             contentPadding: EdgeInsets.zero,
             visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0), // 紧凑显示
-            title: const Text.rich(
+            title: Text.rich(
               TextSpan(
                 children: [
-                  TextSpan(text: '已阅读并同意 '),
+                  const TextSpan(text: '已阅读并同意 '),
                   TextSpan(
                     text: '《服务声明》',
-                    style: TextStyle(color: Colors.blue),
+                    style: const TextStyle(color: Colors.blue),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        Get.toNamed(
+                          '/term',
+                          arguments: {"title": "服务声明", "htmlFilePath": "lib/assets/term/group_term.html"},
+                        );
+                      },
                   ),
-                  TextSpan(text: '。根据主管部门要求，未成年人禁止担任粉丝群的群主/管理员，一经核实将按照相关规则进行处理。'),
+                  const TextSpan(text: '。根据主管部门要求，未成年人禁止担任粉丝群的群主/管理员，一经核实将按照相关规则进行处理。'),
                 ],
               ),
-              style: TextStyle(fontSize: 11.5),
+              style: const TextStyle(fontSize: 11.5),
             ),
           ),
           const SizedBox(height: 20),
@@ -435,7 +442,6 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
 
   _createGroupDo(Map params) async {
     GroupApi.createGroup(params, onSuccess: (res) async {
-      logPrint(res);
       Map talkObj = {
         "objId": res['data']['groupId'],
         "type": 2,

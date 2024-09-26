@@ -5,7 +5,6 @@ import 'package:qim/controller/apply.dart';
 import 'package:qim/controller/contact_group.dart';
 import 'package:qim/controller/friend_group.dart';
 import 'package:qim/controller/group.dart';
-import 'package:qim/controller/talkObj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
@@ -247,6 +246,8 @@ class _ContactPageState extends State<ContactPage> {
   int uid = 0;
   Map userInfo = {};
 
+  late Offset _tapPosition;
+
   @override
   void initState() {
     super.initState();
@@ -291,6 +292,7 @@ class _ContactPageState extends State<ContactPage> {
     _tabArr2.clear();
     _tabArr2 = List.from(friendGroupController.allFriendGroups);
     for (var friendGroupObj in _tabArr2) {
+      friendGroupObj['controller'] = ExpansionTileController();
       friendGroupObj['children'] = [];
       for (var contactFriendObj in contactFriendController.allContactFriends) {
         if (contactFriendObj['friendGroupId'] == friendGroupObj['friendGroupId']) {
@@ -320,6 +322,42 @@ class _ContactPageState extends State<ContactPage> {
       _tabArr2 = _tabArr2;
       _tabArr3 = _tabArr3;
     });
+  }
+
+  void _showGroupMenu(BuildContext context) async {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final selected = await showMenu(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      color: Colors.grey,
+      position: RelativeRect.fromRect(
+        _tapPosition & const Size(40, 40),
+        Offset.zero & overlay.size,
+      ),
+      items: [
+        const PopupMenuItem<String>(
+          height: 25,
+          value: 'group_manage',
+          child: Text(
+            '分组管理',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+      elevation: 8.0,
+    );
+    if (selected == 'group_manage') {
+      _selectGroup();
+    }
+  }
+
+  void _selectGroup() async {
+    await Navigator.pushNamed(
+      context,
+      '/friend-group',
+    );
   }
 
   @override
@@ -404,7 +442,25 @@ class _ContactPageState extends State<ContactPage> {
           return Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              title: Text(_tabArr2[index]['name']),
+              controller: _tabArr2[index]['controller'],
+              title: GestureDetector(
+                child: Text(_tabArr2[index]['name']),
+                onTapDown: (TapDownDetails details) {
+                  _tapPosition = details.globalPosition;
+                },
+                onTapUp: (TapUpDetails details) {
+                  setState(() {
+                    if (_tabArr2[index]['controller'].isExpanded) {
+                      _tabArr2[index]['controller'].collapse(); // 收起
+                    } else {
+                      _tabArr2[index]['controller'].expand(); // 展开
+                    }
+                  });
+                },
+                onLongPressStart: (LongPressStartDetails details) {
+                  _showGroupMenu(context);
+                },
+              ),
               controlAffinity: ListTileControlAffinity.leading,
               leading: Icon(
                 isExpandeds[index] ? Icons.arrow_drop_down : Icons.arrow_right,
@@ -416,7 +472,7 @@ class _ContactPageState extends State<ContactPage> {
                   isExpandeds[index] = expanded;
                 });
               },
-              maintainState: isExpandeds[index],
+              initiallyExpanded: isExpandeds[index],
               children: [
                 ListView.builder(
                   shrinkWrap: true,

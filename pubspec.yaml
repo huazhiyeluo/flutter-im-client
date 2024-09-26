@@ -72,6 +72,8 @@ dependencies:
   google_sign_in: ^6.2.1
   qr_flutter: ^4.1.0
   qr_code_scanner: ^1.0.1
+  webview_flutter: ^4.9.0
+  webview_flutter_wkwebview: ^3.15.0
 
   
 
@@ -102,6 +104,7 @@ flutter:
     - lib/assets/images/
     - lib/assets/emojis/
     - lib/assets/voices/
+    - lib/assets/term/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

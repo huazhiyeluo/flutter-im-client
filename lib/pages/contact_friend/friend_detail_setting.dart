@@ -161,6 +161,25 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
             ),
             onTap: _selectGroup,
           ),
+          Container(
+            height: 10,
+            color: Colors.grey[200],
+          ),
+          ListTile(
+            title: const Text('推荐给朋友'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/share',
+                arguments: talkObj,
+              );
+            },
+          ),
+          Container(
+            height: 10,
+            color: Colors.grey[200],
+          ),
           talkObj['objId'] != uid
               ? Row(
                   children: [

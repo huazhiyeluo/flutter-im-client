@@ -28,8 +28,9 @@ class Apis {
 
   //contact_friend
   static const String getContactFriendGroup = '/user/getContactFriendGroup';
-  static const String addContactFriendGroup = '/user/addContactFriendGroup';
+  static const String editContactFriendGroup = '/user/editContactFriendGroup';
   static const String delContactFriendGroup = '/user/delContactFriendGroup';
+  static const String sortContactFriendGroup = '/user/sortContactFriendGroup';
   static const String getContactFriendList = '/user/getContactFriendList';
   static const String getContactFriendOne = '/user/getContactFriendOne';
   static const String addContactFriend = '/user/addContactFriend';

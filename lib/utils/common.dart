@@ -279,7 +279,6 @@ Future<void> loadFriendManage(int uid, Map msg) async {
           'msgMedia': 1,
           'msgType': 1
         };
-        logPrint(msg);
         webSocketController.sendMessage(msg);
         msg['createTime'] = getTime();
         joinData(uid, msg);

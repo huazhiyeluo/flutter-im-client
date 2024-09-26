@@ -25,9 +25,28 @@ class FriendGroupController extends GetxController {
     update();
   }
 
+  //2、删除
+  void delFriendGroup(int friendGroupId) {
+    final existingIndex = allFriendGroups.indexWhere((c) => c['friendGroupId'] == friendGroupId);
+    if (existingIndex != -1) {
+      allFriendGroups.removeAt(existingIndex);
+      update();
+    }
+  }
+
   Map getOneFriendGroup(int friendGroupId) {
     // 查找是否已经存在相同的数据
     final existingFriendGroupIndex = allFriendGroups.indexWhere((c) => c['friendGroupId'] == friendGroupId);
+    if (existingFriendGroupIndex != -1) {
+      return allFriendGroups[existingFriendGroupIndex];
+    }
+    return {};
+  }
+
+  //默认组
+  Map getOneDefaultFriendGroup() {
+    // 查找是否已经存在相同的数据
+    final existingFriendGroupIndex = allFriendGroups.indexWhere((c) => c['isDefault'] == 1);
     if (existingFriendGroupIndex != -1) {
       return allFriendGroups[existingFriendGroupIndex];
     }

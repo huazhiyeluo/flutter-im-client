@@ -4,6 +4,8 @@ import 'package:qim/middleware/home_middleware.dart';
 import 'package:qim/pages/contact/add_contact.dart';
 import 'package:qim/pages/contact/add_contact_friend_do.dart';
 import 'package:qim/pages/contact/add_contact_group_do.dart';
+import 'package:qim/pages/contact_friend/friend_detail_more.dart';
+import 'package:qim/pages/contact_friend/friend_group.dart';
 import 'package:qim/pages/contact_group/group_chat_setting.dart';
 import 'package:qim/pages/contact_group/group_chat_setting_nickname.dart';
 import 'package:qim/pages/contact_group/group_chat_setting_remark.dart';
@@ -35,9 +37,12 @@ import 'package:qim/pages/person/setting.dart';
 import 'package:qim/pages/person/info_nickname.dart';
 import 'package:qim/pages/qrview.dart';
 import 'package:qim/pages/search.dart';
+import 'package:qim/pages/share/share.dart';
+import 'package:qim/pages/share/share_shect.dart';
 import 'package:qim/pages/user/login.dart';
 import 'package:qim/pages/user/login_code.dart';
 import 'package:qim/pages/user/register.dart';
+import 'package:qim/pages/term.dart';
 import 'package:qim/pages/user/repasswd.dart';
 import 'package:qim/utils/cache.dart';
 import 'package:qim/utils/db.dart';
@@ -50,8 +55,11 @@ class AppPage {
     GetPage(name: "/login-code", page: () => const LoginCode()),
     GetPage(name: "/repasswd", page: () => const Repasswd()),
     GetPage(name: "/register", page: () => const Register()),
+    GetPage(name: "/term", page: () => const Term()),
     GetPage(name: "/search", page: () => const Search()),
     GetPage(name: "/qrview", page: () => const QrView()),
+    GetPage(name: "/share", page: () => const Share()),
+    GetPage(name: "/share-select", page: () => const ShareSelect()),
     GetPage(name: "/", page: () => const Home(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/talk", page: () => const Talk(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/notice-user", page: () => const NoticeUser(), middlewares: [HomeMiddleware()]),
@@ -70,6 +78,7 @@ class AppPage {
     GetPage(name: "/add-contact-friend-do", page: () => const AddContactFriendDo(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/add-contact-group-do", page: () => const AddContactGroupDo(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/friend-detail", page: () => const FriendDetail(), middlewares: [HomeMiddleware()]),
+    GetPage(name: "/friend-detail-more", page: () => const FriendDetailMore(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/friend-detail-setting", page: () => const FriendDetailSetting(), middlewares: [HomeMiddleware()]),
     GetPage(
         name: "/friend-detail-setting-remark",
@@ -79,6 +88,7 @@ class AppPage {
         name: "/friend-detail-setting-group",
         page: () => const FriendDetailSettingGroup(),
         middlewares: [HomeMiddleware()]),
+    GetPage(name: "/friend-group", page: () => const FriendGroup(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/friend-chat-setting", page: () => const FriendSettingChat(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/group-chat-setting", page: () => const GroupChatSetting(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/group-user", page: () => const GroupUser(), middlewares: [HomeMiddleware()]),
@@ -118,11 +128,11 @@ Future<void> initialDb(int uid) async {
   String dbName = 'qim-$uid.db';
   // await DBHelper.deleteDatabase(dbName);
   List<String> tableSQLs = [
-    'CREATE TABLE IF NOT EXISTS `apply` (id INTEGER PRIMARY KEY, fromId INTEGER, fromName TEXT, fromIcon TEXT, toId INTEGER, toName TEXT, toIcon TEXT, type INTEGER, status INTEGER, reason TEXT, operateTime INTEGER)',
-    'CREATE TABLE IF NOT EXISTS `friend_group` (friendGroupId INTEGER PRIMARY KEY, name TEXT, ownerUid INTEGER);',
     'CREATE TABLE IF NOT EXISTS `user` (uid INTEGER PRIMARY KEY, nickname TEXT, email TEXT, phone TEXT, avatar TEXT, sex INTEGER, birthday INTEGER, info TEXT, exp INTEGER, createTime INTEGER)',
-    'CREATE TABLE IF NOT EXISTS `contact_friend` (fromId INTEGER,toId INTEGER,friendGroupId INTEGER, level INTEGER, remark TEXT,desc TEXT,isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER, isOnline INTEGER);',
     'CREATE TABLE IF NOT EXISTS `group` (groupId INTEGER PRIMARY KEY, ownerUid INTEGER, name TEXT, icon TEXT, info TEXT, num INTEGER, exp INTEGER, createTime INTEGER)',
+    'CREATE TABLE IF NOT EXISTS `apply` (id INTEGER PRIMARY KEY, fromId INTEGER, fromName TEXT, fromIcon TEXT, toId INTEGER, toName TEXT, toIcon TEXT, type INTEGER, status INTEGER, reason TEXT, operateTime INTEGER)',
+    'CREATE TABLE IF NOT EXISTS `friend_group` (friendGroupId INTEGER PRIMARY KEY, name TEXT, ownerUid INTEGER, isDefault INTEGER, sort INTEGER);',
+    'CREATE TABLE IF NOT EXISTS `contact_friend` (fromId INTEGER,toId INTEGER,friendGroupId INTEGER, level INTEGER, remark TEXT,desc TEXT,isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER, isOnline INTEGER);',
     'CREATE TABLE IF NOT EXISTS `contact_group` (fromId INTEGER,toId INTEGER,groupPower INTEGER, level INTEGER, remark TEXT, nickname TEXT, isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, joinTime INTEGER);',
     'CREATE TABLE IF NOT EXISTS `message` (id INTEGER PRIMARY KEY, fromId INTEGER, toId INTEGER, nickname TEXT,avatar TEXT, msgType INTEGER, msgMedia INTEGER, content TEXT,  createTime INTEGER)',
     'CREATE TABLE IF NOT EXISTS `chat` (id INTEGER PRIMARY KEY,objId INTEGER,type INTEGER, name TEXT, info TEXT,remark TEXT, icon TEXT, isTop INTEGER, isHidden INTEGER, isQuiet INTEGER, tips INTEGER, operateTime INTEGER, msgMedia INTEGER, content TEXT)',

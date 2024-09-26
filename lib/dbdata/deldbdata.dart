@@ -19,6 +19,12 @@ Future<void> delDbUser(int uid) async {
   ]);
 }
 
+Future<void> delDbFriendGroup(int friendGroupId) async {
+  await DBHelper.deleteData('friend_group', [
+    ['friendGroupId', '=', friendGroupId]
+  ]);
+}
+
 Future<void> delDbContactFriend(int fromId, int toId) async {
   await DBHelper.deleteData('contact_friend', [
     ['fromId', '=', fromId],

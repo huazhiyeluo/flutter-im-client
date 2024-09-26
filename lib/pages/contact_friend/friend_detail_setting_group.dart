@@ -52,24 +52,31 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
     Navigator.pop(context, {'friendGroupId': friendGroupId});
   }
 
-  void _addGroup() {
+  void _editGroup({int friendGroupId = 0, String name = ""}) {
+    String title = "添加分组";
+    if (friendGroupId != 0) {
+      title = "编辑分组";
+    }
+    if (name != "") {
+      nameCtr.text = name;
+    }
     showCustomDialog(
-      title: "添加分组",
+      title: title,
       context: context,
       content: TextField(
         controller: nameCtr,
         decoration: const InputDecoration(hintText: "分组名"),
       ),
       onConfirm: () async {
-        var params = {'ownerUid': uid, 'name': nameCtr.text};
-        ContactFriendApi.addContactFriendGroup(params, onSuccess: (res) async {
+        var params = {'friendGroupId': friendGroupId, 'ownerUid': uid, 'name': nameCtr.text};
+        ContactFriendApi.editContactFriendGroup(params, onSuccess: (res) async {
           friendGroupController.upsetFriendGroup(res['data']);
           saveDbFriendGroup(res['data']);
         }, onError: (res) {
           TipHelper.instance.showToast(res['msg']);
         });
       },
-      onConfirmText: "添加",
+      onConfirmText: "确定",
       onCancel: () {
         // 处理取消逻辑
       },
@@ -94,7 +101,7 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
                   size: 30,
                 ),
                 onTap: () {
-                  _addGroup();
+                  _editGroup();
                 },
               ),
               const Divider(),

@@ -35,7 +35,6 @@ class _QrViewState extends State<QrView> {
           Map result = json.decode(scanData.code!);
           // 在这里可以使用 msg 进行后续处理
           if (result.containsKey('type') && result.containsKey('content')) {
-            logPrint(result['content']);
             if (result['type'] == 1) {
               Get.toNamed(
                 '/add-contact-group-do',

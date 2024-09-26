@@ -167,7 +167,13 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
             trailing: const Icon(
               Icons.chevron_right,
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/friend-detail-more',
+                arguments: talkObj,
+              );
+            },
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),

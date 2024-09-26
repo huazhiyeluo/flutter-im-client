@@ -136,6 +136,20 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           contactFriendController.upsetContactFriend(item);
           saveDbContactFriend(item);
         }
+        if (msg['msgMedia'] == 13) {
+          Map data = json.decode(msg['content']['data']);
+          if (data['user'] != null) {
+            userController.upsetUser(data['user']);
+            saveDbUser(data['user']);
+          }
+        }
+        if (msg['msgMedia'] == 14) {
+          Map data = json.decode(msg['content']['data']);
+          if (data['group'] != null) {
+            groupController.upsetGroup(data['group']);
+            saveDbGroup(data['group']);
+          }
+        }
         if ([21, 22, 23, 24].contains(msg['msgMedia'])) {
           loadFriendManage(uid, msg);
         }
@@ -265,9 +279,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       if (res['data'] != null) {
         friendGroupArr = res['data'];
       }
-      Map defaultContactGroup = {"friendGroupId": 0, "ownerUid": uid, "name": "默认分组"};
-      friendGroupArr.insert(0, defaultContactGroup);
-
       for (var item in friendGroupArr) {
         friendGroupController.upsetFriendGroup(item);
         saveDbFriendGroup(item);
