@@ -233,9 +233,6 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             TextButton(
               onPressed: () {
-                // 处理注册账号逻辑
-                // Navigator.pushNamed(context, '/register-one');
-                // Get.toNamed("/login-code");
                 _loginVisitorAction();
               },
               child: const Text(

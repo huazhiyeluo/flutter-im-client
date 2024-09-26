@@ -63,6 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '822705825488',
     projectId: 'messagesend-e0b2d',
     storageBucket: 'messagesend-e0b2d.appspot.com',
+    androidClientId: '822705825488-g08u9ahu55q1nts47iov7rfggi4bsd2q.apps.googleusercontent.com',
+    iosClientId: '822705825488-skjuekp8hmtv3atv2ep07kp386n18cle.apps.googleusercontent.com',
     iosBundleId: 'com.siyuwen.qim',
   );
 
@@ -72,6 +74,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '822705825488',
     projectId: 'messagesend-e0b2d',
     storageBucket: 'messagesend-e0b2d.appspot.com',
+    androidClientId: '822705825488-g08u9ahu55q1nts47iov7rfggi4bsd2q.apps.googleusercontent.com',
     iosBundleId: 'com.example.qim',
   );
 
@@ -84,4 +87,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'messagesend-e0b2d.appspot.com',
     measurementId: 'G-BF1MQM292T',
   );
+
 }
