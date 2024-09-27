@@ -1,16 +1,4 @@
-# qim
+# 类qq微信app
 
-A new Flutter project.
+支持：注册、登录、 好友管理、群聊管理 、 一对一消息、群聊消息、视频通话、文件传输、视频、音频播放，个人信息管理
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
