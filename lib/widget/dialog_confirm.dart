@@ -66,14 +66,22 @@ Future<void> showCustomDialog({
   return showDialog(
     context: context,
     builder: (BuildContext context) {
-      return DialogConfirm(
-        title: title,
-        content: content,
-        onConfirm: onConfirm,
-        onConfirmText: onConfirmText,
-        onCancel: onCancel,
-        onCancelText: onCancelText,
-      );
+      return title != null
+          ? DialogConfirm(
+              title: title,
+              content: content,
+              onConfirm: onConfirm,
+              onConfirmText: onConfirmText,
+              onCancel: onCancel,
+              onCancelText: onCancelText,
+            )
+          : DialogConfirm(
+              content: content,
+              onConfirm: onConfirm,
+              onConfirmText: onConfirmText,
+              onCancel: onCancel,
+              onCancelText: onCancelText,
+            );
     },
   );
 }

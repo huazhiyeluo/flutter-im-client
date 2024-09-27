@@ -411,3 +411,41 @@ Future<XFile> compressImage(XFile pickedFile) async {
   );
   return result ?? pickedFile;
 }
+
+String getContent(int msgMedia, Map content) {
+  if ([1, 10, 11, 13].contains(msgMedia)) {
+    return content['data'];
+  }
+
+  if (msgMedia == 2) {
+    return "[图片]";
+  }
+
+  if (msgMedia == 3) {
+    return "[音频]";
+  }
+
+  if (msgMedia == 4) {
+    return "[视频]";
+  }
+
+  if (msgMedia == 5) {
+    return "[文件]";
+  }
+
+  if (msgMedia == 6) {
+    return "[表情]";
+  }
+
+  if (msgMedia == 12) {
+    return "通话时长: ${formatSecondsToHMS(int.parse(content['data']))}";
+  }
+  if (msgMedia == 21) {
+    return "邀请你加入群聊";
+  }
+  if (msgMedia == 22) {
+    return "个人名片";
+  }
+
+  return "";
+}

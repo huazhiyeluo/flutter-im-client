@@ -90,12 +90,17 @@ class _ChatMessageState extends State<ChatMessage> {
                         maxWidth: MediaQuery.of(context).size.width * 0.65,
                       ),
                       decoration: BoxDecoration(
-                        color: isSentByMe ? const Color.fromARGB(255, 169, 233, 123) : Colors.white,
+                        color: isSentByMe ? const Color.fromARGB(255, 168, 208, 128) : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _getContentAll(isSentByMe, messageList[index]),
+                      child: GestureDetector(
+                        onLongPressStart: (LongPressStartDetails details) {
+                          _loadData(messageList[index], details);
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _getContentAll(isSentByMe, messageList[index]),
+                        ),
                       ),
                     ),
                   ),
@@ -110,6 +115,49 @@ class _ChatMessageState extends State<ChatMessage> {
         ),
       );
     });
+  }
+
+  Future<void> _loadData(Map data, LongPressStartDetails details) async {
+// 获取长按位置
+    final Offset position = details.globalPosition;
+
+    // 弹出菜单
+    final result = await showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        position.dx, // 左边距离
+        position.dy, // 顶部距离
+        position.dx + 1, // 右边距离，通常 +1 即可
+        position.dy + 1, // 底部距离，通常 +1 即可
+      ),
+      items: [
+        const PopupMenuItem<int>(
+          value: 1,
+          child: Text('转发'),
+        ),
+        const PopupMenuItem<int>(
+          value: 2,
+          child: Text('复制'),
+        ),
+        const PopupMenuItem<int>(
+          value: 3,
+          child: Text('引用'),
+        ),
+      ],
+      elevation: 8.0,
+    );
+
+    // 处理菜单选项
+    if (result != null) {
+      if (result == 1) {
+        Map msgObj = {'content': data['content'], 'msgMedia': data['msgMedia']};
+        Navigator.pushNamed(
+          context,
+          '/share',
+          arguments: msgObj,
+        );
+      }
+    }
   }
 
   List<Widget> _getContentAll(bool isSentByMe, Map data) {
@@ -294,6 +342,44 @@ class _ChatMessageState extends State<ChatMessage> {
             ),
             Text('"${data['nickname']}"邀请你加入群里群聊"${temp['group']['name']}",进入可查看详情'),
           ],
+        ),
+      );
+    } else if ([22].contains(data['msgMedia'])) {
+      Map temp = json.decode(data['content']['data']);
+      // 邀请入群消息
+      item = GestureDetector(
+        onTap: () {
+          Map talkObj = {
+            "objId": temp['user']['uid'],
+            "type": 1,
+          };
+          Navigator.pushNamed(context, '/friend-detail', arguments: talkObj);
+        },
+        child: Container(
+          color: const Color.fromARGB(255, 247, 247, 247),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              ListTile(
+                leading: CircleAvatar(
+                  radius: 20,
+                  backgroundImage: CachedNetworkImageProvider(
+                    temp['user']['avatar'],
+                  ),
+                ),
+                title: Text('${temp['user']['nickname']}'),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(18, 5, 0, 5),
+                child: Text(
+                  "个人名片",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(fontSize: 13),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }

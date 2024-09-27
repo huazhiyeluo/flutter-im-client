@@ -2,7 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/controller/chat.dart';
+import 'package:qim/controller/userinfo.dart';
+import 'package:qim/controller/websocket.dart';
+import 'package:qim/utils/common.dart';
+import 'package:qim/utils/date.dart';
+import 'package:qim/utils/functions.dart';
 import 'package:qim/widget/custom_search_field.dart';
+import 'package:qim/widget/dialog_confirm.dart';
 
 class Share extends StatefulWidget {
   const Share({super.key});
@@ -12,10 +18,196 @@ class Share extends StatefulWidget {
 }
 
 class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
+  final WebSocketController webSocketController = Get.find();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController inputController = TextEditingController();
+  final ChatController chatController = Get.find();
+  final TextEditingController nameCtr = TextEditingController();
+  final UserInfoController userInfoController = Get.find();
 
   bool isSingle = true;
+
+  Map msgObj = {};
+  int uid = 0;
+  Map userInfo = {};
+
+  List _cateShareArrs = [];
+  List _cateChatArrs = [];
+  final List<Map> _userSelectArrs = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (Get.arguments != null) {
+      msgObj = Get.arguments;
+      logPrint(msgObj);
+    }
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
+
+    for (var chatObj in chatController.allShowChats) {
+      chatObj['isSelect'] = false;
+      chatObj['isHidden'] = false;
+      _cateShareArrs.add(chatObj);
+    }
+
+    for (var chatObj in chatController.allShowChats) {
+      chatObj['isSelect'] = false;
+      chatObj['isHidden'] = false;
+      _cateChatArrs.add(chatObj);
+    }
+  }
+
+  void _changeTo() {
+    _userSelectArrs.clear();
+    for (var it in _cateChatArrs) {
+      it['isSelect'] = false;
+    }
+    for (var it in _cateShareArrs) {
+      it['isSelect'] = false;
+    }
+    setState(() {
+      isSingle = !isSingle;
+    });
+  }
+
+  Widget _getToSends() {
+    List arr = [];
+    for (var it in _userSelectArrs) {
+      arr.add(it['remark'] != "" ? it['remark'] : it['name']);
+    }
+    String str = arr.join(', ');
+    return Text(str);
+  }
+
+  Widget _getOpt() {
+    Widget temp = const Text("多选");
+    if (!isSingle) {
+      if (_userSelectArrs.isNotEmpty) {
+        temp = TextButton(
+          onPressed: _send,
+          child: Text("发送(${_userSelectArrs.length})人"),
+        );
+      } else {
+        temp = const Text("单选");
+      }
+    }
+    return temp;
+  }
+
+  void _setSelected(int objId, int type) {
+    if (isSingle) {
+      _userSelectArrs.clear();
+    }
+
+    bool flag = false;
+    final existingIndex = _userSelectArrs.indexWhere((c) => c['objId'] == objId && c['type'] == type);
+    if (existingIndex != -1) {
+      flag = true;
+      _userSelectArrs.removeAt(existingIndex);
+    }
+
+    Map temp = {};
+    for (var it in _cateChatArrs) {
+      if (it['objId'] == objId && it['type'] == type) {
+        it['isSelect'] = !flag;
+        temp = it;
+      }
+    }
+    for (var it in _cateShareArrs) {
+      if (it['objId'] == objId && it['type'] == type) {
+        it['isSelect'] = !flag;
+        temp = it;
+      }
+    }
+
+    if (existingIndex == -1) {
+      _userSelectArrs.add(temp);
+    }
+
+    setState(() {
+      _cateChatArrs = _cateChatArrs;
+      _cateShareArrs = _cateShareArrs;
+    });
+
+    if (isSingle) {
+      _send();
+    }
+  }
+
+  Future<void> _selectMore() async {
+    final result = await Navigator.pushNamed(
+      context,
+      '/share-select',
+    );
+    if (result != null && result is Map) {
+      for (var it in result['_userSelectArrs']) {
+        msgObj["fromId"] = uid;
+        msgObj["toId"] = it['toId'];
+        msgObj["msgType"] = it['type'];
+        webSocketController.sendMessage(msgObj);
+        if (![1, 2].contains(msgObj['msgType'])) {
+          return;
+        }
+        msgObj['createTime'] = getTime();
+        joinData(uid, msgObj);
+      }
+    }
+  }
+
+  void _send() {
+    showCustomDialog(
+      context: context,
+      content: Container(
+        constraints: const BoxConstraints(maxHeight: 150),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(_userSelectArrs.length == 1 ? "发送给：" : "分别发送给：", style: const TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(
+              height: 10,
+            ),
+            _getToSends(),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              getContent(msgObj['msgMedia'], msgObj['content']),
+              maxLines: 1,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextField(
+              controller: nameCtr,
+              decoration: const InputDecoration(hintText: "给朋友留言"),
+            )
+          ],
+        ),
+      ),
+      onConfirm: () async {
+        for (var it in _userSelectArrs) {
+          msgObj["fromId"] = uid;
+          msgObj["toId"] = it['objId'];
+          msgObj["msgType"] = it['type'];
+          webSocketController.sendMessage(msgObj);
+          if (![1, 2].contains(msgObj['msgType'])) {
+            return;
+          }
+          msgObj['createTime'] = getTime();
+          joinData(uid, msgObj);
+        }
+        Navigator.pop(context);
+      },
+      onConfirmText: "发送",
+      onCancel: () {
+        // 处理取消逻辑
+      },
+      onCancelText: "取消",
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +217,9 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
         actions: [
           TextButton(
             onPressed: () {
-              setState(() {
-                isSingle = !isSingle;
-              });
+              _changeTo();
             },
-            child: Text(isSingle ? '多选' : '单选'),
+            child: _getOpt(),
           )
         ],
       ),
@@ -75,67 +265,74 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
                       padding: const EdgeInsets.all(10),
                       color: Colors.white,
                       height: 120,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          Container(
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal, // 水平滚动
+                        itemCount: _cateShareArrs.length, // 根据数据的长度生成项目
+                        itemBuilder: (context, index) {
+                          // 获取当前项目的数据
+                          final item = _cateShareArrs[index];
+                          return Container(
                             height: 90,
                             width: 80,
                             alignment: Alignment.center,
                             child: GestureDetector(
-                              onTap: () {},
-                              child: const Column(
+                              onTap: () {
+                                // 可以根据需要在点击时处理不同的项目
+                              },
+                              child: Stack(
                                 children: [
-                                  CircleAvatar(
-                                    radius: 28,
-                                    backgroundImage:
-                                        CachedNetworkImageProvider('http://img.siyuwen.com/godata/avatar/210.jpg'),
-                                  ),
+                                  // 头像和文字区域
                                   SizedBox(
-                                    height: 1,
+                                    height: 85,
+                                    width: 80,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min, // 保证 Column 大小自适应内容
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 28,
+                                          backgroundImage: CachedNetworkImageProvider(item['icon']),
+                                        ),
+                                        const SizedBox(height: 1),
+                                        Text(
+                                          item["remark"].isNotEmpty ? item["remark"] : item["name"], // 使用数组中的名称
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(fontSize: 11),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  Text(
-                                    "秋风我最新",
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 11),
-                                  ),
+                                  // Checkbox 顶部右对齐
+                                  if (!isSingle)
+                                    Positioned(
+                                      left: 17,
+                                      top: -15,
+                                      child: SizedBox(
+                                        child: Transform.scale(
+                                          scale: 1.0,
+                                          child: Checkbox(
+                                            value: item['isSelect'],
+                                            onChanged: (bool? value) {
+                                              _setSelected(item['objId'], item['type']); // 处理选中事件
+                                            },
+                                            side: const BorderSide(
+                                              color: Colors.white,
+                                              width: 2,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(25),
+                                            ),
+                                            materialTapTargetSize: MaterialTapTargetSize.padded,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            height: 90,
-                            width: 80,
-                            alignment: Alignment.center,
-                            child: GestureDetector(
-                              onTap: () {},
-                              child: const Column(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 28,
-                                    backgroundImage:
-                                        CachedNetworkImageProvider('http://img.siyuwen.com/godata/avatar/200.jpg'),
-                                  ),
-                                  SizedBox(
-                                    height: 1,
-                                  ),
-                                  Text(
-                                    "秋风我最",
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 11),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -165,10 +362,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
                         label: const Text("创建新的聊天"),
                         icon: const Icon(Icons.add),
                         onPressed: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/share-select',
-                          );
+                          _selectMore();
                         },
                       ),
                       const SizedBox(
@@ -181,59 +375,52 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
             ),
           ];
         },
-        body: SharePage(
-          scrollController: _scrollController,
-        ),
-      ),
-    );
-  }
-}
-
-class SharePage extends StatefulWidget {
-  final ScrollController scrollController;
-  const SharePage({super.key, required this.scrollController});
-
-  @override
-  State<SharePage> createState() => _SharePageState();
-}
-
-class _SharePageState extends State<SharePage> {
-  final ChatController chatController = Get.find();
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      return ListView.builder(
-          itemCount: chatController.allShowChats.length,
+        body: ListView.builder(
+          itemCount: _cateChatArrs.length,
           itemBuilder: (BuildContext context, int index) {
-            var temp = chatController.allShowChats[index];
+            var item = _cateChatArrs[index];
             return Column(
               children: [
                 Container(
-                  padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                  child: Row(
-                    children: [
-                      Transform.scale(
-                        scale: 1.3,
-                        child: Checkbox(
-                          value: false,
-                          onChanged: (bool? value) {},
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
+                  padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                  child: InkWell(
+                    onTap: () {
+                      _setSelected(item['objId'], item['type']);
+                    },
+                    child: Row(
+                      children: [
+                        !isSingle
+                            ? SizedBox(
+                                height: 40,
+                                child: Transform.scale(
+                                  scale: 1.2,
+                                  child: Checkbox(
+                                    value: item['isSelect'],
+                                    onChanged: (bool? value) {},
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                width: 10,
+                              ),
+                        SizedBox(
+                          height: 40,
+                          child: CircleAvatar(
+                            radius: 20,
+                            backgroundImage: CachedNetworkImageProvider(
+                              item['icon'],
+                            ),
                           ),
                         ),
-                      ),
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: CachedNetworkImageProvider(
-                          temp['icon'],
+                        const SizedBox(
+                          width: 10,
                         ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Text(temp["remark"] != '' ? temp["remark"] : temp["name"]),
-                    ],
+                        Text(item["remark"] != '' ? item["remark"] : item["name"]),
+                      ],
+                    ),
                   ),
                 ),
                 Container(
@@ -242,8 +429,10 @@ class _SharePageState extends State<SharePage> {
                 )
               ],
             );
-          });
-    });
+          },
+        ),
+      ),
+    );
   }
 }
 

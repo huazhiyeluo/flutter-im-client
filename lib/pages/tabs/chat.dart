@@ -6,10 +6,10 @@ import 'package:qim/api/contact_friend.dart';
 import 'package:qim/api/contact_group.dart';
 import 'package:qim/controller/chat.dart';
 import 'package:qim/controller/contact_group.dart';
-import 'package:qim/controller/talkobj.dart';
 import 'package:qim/controller/contact_friend.dart';
 import 'package:qim/controller/userinfo.dart';
 import 'package:qim/dbdata/deldbdata.dart';
+import 'package:qim/utils/common.dart';
 import 'package:qim/utils/date.dart';
 import 'package:qim/dbdata/savedbdata.dart';
 import 'package:qim/utils/tips.dart';
@@ -177,7 +177,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     title: Text(temp["remark"] != '' ? temp["remark"] : temp["name"]),
                     subtitle: Text(
-                      _getContent(temp["msgMedia"], temp["content"]),
+                      getContent(temp["msgMedia"], temp["content"]),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -266,40 +266,5 @@ class _ChatPageState extends State<ChatPage> {
         TipHelper.instance.showToast(res['msg']);
       });
     }
-  }
-
-  String _getContent(int msgMedia, Map content) {
-    if ([1, 10, 11, 13].contains(msgMedia)) {
-      return content['data'];
-    }
-
-    if (msgMedia == 2) {
-      return "[图片]";
-    }
-
-    if (msgMedia == 3) {
-      return "[音频]";
-    }
-
-    if (msgMedia == 4) {
-      return "[视频]";
-    }
-
-    if (msgMedia == 5) {
-      return "[文件]";
-    }
-
-    if (msgMedia == 6) {
-      return "[表情]";
-    }
-
-    if (msgMedia == 12) {
-      return "通话时长: ${formatSecondsToHMS(int.parse(content['data']))}";
-    }
-    if (msgMedia == 21) {
-      return "邀请你加入群聊";
-    }
-
-    return "";
   }
 }

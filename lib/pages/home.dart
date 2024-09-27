@@ -73,18 +73,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     uid = userInfo['uid'];
     userInfoController.setUserInfo(userInfo);
 
-    webSocketController = Get.put(WebSocketController(uid, Apis.socketUrl));
-
-    signalingController =
-        Get.put(SignalingController(fromId: uid, context: context, webSocketController: webSocketController));
-
-    _initOnReceive();
-
-    _getFriendGroupList();
-    _getContactFriendList();
-    _getContactGroupList();
-    _getChatList();
-    _getApplyList();
+    _initializeData();
   }
 
   @override
@@ -108,6 +97,21 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         webSocketController.onInit();
       }
     }
+  }
+
+  Future<void> _initializeData() async {
+    // 确保所有获取数据的方法按顺序执行
+    await _getFriendGroupList();
+    await _getContactFriendList();
+    await _getContactGroupList();
+    await _getChatList();
+    await _getApplyList();
+
+    // 初始化 WebSocketController 和 SignalingController
+    webSocketController = Get.put(WebSocketController(uid, Apis.socketUrl));
+    _initOnReceive(); // 假设 _initOnReceive 不需要等待
+    signalingController =
+        Get.put(SignalingController(fromId: uid, context: context, webSocketController: webSocketController));
   }
 
   Future<void> _initOnReceive() async {
@@ -271,7 +275,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     );
   }
 
-  void _getFriendGroupList() async {
+  Future<void> _getFriendGroupList() async {
     var params = {"ownerUid": uid};
     ContactFriendApi.getContactFriendGroup(params, onSuccess: (res) {
       if (!mounted) return;
@@ -288,7 +292,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     });
   }
 
-  void _getContactFriendList() async {
+  Future<void> _getContactFriendList() async {
     var params = {
       'fromId': uid,
     };
@@ -315,7 +319,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     });
   }
 
-  void _getContactGroupList() async {
+  Future<void> _getContactGroupList() async {
     var params = {
       'fromId': uid,
     };
@@ -343,7 +347,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     });
   }
 
-  void _getChatList() async {
+  Future<void> _getChatList() async {
     if (chatController.allChats.isEmpty) {
       List chats = await DBHelper.getData('chat', []);
 
@@ -355,7 +359,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     }
   }
 
-  void _getApplyList() async {
+  Future<void> _getApplyList() async {
     if (applyController.allApplys.isEmpty) {
       List applys = await DBHelper.getData('apply', []);
 

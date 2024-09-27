@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/api/contact_friend.dart';
@@ -49,6 +51,7 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
   Map userInfo = {};
 
   Map talkObj = {};
+  Map userObj = {};
   Map contactFriendObj = {};
   Map friendGroupObj = {};
 
@@ -115,15 +118,20 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (talkObj.isEmpty) {
-        return const Center(child: Text(""));
+        return const Center(child: Text("1"));
       }
+      userObj = userController.getOneUser(talkObj['objId']);
+      if (userObj.isEmpty) {
+        return const Center(child: Text("2"));
+      }
+
       contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
       if (contactFriendObj.isEmpty) {
-        return const Center(child: Text(""));
+        return const Center(child: Text("3"));
       }
       friendGroupObj = friendGroupController.getOneFriendGroup(contactFriendObj['friendGroupId']);
       if (friendGroupObj.isEmpty) {
-        return const Center(child: Text(""));
+        return const Center(child: Text("4"));
       }
       return ListView(
         children: [
@@ -169,10 +177,16 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
             title: const Text('推荐给朋友'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
+              Map msgObj = {
+                'content': {
+                  "data": json.encode({"user": userObj})
+                },
+                'msgMedia': 22
+              };
               Navigator.pushNamed(
                 context,
                 '/share',
-                arguments: talkObj,
+                arguments: msgObj,
               );
             },
           ),

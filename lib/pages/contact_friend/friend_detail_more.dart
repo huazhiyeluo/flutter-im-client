@@ -7,6 +7,7 @@ import 'package:qim/controller/user.dart';
 import 'package:qim/controller/userinfo.dart';
 import 'package:qim/utils/common.dart';
 import 'package:qim/controller/signaling.dart';
+import 'package:qim/utils/date.dart';
 import 'package:qim/utils/functions.dart';
 
 class FriendDetailMore extends StatefulWidget {
@@ -76,12 +77,18 @@ class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
         children: [
           ListTile(
             title: const Text("个性签名"),
-            trailing: Text(userObj['info']),
+            trailing: Text(
+              userObj['info'],
+              style: const TextStyle(fontSize: 14),
+            ),
             onTap: () {},
           ),
           ListTile(
             title: const Text("加入好友时间"),
-            trailing: Text("${contactFriendObj['joinTime']}"),
+            trailing: Text(
+              formatDate(contactFriendObj['joinTime']),
+              style: const TextStyle(fontSize: 14),
+            ),
             onTap: () {},
           ),
         ],

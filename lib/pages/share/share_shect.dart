@@ -297,7 +297,9 @@ class _ShareSelectState extends State<ShareSelect> {
     return lists;
   }
 
-  _doneAction() async {}
+  _doneAction() async {
+    Navigator.pop(context, {'_userSelectArrs': _userSelectArrs});
+  }
 
   @override
   Widget build(BuildContext context) {
