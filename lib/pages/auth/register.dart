@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:qim/common/widget/custom_text_field_more.dart';
 import 'package:qim/data/api/common.dart';
 import 'package:qim/data/api/register.dart';
 import 'package:qim/common/utils/common.dart';
@@ -46,10 +47,20 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController nicknameController = TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController repasswordController = TextEditingController();
+  final TextEditingController _nicknameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _repasswordController = TextEditingController();
+
+  final FocusNode _focusNode1 = FocusNode();
+  final FocusNode _focusNode2 = FocusNode();
+  final FocusNode _focusNode3 = FocusNode();
+  final FocusNode _focusNode4 = FocusNode();
+
+  bool _isFocusNode1 = false;
+  bool _isFocusNode2 = false;
+  bool _isFocusNode3 = false;
+  bool _isFocusNode4 = false;
 
   bool _obscureText = true;
   bool _isDelayed = false;
@@ -68,6 +79,55 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void initState() {
     super.initState();
+
+    // 监听焦点变化事件
+    _focusNode1.addListener(() {
+      if (_focusNode1.hasFocus) {
+        setState(() {
+          _isFocusNode1 = true;
+        });
+      } else {
+        setState(() {
+          _isFocusNode1 = false;
+        });
+      }
+    });
+
+    _focusNode2.addListener(() {
+      if (_focusNode2.hasFocus) {
+        setState(() {
+          _isFocusNode2 = true;
+        });
+      } else {
+        setState(() {
+          _isFocusNode2 = false;
+        });
+      }
+    });
+
+    _focusNode3.addListener(() {
+      if (_focusNode3.hasFocus) {
+        setState(() {
+          _isFocusNode3 = true;
+        });
+      } else {
+        setState(() {
+          _isFocusNode3 = false;
+        });
+      }
+    });
+
+    _focusNode4.addListener(() {
+      if (_focusNode4.hasFocus) {
+        setState(() {
+          _isFocusNode4 = true;
+        });
+      } else {
+        setState(() {
+          _isFocusNode4 = false;
+        });
+      }
+    });
   }
 
   void _togglePasswordVisibility() {
@@ -115,6 +175,10 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void dispose() {
     super.dispose();
+    _nicknameController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _repasswordController.dispose();
   }
 
   @override
@@ -181,36 +245,27 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Expanded(
-              child: TextField(
-                controller: nicknameController,
+              child: CustomTextFieldMore(
+                focusNode: _focusNode1,
+                isFocused: _isFocusNode1,
+                controller: _nicknameController,
+                hintText: '请输入昵称',
                 keyboardType: TextInputType.text,
+                suffixIcon: _isShowNicknameClear
+                    ? IconButton(
+                        icon: Icon(
+                          Icons.clear,
+                          color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                        ),
+                        onPressed: _clearNickname,
+                      )
+                    : const SizedBox.shrink(),
+                focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                unfocusedColor: Colors.grey,
+                showUnderline: false,
                 onChanged: (val) {
                   _checkNickname(val);
                 },
-                decoration: InputDecoration(
-                  suffixIcon: _isShowNicknameClear
-                      ? IconButton(
-                          icon: const Icon(
-                            Icons.clear,
-                            color: Color.fromARGB(199, 171, 175, 169),
-                          ),
-                          onPressed: _clearNickname,
-                        )
-                      : const SizedBox.shrink(),
-                  hintText: '请输入昵称',
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                ),
               ),
             ),
           ],
@@ -228,39 +283,27 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Expanded(
-              child: TextField(
-                controller: usernameController,
+              child: CustomTextFieldMore(
+                focusNode: _focusNode2,
+                isFocused: _isFocusNode2,
+                controller: _usernameController,
+                hintText: '请输入用户名',
                 keyboardType: TextInputType.text,
+                suffixIcon: _isShowUsernameClear
+                    ? IconButton(
+                        icon: Icon(
+                          Icons.clear,
+                          color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                        ),
+                        onPressed: _clearUsername,
+                      )
+                    : const SizedBox.shrink(),
+                focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                unfocusedColor: Colors.grey,
+                showUnderline: false,
                 onChanged: (val) {
                   _checkUsername(val);
                 },
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')), // 只允许字母和数字
-                ],
-                decoration: InputDecoration(
-                  suffixIcon: _isShowUsernameClear
-                      ? IconButton(
-                          icon: const Icon(
-                            Icons.clear,
-                            color: Color.fromARGB(199, 171, 175, 169),
-                          ),
-                          onPressed: _clearUsername,
-                        )
-                      : const SizedBox.shrink(),
-                  hintText: '请输入用户名',
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                ),
               ),
             ),
           ],
@@ -278,32 +321,23 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Expanded(
-              child: TextField(
-                controller: passwordController, // 用户名控制器
+              child: CustomTextFieldMore(
+                focusNode: _focusNode3,
+                isFocused: _isFocusNode3,
+                controller: _passwordController,
                 obscureText: _obscureText,
+                hintText: '请输入密码',
                 keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  hintText: '请输入密码',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureText ? Icons.visibility_off : Icons.visibility,
-                      color: const Color.fromARGB(199, 171, 175, 169),
-                    ),
-                    onPressed: _togglePasswordVisibility,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                    color: _isFocusNode3 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
                   ),
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
+                  onPressed: _togglePasswordVisibility,
                 ),
+                focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                unfocusedColor: Colors.grey,
+                showUnderline: false,
               ),
             ),
           ],
@@ -321,32 +355,23 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Expanded(
-              child: TextField(
-                controller: repasswordController, // 用户名控制器
+              child: CustomTextFieldMore(
+                focusNode: _focusNode4,
+                isFocused: _isFocusNode4,
+                controller: _repasswordController,
                 obscureText: _obscureTextRe,
+                hintText: '请输入确认密码',
                 keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  hintText: '请输入确认密码',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureTextRe ? Icons.visibility_off : Icons.visibility,
-                      color: const Color.fromARGB(199, 171, 175, 169),
-                    ),
-                    onPressed: _toggleRepasswordVisibility,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureTextRe ? Icons.visibility_off : Icons.visibility,
+                    color: _isFocusNode4 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
                   ),
-                  border: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide.none,
-                    borderRadius: BorderRadius.circular(0),
-                  ),
+                  onPressed: _toggleRepasswordVisibility,
                 ),
+                focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                unfocusedColor: Colors.grey,
+                showUnderline: false,
               ),
             ),
           ],
@@ -417,7 +442,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   _clearNickname() {
-    nicknameController.text = "";
+    _nicknameController.text = "";
     setState(() {
       _isShowNicknameClear = false;
     });
@@ -436,7 +461,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   _clearUsername() {
-    usernameController.text = "";
+    _usernameController.text = "";
     setState(() {
       _isShowUsernameClear = false;
     });
@@ -470,10 +495,10 @@ class _RegisterPageState extends State<RegisterPage> {
     CommonApi.upload({'file': file}, onSuccess: (res) async {
       var params = {
         'avatar': res['data'],
-        'nickname': nicknameController.text,
-        'username': usernameController.text,
-        'password': passwordController.text,
-        'repassword': repasswordController.text
+        'nickname': _nicknameController.text,
+        'username': _usernameController.text,
+        'password': _passwordController.text,
+        'repassword': _repasswordController.text
       };
       RegisterApi.register(params, onSuccess: (res) async {
         Navigator.of(context).pop(false);

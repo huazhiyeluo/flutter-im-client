@@ -2,13 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/widget/custom_text_field_more.dart';
 import 'package:qim/data/api/login.dart';
 import 'package:qim/data/api/user.dart';
 import 'package:qim/data/cache/keys.dart';
 import 'package:qim/routes/route.dart';
 import 'package:qim/common/utils/cache.dart';
 import 'package:qim/common/utils/device_info.dart';
-import 'package:qim/common/utils/functions.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/common/widget/custom_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -39,8 +39,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   final FocusNode _focusNode1 = FocusNode();
   final FocusNode _focusNode2 = FocusNode();
@@ -107,6 +107,8 @@ class _LoginPageState extends State<LoginPage> {
     // 确保在不再需要时清理 FocusNode
     _focusNode1.dispose();
     _focusNode2.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -125,7 +127,10 @@ class _LoginPageState extends State<LoginPage> {
               },
               child: const Text(
                 "注册",
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Color.fromARGB(255, 60, 183, 21),
+                ),
               ),
             ),
           ],
@@ -135,86 +140,46 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 25),
         SizedBox(
           height: 50, // 设置TextField的高度
-          child: TextField(
+          child: CustomTextFieldMore(
             focusNode: _focusNode1,
-            controller: usernameController, // 用户名控制器
-            keyboardType: TextInputType.name,
+            isFocused: _isFocusNode1,
+            controller: _usernameController,
+            hintText: '请输入用户名',
+            keyboardType: TextInputType.text,
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')), // 只允许字母和数字
             ],
-            decoration: InputDecoration(
-              hintText: '请输入用户名',
-              prefixIcon: Icon(
-                Icons.person,
-                color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-              ),
-              border: UnderlineInputBorder(
-                borderSide: const BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: const BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
+            prefixIcon: Icon(
+              Icons.person,
+              color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
             ),
+            focusedColor: const Color.fromARGB(255, 60, 183, 21),
+            unfocusedColor: Colors.grey,
           ),
         ),
         const SizedBox(height: 20),
         SizedBox(
           height: 50, // 设置TextField的高度
-          child: TextField(
+          child: CustomTextFieldMore(
             focusNode: _focusNode2,
-            controller: passwordController, // 用户名控制器
+            isFocused: _isFocusNode2,
+            controller: _passwordController,
             obscureText: _obscureText,
-            keyboardType: TextInputType.name,
-            decoration: InputDecoration(
-              hintText: '请输入密码',
-              prefixIcon: Icon(
-                Icons.lock,
+            hintText: '请输入密码',
+            keyboardType: TextInputType.text,
+            prefixIcon: Icon(
+              Icons.lock,
+              color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+            ),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureText ? Icons.visibility_off : Icons.visibility,
                 color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
               ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: const Color.fromARGB(199, 171, 175, 169),
-                ),
-                onPressed: _togglePasswordVisibility,
-              ),
-              border: UnderlineInputBorder(
-                borderSide: const BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: const BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
+              onPressed: _togglePasswordVisibility,
             ),
+            focusedColor: const Color.fromARGB(255, 60, 183, 21),
+            unfocusedColor: Colors.grey,
           ),
         ),
         const SizedBox(height: 20),
@@ -240,21 +205,23 @@ class _LoginPageState extends State<LoginPage> {
                 style: TextStyle(fontSize: 16, color: Colors.black),
               ),
             ),
-            TextButton(
-              onPressed: () {
-                Get.toNamed("/repasswd");
-              },
-              child: const Text(
-                '忘记密码?',
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
-            ),
+            const Text("|"),
             TextButton(
               onPressed: () {
                 _signInWithGoogle();
               },
               child: const Text(
                 '谷歌登录',
+                style: TextStyle(fontSize: 16, color: Colors.black),
+              ),
+            ),
+            Expanded(child: Container()),
+            TextButton(
+              onPressed: () {
+                Get.toNamed("/repasswd");
+              },
+              child: const Text(
+                '忘记密码?',
                 style: TextStyle(fontSize: 16, color: Colors.black),
               ),
             ),
@@ -270,8 +237,8 @@ class _LoginPageState extends State<LoginPage> {
       'platform': "account",
       "devname": deviceInfo.deviceName,
       "deviceid": deviceInfo.deviceId,
-      'username': usernameController.text,
-      'password': passwordController.text
+      'username': _usernameController.text,
+      'password': _passwordController.text
     };
     LoginApi.login(params, onSuccess: (res) async {
       _setFcm(res['data']['user']['uid']);

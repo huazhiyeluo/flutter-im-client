@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:qim/common/widget/custom_text_field_more.dart';
 import 'package:qim/data/api/login.dart';
-import 'package:qim/data/cache/keys.dart';
-import 'package:qim/routes/route.dart';
-import 'package:qim/common/utils/cache.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/common/widget/custom_button.dart';
 
@@ -37,8 +34,8 @@ class RepasswdPage extends StatefulWidget {
 }
 
 class _RepasswdPageState extends State<RepasswdPage> {
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   final FocusNode _focusNode1 = FocusNode();
   final FocusNode _focusNode2 = FocusNode();
@@ -105,6 +102,8 @@ class _RepasswdPageState extends State<RepasswdPage> {
     // 确保在不再需要时清理 FocusNode
     _focusNode1.dispose();
     _focusNode2.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -116,86 +115,46 @@ class _RepasswdPageState extends State<RepasswdPage> {
         const SizedBox(height: 30),
         SizedBox(
           height: 50, // 设置TextField的高度
-          child: TextField(
+          child: CustomTextFieldMore(
             focusNode: _focusNode1,
-            controller: usernameController, // 用户名控制器
+            isFocused: _isFocusNode1,
+            controller: _usernameController,
+            hintText: '请输入用户名',
             keyboardType: TextInputType.text,
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')), // 只允许字母和数字
             ],
-            decoration: InputDecoration(
-              hintText: '请输入用户名',
-              prefixIcon: Icon(
-                Icons.person,
-                color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-              ),
-              border: UnderlineInputBorder(
-                borderSide: const BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: const BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
+            prefixIcon: Icon(
+              Icons.person,
+              color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
             ),
+            focusedColor: const Color.fromARGB(255, 60, 183, 21),
+            unfocusedColor: Colors.grey,
           ),
         ),
         const SizedBox(height: 20),
         SizedBox(
           height: 50, // 设置TextField的高度
-          child: TextField(
+          child: CustomTextFieldMore(
             focusNode: _focusNode2,
-            controller: passwordController, // 用户名控制器
+            isFocused: _isFocusNode2,
+            controller: _passwordController,
             obscureText: _obscureText,
+            hintText: '请输入密码',
             keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              hintText: '请输入密码',
-              prefixIcon: Icon(
-                Icons.lock,
+            prefixIcon: Icon(
+              Icons.lock,
+              color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+            ),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureText ? Icons.visibility_off : Icons.visibility,
                 color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
               ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: const Color.fromARGB(199, 171, 175, 169),
-                ),
-                onPressed: _togglePasswordVisibility,
-              ),
-              border: UnderlineInputBorder(
-                borderSide: const BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: const BorderSide(
-                  color: Colors.grey,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(0),
-              ),
+              onPressed: _togglePasswordVisibility,
             ),
+            focusedColor: const Color.fromARGB(255, 60, 183, 21),
+            unfocusedColor: Colors.grey,
           ),
         ),
         const SizedBox(height: 20),
@@ -214,12 +173,8 @@ class _RepasswdPageState extends State<RepasswdPage> {
   }
 
   _repasswdAction() async {
-    var params = {'username': usernameController.text, 'password': passwordController.text};
-    LoginApi.login(params, onSuccess: (res) async {
-      CacheHelper.saveData(Keys.userInfo, res['data']);
-      String initialRouteData = await initialRoute();
-      Get.offAndToNamed(initialRouteData);
-    }, onError: (res) {
+    var params = {'username': _usernameController.text, 'password': _passwordController.text};
+    LoginApi.repassword(params, onSuccess: (res) async {}, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
   }

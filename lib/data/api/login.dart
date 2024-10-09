@@ -10,4 +10,13 @@ class LoginApi {
       onError: onError,
     );
   }
+
+  static void repassword(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.login,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
 }
