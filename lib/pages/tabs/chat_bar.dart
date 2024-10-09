@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/controller/userinfo.dart';
+import 'package:qim/data/controller/userinfo.dart';
 
 final List<Map<String, dynamic>> items = [
   {"val": 1, "label": "创建群聊", "icon": Icons.wechat},

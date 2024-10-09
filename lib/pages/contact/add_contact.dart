@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/group.dart';
-import 'package:qim/api/user.dart';
-import 'package:qim/controller/contact_friend.dart';
-import 'package:qim/controller/group.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/utils/tips.dart';
-import 'package:qim/widget/custom_search_field.dart';
+import 'package:qim/data/api/group.dart';
+import 'package:qim/data/api/user.dart';
+import 'package:qim/data/controller/contact_friend.dart';
+import 'package:qim/data/controller/group.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/common/utils/tips.dart';
+import 'package:qim/common/widget/custom_search_field.dart';
 
 class AddContact extends StatefulWidget {
   const AddContact({super.key});

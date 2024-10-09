@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/controller/userinfo.dart';
+import 'package:qim/data/controller/userinfo.dart';
 
 class Person extends StatefulWidget {
   const Person({super.key});
@@ -19,6 +19,8 @@ class _PersonState extends State<Person> {
   @override
   void initState() {
     super.initState();
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
   }
 
   @override
@@ -49,13 +51,31 @@ class _PersonState extends State<Person> {
               fit: BoxFit.cover,
             ),
           ),
-          trailing: const Icon(
-            Icons.chevron_right,
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.qr_code),
+                onPressed: () {
+                  Map talkObj = {
+                    "objId": uid,
+                    "type": 1,
+                  };
+                  Navigator.pushNamed(context, '/user-info', arguments: talkObj);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/user-detail');
+                },
+              ),
+            ],
           ),
           onTap: () {
             Navigator.pushNamed(
               context,
-              '/person-info',
+              '/user-detail',
             );
           },
         ),
@@ -96,7 +116,7 @@ class _PersonState extends State<Person> {
           onTap: () {
             Navigator.pushNamed(
               context,
-              '/person-setting',
+              '/setting',
             );
           },
         ),

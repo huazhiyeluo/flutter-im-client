@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/contact_group.dart';
-import 'package:qim/controller/contact_group.dart';
-import 'package:qim/controller/user.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/utils/date.dart';
-import 'package:qim/utils/functions.dart';
-import 'package:qim/utils/tips.dart';
-import 'package:qim/widget/custom_search_field.dart';
+import 'package:qim/data/api/contact_group.dart';
+import 'package:qim/data/controller/contact_group.dart';
+import 'package:qim/data/controller/user.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/common/utils/date.dart';
+import 'package:qim/common/utils/functions.dart';
+import 'package:qim/common/utils/tips.dart';
+import 'package:qim/common/widget/custom_search_field.dart';
 
 class GroupUserDelete extends StatefulWidget {
   const GroupUserDelete({super.key});
@@ -123,7 +123,6 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
 
   void selectGroup(String key) {
     if (_userArrs[key] == null) {
-      logPrint("The group with key $key does not exist.");
       return;
     }
     bool tempStatus = !_status[key]!;
@@ -148,7 +147,6 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
       return;
     }
     if (_userArrs[key] == null) {
-      logPrint("The group with key $key does not exist.");
       return;
     }
     bool tempStatus = false;

@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/controller/chat.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/controller/websocket.dart';
-import 'package:qim/utils/common.dart';
-import 'package:qim/utils/date.dart';
-import 'package:qim/utils/functions.dart';
-import 'package:qim/widget/custom_search_field.dart';
-import 'package:qim/widget/dialog_confirm.dart';
+import 'package:qim/data/controller/chat.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/data/controller/websocket.dart';
+import 'package:qim/common/utils/common.dart';
+import 'package:qim/common/utils/date.dart';
+import 'package:qim/common/utils/functions.dart';
+import 'package:qim/common/widget/custom_search_field.dart';
+import 'package:qim/common/widget/dialog_confirm.dart';
 
 class Share extends StatefulWidget {
   const Share({super.key});
@@ -41,7 +41,6 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
 
     if (Get.arguments != null) {
       msgObj = Get.arguments;
-      logPrint(msgObj);
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
@@ -143,14 +142,15 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
     );
     if (result != null && result is Map) {
       for (var it in result['_userSelectArrs']) {
+        msgObj["id"] = genGUID();
         msgObj["fromId"] = uid;
         msgObj["toId"] = it['toId'];
         msgObj["msgType"] = it['type'];
+        msgObj['createTime'] = getTime();
         webSocketController.sendMessage(msgObj);
         if (![1, 2].contains(msgObj['msgType'])) {
           return;
         }
-        msgObj['createTime'] = getTime();
         joinData(uid, msgObj);
       }
     }
@@ -189,15 +189,31 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
       ),
       onConfirm: () async {
         for (var it in _userSelectArrs) {
+          msgObj["id"] = genGUID();
           msgObj["fromId"] = uid;
           msgObj["toId"] = it['objId'];
           msgObj["msgType"] = it['type'];
+          msgObj['createTime'] = getTime();
           webSocketController.sendMessage(msgObj);
           if (![1, 2].contains(msgObj['msgType'])) {
             return;
           }
-          msgObj['createTime'] = getTime();
           joinData(uid, msgObj);
+
+          Map msg = {
+            'id': genGUID(),
+            'fromId': uid,
+            'toId': it['objId'],
+            'content': {"data": nameCtr.text, "url": "", "name": ""},
+            'msgMedia': 1,
+            'msgType': it['type'],
+            'createTime': getTime()
+          };
+          webSocketController.sendMessage(msg);
+          if (![1, 2].contains(msg['msgType'])) {
+            return;
+          }
+          joinData(uid, msg);
         }
         Navigator.pop(context);
       },

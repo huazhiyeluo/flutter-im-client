@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/contact_friend.dart';
-import 'package:qim/controller/friend_group.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/utils/functions.dart';
-import 'package:qim/utils/tips.dart';
-import 'package:qim/widget/custom_button.dart';
-import 'package:qim/widget/custom_text_field.dart';
+import 'package:qim/data/api/contact_friend.dart';
+import 'package:qim/data/controller/friend_group.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/common/utils/tips.dart';
+import 'package:qim/common/widget/custom_button.dart';
+import 'package:qim/common/widget/custom_text_field.dart';
 
 class AddContactFriendDo extends StatefulWidget {
   const AddContactFriendDo({super.key});

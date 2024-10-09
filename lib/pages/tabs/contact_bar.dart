@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/controller/userinfo.dart';
+import 'package:qim/data/controller/userinfo.dart';
 
 AppBar contactBar() {
   final UserInfoController userInfoController = Get.find();

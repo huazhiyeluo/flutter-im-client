@@ -3,17 +3,19 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/controller/contact_group.dart';
-import 'package:qim/controller/message.dart';
-import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/utils/common.dart';
-import 'package:qim/utils/date.dart';
-import 'package:qim/utils/db.dart';
+import 'package:qim/data/controller/contact_group.dart';
+import 'package:qim/data/controller/message.dart';
+import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/data/db/del.dart';
+import 'package:qim/common/utils/common.dart';
+import 'package:qim/common/utils/date.dart';
+import 'package:qim/common/utils/db.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:qim/widget/play_audio.dart';
-import 'package:qim/widget/play_video.dart';
+import 'package:qim/common/utils/functions.dart';
+import 'package:qim/common/widget/play_audio.dart';
+import 'package:qim/common/widget/play_video.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ChatMessage extends StatefulWidget {
@@ -118,7 +120,6 @@ class _ChatMessageState extends State<ChatMessage> {
   }
 
   Future<void> _loadData(Map data, LongPressStartDetails details) async {
-// 获取长按位置
     final Offset position = details.globalPosition;
 
     // 弹出菜单
@@ -143,6 +144,10 @@ class _ChatMessageState extends State<ChatMessage> {
           value: 3,
           child: Text('引用'),
         ),
+        const PopupMenuItem<int>(
+          value: 4,
+          child: Text('删除'),
+        ),
       ],
       elevation: 8.0,
     );
@@ -151,11 +156,16 @@ class _ChatMessageState extends State<ChatMessage> {
     if (result != null) {
       if (result == 1) {
         Map msgObj = {'content': data['content'], 'msgMedia': data['msgMedia']};
-        Navigator.pushNamed(
-          context,
+        Get.toNamed(
           '/share',
           arguments: msgObj,
         );
+      }
+      if (result == 2) {}
+      if (result == 3) {}
+      if (result == 4) {
+        delDbMessageById(data['id']);
+        messageController.delMessageById(data);
       }
     }
   }

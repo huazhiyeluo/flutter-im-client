@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/common.dart';
-import 'package:qim/controller/chat.dart';
-import 'package:qim/controller/contact_friend.dart';
-import 'package:qim/controller/contact_group.dart';
-import 'package:qim/controller/group.dart';
-import 'package:qim/controller/message.dart';
-import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/user.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/controller/websocket.dart';
+import 'package:qim/data/api/common.dart';
+import 'package:qim/data/controller/chat.dart';
+import 'package:qim/data/controller/contact_friend.dart';
+import 'package:qim/data/controller/contact_group.dart';
+import 'package:qim/data/controller/group.dart';
+import 'package:qim/data/controller/message.dart';
+import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/user.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/data/controller/websocket.dart';
 import 'package:qim/pages/chat/talk/emoji_list.dart';
 import 'package:qim/pages/chat/talk/plus_list.dart';
-import 'package:qim/utils/common.dart';
-import 'package:qim/utils/date.dart';
-import 'package:qim/utils/functions.dart';
-import 'package:qim/utils/permission.dart';
-import 'package:qim/controller/signaling.dart';
-import 'package:qim/utils/tips.dart';
+import 'package:qim/common/utils/common.dart';
+import 'package:qim/common/utils/date.dart';
+import 'package:qim/common/utils/functions.dart';
+import 'package:qim/common/utils/permission.dart';
+import 'package:qim/data/controller/signaling.dart';
+import 'package:qim/common/utils/tips.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart' as dio;
@@ -265,7 +265,7 @@ class _TalkPageState extends State<TalkPage> {
                           onChanged: (v) => setState(() {}),
                           controller: _inputController,
                           focusNode: _focusNode,
-                          maxLines: 99,
+                          maxLines: 10,
                           cursorColor: const Color(0xff07c160),
                           style: const TextStyle(
                             textBaseline: TextBaseline.alphabetic,
@@ -275,7 +275,7 @@ class _TalkPageState extends State<TalkPage> {
                         ),
                       ),
                       _showEmoji(),
-                      _inputController.text == "" ? _showPlus() : _showSend(),
+                      _inputController.text.trim() == "" ? _showPlus() : _showSend(),
                     ],
                   );
                 },
@@ -369,8 +369,8 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   void _sendText() async {
-    if (_inputController.text == "") {
-      TipHelper.instance.showToast("bu'd");
+    if (_inputController.text.trim() == "") {
+      TipHelper.instance.showToast("消息不得为空");
       return;
     }
     // 发送按钮的操作
@@ -410,11 +410,12 @@ class _TalkPageState extends State<TalkPage> {
   }
 
   void _send(Map msg) async {
+    msg["id"] = genGUID();
+    msg['createTime'] = getTime();
     webSocketController.sendMessage(msg);
     if (![1, 2].contains(msg['msgType'])) {
       return;
     }
-    msg['createTime'] = getTime();
     joinData(uid, msg);
   }
 

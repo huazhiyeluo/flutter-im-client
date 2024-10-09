@@ -1,16 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/contact_group.dart';
-import 'package:qim/controller/chat.dart';
-import 'package:qim/controller/contact_group.dart';
-import 'package:qim/controller/group.dart';
-import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/user.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/dbdata/savedbdata.dart';
-import 'package:qim/utils/tips.dart';
-import 'package:qim/widget/custom_button.dart';
+import 'package:qim/data/api/contact_group.dart';
+import 'package:qim/data/controller/chat.dart';
+import 'package:qim/data/controller/contact_group.dart';
+import 'package:qim/data/controller/group.dart';
+import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/user.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/data/db/save.dart';
+import 'package:qim/common/utils/tips.dart';
+import 'package:qim/common/widget/custom_button.dart';
 
 class GroupChatSettingRemark extends StatefulWidget {
   const GroupChatSettingRemark({super.key});

@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/utils/functions.dart';
+import 'package:qim/common/utils/functions.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QrView extends StatefulWidget {

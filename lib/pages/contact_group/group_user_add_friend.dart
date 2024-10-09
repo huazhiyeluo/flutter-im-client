@@ -3,11 +3,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lpinyin/lpinyin.dart';
-import 'package:qim/controller/contact_friend.dart';
-import 'package:qim/controller/contact_group.dart';
-import 'package:qim/controller/user.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/widget/custom_search_field.dart';
+import 'package:qim/data/controller/contact_friend.dart';
+import 'package:qim/data/controller/contact_group.dart';
+import 'package:qim/data/controller/user.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/common/widget/custom_search_field.dart';
 
 class UserModel extends ISuspensionBean {
   int? uid;

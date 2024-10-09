@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/controller/group.dart';
-import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/user.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/utils/date.dart';
-import 'package:qim/widget/custom_button.dart';
+import 'package:qim/data/controller/group.dart';
+import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/user.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/common/utils/date.dart';
+import 'package:qim/common/widget/custom_button.dart';
 
 class GroupDetail extends StatefulWidget {
   const GroupDetail({super.key});

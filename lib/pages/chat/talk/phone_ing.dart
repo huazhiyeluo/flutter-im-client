@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
-import 'package:qim/utils/date.dart';
-import 'package:qim/widget/custom_button.dart';
+import 'package:qim/common/utils/date.dart';
+import 'package:qim/common/widget/custom_button.dart';
 
 class PhoneIng extends StatefulWidget {
   final webrtc.RTCVideoRenderer remoteRenderer;

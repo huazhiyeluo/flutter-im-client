@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qim/widget/custom_button.dart';
+import 'package:qim/common/widget/custom_button.dart';
 
 class PhoneTo extends StatefulWidget {
   final Map talkCommonObj;

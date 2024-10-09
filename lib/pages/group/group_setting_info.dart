@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/group.dart';
-import 'package:qim/controller/group.dart';
-import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/user.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/dbdata/savedbdata.dart';
-import 'package:qim/utils/tips.dart';
+import 'package:qim/data/api/group.dart';
+import 'package:qim/data/controller/group.dart';
+import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/user.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/data/db/save.dart';
+import 'package:qim/common/utils/tips.dart';
 
 class GroupSettingInfo extends StatefulWidget {
   const GroupSettingInfo({super.key});

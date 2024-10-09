@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/api/apply.dart';
-import 'package:qim/controller/apply.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/dbdata/deldbdata.dart';
-import 'package:qim/utils/tips.dart';
-import 'package:qim/widget/custom_button.dart';
+import 'package:qim/data/api/apply.dart';
+import 'package:qim/data/controller/apply.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/data/db/del.dart';
+import 'package:qim/common/utils/tips.dart';
+import 'package:qim/common/widget/custom_button.dart';
 
 class NoticeFriendDetail extends StatefulWidget {
   const NoticeFriendDetail({super.key});

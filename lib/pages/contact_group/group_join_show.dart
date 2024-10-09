@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/controller/userinfo.dart';
+import 'package:qim/data/controller/userinfo.dart';
 
 class GroupJoinShow extends StatefulWidget {
   const GroupJoinShow({super.key});

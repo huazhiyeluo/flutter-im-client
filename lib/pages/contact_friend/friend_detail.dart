@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/contact_friend.dart';
-import 'package:qim/controller/user.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/utils/common.dart';
-import 'package:qim/controller/signaling.dart';
+import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/contact_friend.dart';
+import 'package:qim/data/controller/user.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/common/utils/common.dart';
+import 'package:qim/data/controller/signaling.dart';
 
 class FriendDetail extends StatefulWidget {
   const FriendDetail({super.key});

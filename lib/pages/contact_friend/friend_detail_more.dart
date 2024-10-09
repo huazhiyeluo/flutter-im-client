@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/controller/talkobj.dart';
-import 'package:qim/controller/contact_friend.dart';
-import 'package:qim/controller/user.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/utils/common.dart';
-import 'package:qim/controller/signaling.dart';
-import 'package:qim/utils/date.dart';
-import 'package:qim/utils/functions.dart';
+import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/contact_friend.dart';
+import 'package:qim/data/controller/user.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/common/utils/common.dart';
+import 'package:qim/data/controller/signaling.dart';
+import 'package:qim/common/utils/date.dart';
+import 'package:qim/common/utils/functions.dart';
 
 class FriendDetailMore extends StatefulWidget {
   const FriendDetailMore({super.key});
@@ -71,7 +71,6 @@ class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
       if (userObj.isEmpty) {
         return const Center(child: Text(""));
       }
-      logPrint(userObj);
       contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
       return ListView(
         children: [
@@ -83,14 +82,16 @@ class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
             ),
             onTap: () {},
           ),
-          ListTile(
-            title: const Text("加入好友时间"),
-            trailing: Text(
-              formatDate(contactFriendObj['joinTime']),
-              style: const TextStyle(fontSize: 14),
-            ),
-            onTap: () {},
-          ),
+          contactFriendObj.isNotEmpty
+              ? ListTile(
+                  title: const Text("加好友时间"),
+                  trailing: Text(
+                    formatDate(contactFriendObj['joinTime']),
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  onTap: () {},
+                )
+              : Container(),
         ],
       );
     });

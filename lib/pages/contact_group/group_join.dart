@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/controller/userinfo.dart';
-import 'package:qim/widget/custom_button.dart';
+import 'package:qim/data/controller/userinfo.dart';
+import 'package:qim/common/widget/custom_button.dart';
 
 class GroupJoin extends StatefulWidget {
   const GroupJoin({super.key});
