@@ -90,16 +90,16 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (userInfoController.userInfo.isNotEmpty) {
       if (state == AppLifecycleState.paused) {
-        print("didChangeAppLifecycleState-paused");
+        logPrint("didChangeAppLifecycleState-paused");
         webSocketController.onClose();
       } else if (state == AppLifecycleState.resumed) {
-        print("didChangeAppLifecycleState-resumed");
+        logPrint("didChangeAppLifecycleState-resumed");
         webSocketController.onInit();
       }
     }
   }
 
-  Future<void> _initializeData() async {
+  void _initializeData() async {
     // 确保所有获取数据的方法按顺序执行
     await _getFriendGroupList();
     await _getContactFriendList();
@@ -109,7 +109,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
     // 初始化 WebSocketController 和 SignalingController
     webSocketController = Get.put(WebSocketController(uid, Apis.socketUrl));
-    _initOnReceive(); // 假设 _initOnReceive 不需要等待
+    _initOnReceive();
+
+    if (!mounted) return;
     signalingController =
         Get.put(SignalingController(fromId: uid, context: context, webSocketController: webSocketController));
   }

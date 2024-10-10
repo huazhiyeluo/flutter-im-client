@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
+import 'package:qim/data/api/getdata.dart';
+import 'package:qim/data/api/user.dart';
+import 'package:qim/data/db/get.dart';
 
 class UserController extends GetxController {
   final RxList<Map> allUsers = <Map>[].obs;
@@ -35,12 +40,14 @@ class UserController extends GetxController {
   }
 
   //3、获得单条记录
+
   Map getOneUser(int uid) {
+    Map userObj = {};
     // 查找是否已经存在相同的数据
     final existingUserIndex = allUsers.indexWhere((c) => c['uid'] == uid);
     if (existingUserIndex != -1) {
       return allUsers[existingUserIndex];
     }
-    return {};
+    return userObj;
   }
 }

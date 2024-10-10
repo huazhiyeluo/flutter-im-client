@@ -35,19 +35,6 @@ class _GroupJoinState extends State<GroupJoin> {
     super.dispose();
   }
 
-  _doneAction() async {
-    // List<int> fromIds = [];
-    // for (var map in _userSelectArrs) {
-    //   fromIds.add(map['fromId']);
-    // }
-    // var params = {'toId': talkObj['objId'], 'fromIds': fromIds};
-    // ContactGroupApi.delContactGroup(params, onSuccess: (res) async {
-    //   Navigator.pop(context);
-    // }, onError: (res) {
-    //   TipHelper.instance.showToast(res['msg']);
-    // });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

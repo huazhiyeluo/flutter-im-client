@@ -5,7 +5,6 @@ import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
-import 'package:qim/common/utils/common.dart';
 import 'package:qim/data/controller/signaling.dart';
 
 class FriendDetail extends StatefulWidget {
@@ -83,7 +82,6 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
 
   Map talkObj = {};
   Map userObj = {};
-  Map talkCommonObj = {};
   Map contactFriendObj = {};
 
   @override
@@ -94,7 +92,6 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
-    talkCommonObj = getTalkCommonObj(talkObj);
   }
 
   List<Widget> _getTitle() {
@@ -121,6 +118,11 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
 
   //邀请
   void _invite() async {
+    Map talkCommonObj = {};
+    talkCommonObj['objId'] = talkObj['objId'];
+    talkCommonObj['icon'] = userObj['avatar'];
+    talkCommonObj['name'] = userObj['nickname'];
+    talkCommonObj['num'] = 1;
     signalingController.invite(talkCommonObj);
   }
 

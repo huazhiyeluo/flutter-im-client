@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:qim/data/api/apis.dart';
@@ -34,8 +32,8 @@ class RequestHelper {
     bool isUpload = false, // 新增的参数，用于标识是否是文件上传请求
   }) async {
     try {
-      var connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
+      final List<ConnectivityResult> result = await Connectivity().checkConnectivity();
+      if (result.isEmpty) {
         onError?.call({"code": 600, "msg": "网络错误"});
         return;
       }
@@ -56,7 +54,8 @@ class RequestHelper {
           options: Options(),
         );
       } else {
-        logPrint("send:$data");
+        logPrint("send-data:$data");
+        logPrint("send-headers:$mergedHeaders");
         // 如果不是文件上传请求
         response = await _dio.request(
           endpoint,

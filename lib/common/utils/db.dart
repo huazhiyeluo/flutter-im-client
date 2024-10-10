@@ -30,7 +30,7 @@ class DBHelper {
   }
 
   // 查询
-  static Future<List<Map<String, dynamic>>> getData(String tbl, List<List<dynamic>> where) async {
+  static Future<List<Map>> getData(String tbl, List<List<dynamic>> where) async {
     final db = _database;
 
     // 构建 WHERE 子句
@@ -52,7 +52,7 @@ class DBHelper {
   }
 
   // 查询
-  static Future<Map<String, dynamic>?> getOne(String tbl, List<List<dynamic>> where) async {
+  static Future<Map> getOne(String tbl, List<List<dynamic>> where) async {
     final db = _database;
 
     // 构建 WHERE 子句
@@ -70,7 +70,7 @@ class DBHelper {
     List<Map<String, Object?>> result =
         whereArgs.isNotEmpty ? await db.query(tbl, where: whereClause, whereArgs: whereArgs) : await db.query(tbl);
     // 返回结果是否为空
-    return result.isNotEmpty ? result.first : null;
+    return result.isNotEmpty ? result.first : {};
   }
 
   // 新增

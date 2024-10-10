@@ -232,43 +232,30 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _loginAction() async {
-    DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
     var params = {
       'platform': "account",
-      "devname": deviceInfo.deviceName,
-      "deviceid": deviceInfo.deviceId,
       'username': _usernameController.text,
-      'password': _passwordController.text
+      'password': _passwordController.text,
     };
     LoginApi.login(params, onSuccess: (res) async {
-      _setFcm(res['data']['user']['uid']);
-      CacheHelper.saveData(Keys.userInfo, res['data']['user']);
-      String initialRouteData = await initialRoute();
-      Get.offAndToNamed(initialRouteData);
+      _loginAfter(res['data']);
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
   }
 
   _loginVisitorAction() async {
-    DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
     var params = {
       'platform': "visitor",
-      "devname": deviceInfo.deviceName,
-      "deviceid": deviceInfo.deviceId,
     };
     LoginApi.login(params, onSuccess: (res) async {
-      _setFcm(res['data']['user']['uid']);
-      CacheHelper.saveData(Keys.userInfo, res['data']['user']);
-      String initialRouteData = await initialRoute();
-      Get.offAndToNamed(initialRouteData);
+      _loginAfter(res['data']);
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
   }
 
   _signInWithGoogle() async {
-    // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     if (googleUser == null) {
@@ -276,15 +263,12 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Obtain the auth details from the request
     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-    // Create a new credential
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
 
-    // Once signed in, return the UserCredential
     final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
     var params = {
       'platform': "google",
@@ -294,10 +278,7 @@ class _LoginPageState extends State<LoginPage> {
       'siteuid': userCredential.additionalUserInfo?.profile?["sub"],
     };
     LoginApi.login(params, onSuccess: (res) async {
-      _setFcm(res['data']['user']['uid']);
-      CacheHelper.saveData(Keys.userInfo, res['data']['user']);
-      String initialRouteData = await initialRoute();
-      Get.offAndToNamed(initialRouteData);
+      _loginAfter(res['data']);
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
@@ -314,5 +295,13 @@ class _LoginPageState extends State<LoginPage> {
     UserApi.actDeviceToken(params, onSuccess: (res) async {}, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
     });
+  }
+
+  Future<void> _loginAfter(Map data) async {
+    _setFcm(data['user']['uid']);
+    CacheHelper.saveData(Keys.userInfo, data['user']);
+    CacheHelper.saveData(Keys.token, data['token']);
+    String initialRouteData = await initialRoute();
+    Get.offAndToNamed(initialRouteData);
   }
 }

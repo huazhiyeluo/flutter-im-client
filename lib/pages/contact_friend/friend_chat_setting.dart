@@ -12,6 +12,7 @@ import 'package:qim/common/utils/db.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/common/widget/custom_button.dart';
 import 'package:qim/common/widget/dialog_confirm.dart';
+import 'package:qim/data/api/getdata.dart';
 
 class FriendSettingChat extends StatefulWidget {
   const FriendSettingChat({super.key});
@@ -56,13 +57,12 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
 
   @override
   void initState() {
+    super.initState();
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-
-    super.initState();
   }
 
   @override
@@ -70,11 +70,11 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
     return Obx(
       () {
         if (talkObj.isEmpty) {
-          return const Center(child: Text("11111"));
+          return const Center(child: Text(""));
         }
         userObj = userController.getOneUser(talkObj['objId']);
         if (userObj.isEmpty) {
-          return Center(child: Text("${talkObj['objId']}"));
+          return const Center(child: Text(""));
         }
         contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
         String textObj = "";

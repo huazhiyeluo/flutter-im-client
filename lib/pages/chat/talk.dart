@@ -80,17 +80,10 @@ class _TalkState extends State<Talk> {
         title: Obx(() {
           if (talkObj['type'] == 1) {
             Map userObj = userController.getOneUser(talkObj['objId']);
-            if (userObj.isEmpty) {
-              Map chat = chatController.getOneChat(talkObj['objId'], talkObj['type']);
-              iconObj = chat['icon'];
-              nickname = chat['name'];
-            } else {
-              iconObj = userObj['avatar'];
-              nickname = userObj['nickname'];
-            }
+            iconObj = userObj['avatar'];
+            nickname = userObj['nickname'];
 
             Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
-
             if (contactFriendObj.isNotEmpty) {
               textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : nickname;
             } else {
@@ -186,23 +179,12 @@ class _TalkPageState extends State<TalkPage> {
     uid = userInfo['uid'];
     talkCommonObj = getTalkCommonObj(talkObj);
 
-    final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
-    if (talkObj['type'] == 2) {
-      if (contactGroups.length != talkCommonObj['num']) {
-        _initData();
-      }
-    }
-
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
         isShowEmoji = 0;
         isShowPlus = 0;
       }
     });
-  }
-
-  void _initData() async {
-    await getGroupInfo(talkObj['objId']);
   }
 
   final ImagePicker _picker = ImagePicker();

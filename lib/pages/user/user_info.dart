@@ -87,7 +87,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
       userObj = userController.getOneUser(talkObj['objId']);
       Map result = {};
       result['type'] = 1;
-      result['content'] = userObj;
+      result['content'] = {"uid": talkObj['objId']};
 
       return Column(
         children: [

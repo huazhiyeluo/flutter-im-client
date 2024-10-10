@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:qim/data/api/getdata.dart';
+import 'package:qim/data/db/get.dart';
 
 class GroupController extends GetxController {
   final RxList<Map> allGroups = <Map>[].obs;
@@ -37,11 +39,12 @@ class GroupController extends GetxController {
 
   //3、获得单条记录
   Map getOneGroup(int groupId) {
+    Map groupObj = {};
     // 查找是否已经存在相同的数据
     final existingIndex = allGroups.indexWhere((c) => c['groupId'] == groupId);
     if (existingIndex != -1) {
       return allGroups[existingIndex];
     }
-    return {};
+    return groupObj;
   }
 }

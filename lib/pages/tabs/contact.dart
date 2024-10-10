@@ -272,7 +272,7 @@ class _ContactPageState extends State<ContactPage> {
     for (var contactFriendObj in contactFriendController.allContactFriends) {
       ChatModel chat = ChatModel();
 
-      Map? userObj = userController.getOneUser(contactFriendObj['toId'])!;
+      Map userObj = userController.getOneUser(contactFriendObj['toId']);
 
       chat.toId = contactFriendObj['toId'];
       chat.name = userObj['nickname'];
@@ -299,7 +299,7 @@ class _ContactPageState extends State<ContactPage> {
           if (friendGroupObj['children'] == null) {
             friendGroupObj['children'] = [];
           }
-          Map userObj = userController.getOneUser(contactFriendObj['toId'])!;
+          Map userObj = userController.getOneUser(contactFriendObj['toId']);
           contactFriendObj['name'] = userObj['nickname'];
           contactFriendObj['icon'] = userObj['avatar'];
           contactFriendObj['info'] = userObj['info'];

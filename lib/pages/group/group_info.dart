@@ -89,7 +89,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
       groupObj = groupController.getOneGroup(talkObj['objId']);
       Map result = {};
       result['type'] = 2;
-      result['content'] = groupObj;
+      result['content'] = {"groupId": talkObj['objId']};
 
       return Column(
         children: [

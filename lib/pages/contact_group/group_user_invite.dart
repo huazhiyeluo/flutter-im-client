@@ -88,7 +88,7 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
           if (friendGroupObj['children'] == null) {
             friendGroupObj['children'] = [];
           }
-          Map userObj = userController.getOneUser(contactFriendObj['toId'])!;
+          Map userObj = userController.getOneUser(contactFriendObj['toId']);
           contactFriendObj['name'] = userObj['nickname'];
           contactFriendObj['icon'] = userObj['avatar'];
           contactFriendObj['info'] = userObj['info'];

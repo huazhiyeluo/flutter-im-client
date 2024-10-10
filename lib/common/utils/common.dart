@@ -70,16 +70,7 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
   Map lastChat = chatController.getOneChat(objId, msg['msgType']);
   if (lastChat.isEmpty) {
     if ([1].contains(msg['msgType'])) {
-      Map userObj = userController.getOneUser(objId);
-      if (userObj.isEmpty) {
-        for (var group in groupController.allGroups) {
-          List contactGroups = contactGroupController.allContactGroups[group['groupId']] ?? RxList<Map>.from([]);
-          if (contactGroups.length != group['num']) {
-            await getGroupInfo(group['groupId']);
-          }
-        }
-        userObj = userController.getOneUser(msg['fromId']);
-      }
+      Map userObj = userController.getOneUser(objId) as Map;
       Map contactFriendObj = contactFriendController.getOneContactFriend(uid, objId);
 
       chatData['name'] = userObj['nickname'];
@@ -145,19 +136,9 @@ Future<void> joinMessage(int uid, Map temp) async {
     msg['nickname'] = userInfo['nickname'];
   } else {
     if (msg['msgType'] == 1) {
-      final UserController userController = Get.find();
       final ContactFriendController contactFriendController = Get.find();
-      Map userObj = userController.getOneUser(msg['fromId']);
-      if (userObj.isEmpty) {
-        for (var group in groupController.allGroups) {
-          List contactGroups = contactGroupController.allContactGroups[group['groupId']] ?? RxList<Map>.from([]);
-          if (contactGroups.length != group['num']) {
-            await getGroupInfo(group['groupId']);
-          }
-        }
-        userObj = userController.getOneUser(msg['fromId']);
-      }
-
+      final UserController userController = Get.find();
+      Map userObj = userController.getOneUser(msg['fromId']) as Map;
       Map contactFriendObj = contactFriendController.getOneContactFriend(uid, msg['fromId']);
       msg['avatar'] = userObj['avatar'];
 
@@ -168,15 +149,11 @@ Future<void> joinMessage(int uid, Map temp) async {
       }
     }
     if (msg['msgType'] == 2) {
-      final UserController userController = Get.find();
       final ContactGroupController contactGroupController = Get.find();
-      Map userObj = userController.getOneUser(msg['fromId']);
-      if (userObj.isEmpty) {
-        await getGroupInfo(msg['toId']);
-        userObj = userController.getOneUser(msg['fromId']);
-      }
-      Map contactGroupObj = contactGroupController.getOneContactGroup(msg['fromId'], msg['toId']);
+      final UserController userController = Get.find();
+      Map userObj = userController.getOneUser(msg['fromId']) as Map;
 
+      Map contactGroupObj = contactGroupController.getOneContactGroup(msg['fromId'], msg['toId']);
       msg['avatar'] = userObj['avatar'];
       msg['nickname'] = contactGroupObj.isNotEmpty && contactGroupObj['nickname'] != ""
           ? contactGroupObj['nickname']
@@ -233,13 +210,13 @@ Map getTalkCommonObj(Map talkObj) {
   talkCommonObj['objId'] = talkObj['objId'];
   if (talkObj['type'] == 1) {
     final UserController userController = Get.find();
-    Map userObj = userController.getOneUser(talkObj['objId'])!;
+    Map userObj = userController.getOneUser(talkObj['objId']);
     talkCommonObj['icon'] = userObj['avatar'];
     talkCommonObj['name'] = userObj['nickname'];
     talkCommonObj['num'] = 1;
   } else if (talkObj['type'] == 2) {
     final GroupController groupController = Get.find();
-    Map? groupObj = groupController.getOneGroup(talkObj['objId'])!;
+    Map groupObj = groupController.getOneGroup(talkObj['objId']);
     talkCommonObj['icon'] = groupObj['icon'];
     talkCommonObj['name'] = groupObj['name'];
     talkCommonObj['num'] = groupObj['num'];

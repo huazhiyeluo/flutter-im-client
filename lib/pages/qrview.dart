@@ -3,7 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qim/common/utils/functions.dart';
+import 'package:qim/data/controller/group.dart';
+import 'package:qim/data/controller/user.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QrView extends StatefulWidget {
@@ -29,22 +30,26 @@ class _QrViewState extends State<QrView> {
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
-    controller.scannedDataStream.listen((scanData) {
+    controller.scannedDataStream.listen((scanData) async {
       if (scanData.code != null) {
         try {
           Map result = json.decode(scanData.code!);
           // 在这里可以使用 msg 进行后续处理
           if (result.containsKey('type') && result.containsKey('content')) {
             if (result['type'] == 1) {
+              final UserController userController = Get.find();
+              Map userObj = userController.getOneUser(result['content']['uid']) as Map;
               Get.toNamed(
-                '/add-contact-group-do',
-                arguments: result['content'],
+                '/add-contact-user-do',
+                arguments: userObj,
               );
             }
             if (result['type'] == 2) {
+              final GroupController groupController = Get.find();
+              Map groupObj = groupController.getOneGroup(result['content']['groupId']);
               Get.toNamed(
                 '/add-contact-group-do',
-                arguments: result['content'],
+                arguments: groupObj,
               );
             }
           } else {

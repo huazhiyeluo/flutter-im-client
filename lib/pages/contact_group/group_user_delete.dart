@@ -6,7 +6,6 @@ import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/common/utils/date.dart';
-import 'package:qim/common/utils/functions.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/common/widget/custom_search_field.dart';
 
@@ -65,7 +64,7 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
     int oneYear = getTime() - 360 * 24 * 3600;
     final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
     for (var item in contactGroups) {
-      Map userObj = userController.getOneUser(item['fromId'])!;
+      Map userObj = userController.getOneUser(item['fromId']);
       if (userObj['nickname'].contains(inputController.text) ||
           item['remark'].contains(inputController.text) ||
           item['fromId'].toString().contains(inputController.text)) {

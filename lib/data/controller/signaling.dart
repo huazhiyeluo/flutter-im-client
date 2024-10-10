@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/websocket.dart';
-import 'package:qim/data/db/get.dart';
 import 'package:qim/pages/chat/talk/phone_from.dart';
 import 'package:qim/pages/chat/talk/phone_ing.dart';
 import 'package:qim/pages/chat/talk/phone_to.dart';
@@ -122,14 +122,15 @@ class SignalingController extends GetxController {
   void handinvite(Map msg) async {
     await logPrint("handinvite: 1 ,$msg");
     if (msg['msgMedia'] == 1) {
-      Map<String, dynamic>? objUser = await getDbOneUser(msg['fromId']);
-      if (objUser == null) {
+      final UserController userController = Get.find();
+      Map userObj = userController.getOneUser(msg['fromId']) as Map;
+      if (userObj.isEmpty) {
         return;
       }
       talkCommonObj = {
         "objId": msg['fromId'],
-        "name": objUser['nickname'],
-        "icon": objUser['avatar'],
+        "name": userObj['nickname'],
+        "icon": userObj['avatar'],
       };
       toId = talkCommonObj["objId"];
       await initRenderers();
