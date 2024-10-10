@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/data.dart';
+import 'package:qim/common/utils/functions.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/contact_group.dart';
@@ -335,13 +337,14 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
       Map data = {};
       data['group'] = groupObj;
       Map msg = {
+        'id': genGUID(),
         'fromId': uid,
         'toId': map['toId'],
         'content': {"data": json.encode(data), "url": "", "name": ""},
         'msgMedia': 21,
-        'msgType': 1
+        'msgType': 1,
+        'createTime': getTime()
       };
-      msg['createTime'] = getTime();
       joinData(uid, msg);
     }
     var params = {'fromId': uid, 'toIds': toIds, 'groupId': talkObj['objId']};

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/data.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/message.dart';
@@ -63,6 +64,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
+    initOneUser(talkObj['objId']);
   }
 
   @override
@@ -78,7 +80,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
         }
         contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
         String textObj = "";
-        if (contactFriendObj.isNotEmpty) {
+        if (contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0) {
           textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : userObj['nickname'];
         } else {
           textObj = "${userObj['nickname']}(临时聊天)";
@@ -176,7 +178,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: const Divider(),
             ),
-            talkObj['objId'] != uid && contactFriendObj.isNotEmpty
+            talkObj['objId'] != uid && contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0
                 ? Row(
                     children: [
                       const SizedBox(width: 20),

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/data.dart';
 import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/user.dart';
@@ -54,11 +55,12 @@ class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
   @override
   void initState() {
     super.initState();
-    userInfo = userInfoController.userInfo;
-    uid = userInfo['uid'];
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
+    initOneUser(talkObj['objId']);
   }
 
   @override

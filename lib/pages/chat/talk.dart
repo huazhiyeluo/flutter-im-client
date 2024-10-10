@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/data.dart';
 import 'package:qim/data/api/common.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/contact_friend.dart';
@@ -59,6 +60,11 @@ class _TalkState extends State<Talk> {
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
+    if (talkObj['type'] == 1) {
+      initOneUser(talkObj['objId']);
+    } else if (talkObj['type'] == 2) {
+      initOneGroup(talkObj['objId']);
+    }
   }
 
   @override
@@ -84,7 +90,7 @@ class _TalkState extends State<Talk> {
             nickname = userObj['nickname'];
 
             Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
-            if (contactFriendObj.isNotEmpty) {
+            if (contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0) {
               textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : nickname;
             } else {
               if (talkObj['objId'] == uid) {

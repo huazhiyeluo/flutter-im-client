@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/data.dart';
 import 'package:qim/data/controller/group.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -37,14 +38,16 @@ class _QrViewState extends State<QrView> {
           // 在这里可以使用 msg 进行后续处理
           if (result.containsKey('type') && result.containsKey('content')) {
             if (result['type'] == 1) {
+              initOneUser(result['content']['uid']);
               final UserController userController = Get.find();
-              Map userObj = userController.getOneUser(result['content']['uid']) as Map;
+              Map userObj = userController.getOneUser(result['content']['uid']);
               Get.toNamed(
-                '/add-contact-user-do',
+                '/add-contact-friend-do',
                 arguments: userObj,
               );
             }
             if (result['type'] == 2) {
+              initOneGroup(result['content']['groupId']);
               final GroupController groupController = Get.find();
               Map groupObj = groupController.getOneGroup(result['content']['groupId']);
               Get.toNamed(

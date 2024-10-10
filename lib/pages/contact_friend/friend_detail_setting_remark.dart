@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/chat.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/contact_friend.dart';
-import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/save.dart';
 import 'package:qim/common/utils/tips.dart';
@@ -17,11 +15,8 @@ class FriendDetailSettingRemark extends StatefulWidget {
 }
 
 class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final ChatController chatController = Get.find();
-
-  final UserController userController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
 
   final TextEditingController remarkCtr = TextEditingController();

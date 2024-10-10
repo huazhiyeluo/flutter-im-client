@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/data.dart';
 import 'package:qim/data/controller/group.dart';
 import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
@@ -102,6 +103,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
+    initOneGroup(talkObj['objId']);
   }
 
   List<Widget> _getTitle() {
@@ -123,6 +125,9 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         return const Center(child: Text(""));
       }
       groupObj = groupController.getOneGroup(talkObj['objId']);
+      if (groupObj.isEmpty) {
+        return const Center(child: Text(""));
+      }
       return Column(
         children: [
           ListTile(

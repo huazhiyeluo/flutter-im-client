@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/data.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/contact_group.dart';
@@ -10,7 +11,6 @@ import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/save.dart';
-import 'package:qim/common/utils/common.dart';
 import 'package:qim/common/utils/db.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/common/widget/custom_button.dart';
@@ -43,7 +43,6 @@ class GroupChatSettingPage extends StatefulWidget {
 }
 
 class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final ChatController chatController = Get.find();
   final MessageController messageController = Get.find();
@@ -74,6 +73,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
     }
 
     _fetchData();
+    initOneGroup(talkObj['objId']);
     super.initState();
   }
 

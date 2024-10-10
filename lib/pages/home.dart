@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/data.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/api/apis.dart';

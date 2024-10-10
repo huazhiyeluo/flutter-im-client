@@ -1,11 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/common.dart';
+import 'package:qim/common/utils/data.dart';
+import 'package:qim/data/api/getdata.dart';
 import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/controller/signaling.dart';
+import 'package:qim/data/db/get.dart';
 
 class FriendDetail extends StatefulWidget {
   const FriendDetail({super.key});
@@ -92,6 +96,7 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
+    initOneUser(talkObj['objId']);
   }
 
   List<Widget> _getTitle() {
@@ -134,7 +139,7 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
       }
       userObj = userController.getOneUser(talkObj['objId']);
       if (userObj.isEmpty) {
-        return const Center(child: Text(""));
+        return const Center(child: Text("1111"));
       }
       contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
       return ListView(

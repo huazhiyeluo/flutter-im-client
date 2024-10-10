@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/data.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/controller/websocket.dart';

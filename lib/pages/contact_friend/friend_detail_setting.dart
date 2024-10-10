@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/data.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/friend_group.dart';
 import 'package:qim/data/controller/talkobj.dart';
@@ -57,12 +58,13 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
 
   @override
   void initState() {
-    userInfo = userInfoController.userInfo;
-    uid = userInfo['uid'];
+    super.initState();
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
-    super.initState();
+    userInfo = userInfoController.userInfo;
+    uid = userInfo['uid'];
+    initOneUser(talkObj['objId']);
   }
 
   void _delContact() {
