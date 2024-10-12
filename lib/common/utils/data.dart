@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
+import 'package:qim/common/utils/date.dart';
 import 'package:qim/common/utils/play.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/data/api/contact_group.dart';
@@ -10,6 +11,7 @@ import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/group.dart';
 import 'package:qim/data/controller/message.dart';
+import 'package:qim/data/controller/share.dart';
 import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -145,6 +147,24 @@ Future<void> joinMessage(int uid, Map temp) async {
   }
   messageController.addMessage(msg);
   saveDbMessage(msg);
+}
+
+Future<void> joinShare(Map temp) async {
+  Map msg = Map.from(temp);
+
+  final ShareController shareController = Get.find();
+
+  Map shareData = {};
+  shareData['type'] = msg['type'];
+  shareData['objId'] = msg['objId'];
+  shareData['name'] = msg['name'];
+  shareData['remark'] = msg['remark'];
+  shareData['icon'] = msg['icon'];
+  shareData['info'] = msg['info'];
+  shareData['operateTime'] = getTime();
+
+  shareController.upsetShare(shareData);
+  saveDbShare(shareData);
 }
 
 Future<void> getGroupInfo(int groupId) async {

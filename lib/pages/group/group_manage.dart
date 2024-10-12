@@ -49,7 +49,7 @@ class _GroupManagerState extends State<GroupManager> with TickerProviderStateMix
   }
 
   void _clearSlidable() {
-    logPrint("_clearSlidable");
+
     slidableControllers.forEach((key, tempSlidable) {
       tempSlidable.close();
     });

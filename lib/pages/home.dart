@@ -13,6 +13,7 @@ import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/friend_group.dart';
 import 'package:qim/data/controller/group.dart';
+import 'package:qim/data/controller/share.dart';
 import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -51,6 +52,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   final GroupController groupController = Get.put(GroupController());
 
   final ChatController chatController = Get.put(ChatController());
+  final ShareController shareController = Get.put(ShareController());
+
   final TalkobjController talkobjController = Get.put(TalkobjController());
   final ApplyController applyController = Get.put(ApplyController());
   final UserInfoController userInfoController = Get.put(UserInfoController());

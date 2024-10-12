@@ -30,7 +30,8 @@ class DBHelper {
   }
 
   // 查询
-  static Future<List<Map>> getData(String tbl, List<List<dynamic>> where) async {
+  static Future<List<Map>> getData(String tbl, List<List<dynamic>> where,
+      {String? orderBy, int? limit, int? offset}) async {
     final db = _database;
 
     // 构建 WHERE 子句
@@ -44,10 +45,25 @@ class DBHelper {
       whereClause += '${item[0]} ${item[1]} ?';
       whereArgs.add(item[2]);
     }
+
+    // 如果有 WHERE 子句
     if (whereArgs.isNotEmpty) {
-      return db.query(tbl, where: whereClause, whereArgs: whereArgs);
+      return db.query(
+        tbl,
+        where: whereClause,
+        whereArgs: whereArgs,
+        orderBy: orderBy,
+        limit: limit, // 添加分页
+        offset: offset, // 设置起始位置
+      );
     } else {
-      return db.query(tbl);
+      // 如果没有 WHERE 子句
+      return db.query(
+        tbl,
+        orderBy: orderBy,
+        limit: limit, // 添加分页
+        offset: offset, // 设置起始位置
+      );
     }
   }
 

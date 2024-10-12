@@ -155,7 +155,7 @@ Future<void> saveDbContactGroup(Map data) async {
   ]);
 }
 
-// 3、保存chat
+// 3-1、保存chat
 Future<void> saveDbChat(Map data) async {
   Map<String, dynamic> chat = {};
 
@@ -188,6 +188,32 @@ Future<void> saveDbChat(Map data) async {
   await DBHelper.upsertData('chat', chat, [
     ["objId", "=", chat['objId']],
     ["type", "=", chat['type']]
+  ]);
+}
+
+// 3-2、保存share
+Future<void> saveDbShare(Map data) async {
+  Map<String, dynamic> share = {};
+
+  List<String> fields = [
+    'objId',
+    'type',
+    'name',
+    'info',
+    'remark',
+    'icon',
+    'operateTime',
+  ];
+
+  for (var field in fields) {
+    if (data[field] != null) {
+      share[field] = data[field];
+    }
+  }
+
+  await DBHelper.upsertData('share', share, [
+    ["objId", "=", share['objId']],
+    ["type", "=", share['type']]
   ]);
 }
 

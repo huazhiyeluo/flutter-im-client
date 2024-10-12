@@ -3,16 +3,16 @@ import 'package:get/get.dart';
 class ShareController extends GetxController {
   final RxList<Map> allShares = <Map>[].obs;
 
-  void upsetShare(Map chat) {
-    final objId = chat['objId'];
-    final type = chat['type'];
+  void upsetShare(Map share) {
+    final objId = share['objId'];
+    final type = share['type'];
     // 查找是否已经存在相同的数据
     final existingShareIndex = allShares.indexWhere((c) => c['objId'] == objId && c['type'] == type);
 
     if (existingShareIndex != -1) {
       // 如果已经存在相同的数据，则更新对应字段的值
       final existingShare = allShares[existingShareIndex];
-      chat.forEach((key, value) {
+      share.forEach((key, value) {
         if (existingShare.containsKey(key)) {
           existingShare[key] = value;
         }
@@ -20,7 +20,7 @@ class ShareController extends GetxController {
       allShares[existingShareIndex] = existingShare;
     } else {
       // 否则，将数据添加到列表中
-      allShares.add(chat);
+      allShares.add(share);
     }
     allShares.sort((a, b) {
       return b['operateTime'].compareTo(a['operateTime']);

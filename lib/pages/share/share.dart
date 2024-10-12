@@ -5,9 +5,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/common/utils/db.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/data/api/common.dart';
 import 'package:qim/data/controller/chat.dart';
+import 'package:qim/data/controller/share.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/controller/websocket.dart';
 import 'package:qim/common/utils/common.dart';
@@ -30,6 +32,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController inputController = TextEditingController();
   final ChatController chatController = Get.find();
+  final ShareController shareController = Get.find();
   final TextEditingController nameCtr = TextEditingController();
   final UserInfoController userInfoController = Get.find();
 
@@ -51,22 +54,36 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
     if (Get.arguments != null) {
       msgObj = Get.arguments['msgObj'];
       ttype = Get.arguments['ttype'];
-      logPrint(ttype);
+
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 
-    for (var chatObj in chatController.allShowChats) {
-      chatObj['isSelect'] = false;
-      chatObj['isHidden'] = false;
-      _cateShareArrs.add(chatObj);
+    _initData();
+  }
+
+  void _initData() async {
+    if (shareController.allShares.isEmpty) {
+      List shares = await DBHelper.getData('share', [], orderBy: 'operateTime DESC', limit: 10);
+      for (var item in shares) {
+        shareController.upsetShare(item);
+      }
+    }
+    for (var shareObj in shareController.allShares) {
+      Map temp = Map.from(shareObj);
+      temp['isSelect'] = false;
+      temp['isHidden'] = false;
+      _cateShareArrs.add(temp);
     }
 
     for (var chatObj in chatController.allShowChats) {
-      chatObj['isSelect'] = false;
-      chatObj['isHidden'] = false;
-      _cateChatArrs.add(chatObj);
+      Map temp = Map.from(chatObj);
+      temp['isSelect'] = false;
+      temp['isHidden'] = false;
+      _cateChatArrs.add(temp);
     }
+
+    setState(() {});
   }
 
   void _changeTo() {
@@ -88,7 +105,11 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
       arr.add(it['remark'] != "" ? it['remark'] : it['name']);
     }
     String str = arr.join(', ');
-    return Text(str);
+    return Text(
+      str,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
   }
 
   Widget _getOpt() {
@@ -193,7 +214,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
     showCustomDialog(
       context: context,
       content: Container(
-        constraints: const BoxConstraints(maxHeight: 150),
+        constraints: const BoxConstraints(maxHeight: 160),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,7 +273,10 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
             }
             joinData(uid, msg);
           }
+
+          joinShare(it);
         }
+
         if (!mounted) return;
         _userSelectArrs.clear();
         Navigator.pop(context);
@@ -301,9 +325,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
                         expands: false,
                         maxHeight: 40,
                         minHeight: 40,
-                        onTap: () {
-                          // 处理点击事件的逻辑
-                        },
+                        onTap: () {},
                       ),
                     ),
                     Container(
@@ -333,7 +355,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
                             alignment: Alignment.center,
                             child: GestureDetector(
                               onTap: () {
-                                // 可以根据需要在点击时处理不同的项目
+                                _setSelected(item['objId'], item['type']);
                               },
                               child: Stack(
                                 children: [

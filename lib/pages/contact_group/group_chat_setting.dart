@@ -121,7 +121,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
       groupObj = groupController.getOneGroup(talkObj['objId']);
       contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
       int count = contactGroups.length >= 15 - optShow ? 15 : contactGroups.length + optShow;
-      logPrint(count);
+
       if (contactGroups.isEmpty) {
         return const Center(child: Text(""));
       }
