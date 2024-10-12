@@ -84,7 +84,7 @@ class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
             ),
             onTap: () {},
           ),
-          contactFriendObj.isNotEmpty
+          contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0
               ? ListTile(
                   title: const Text("加好友时间"),
                   trailing: Text(

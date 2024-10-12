@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/common.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/common/utils/functions.dart';
 import 'package:qim/data/api/getdata.dart';
 import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/contact_friend.dart';
@@ -139,7 +140,7 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
       }
       userObj = userController.getOneUser(talkObj['objId']);
       if (userObj.isEmpty) {
-        return const Center(child: Text("1111"));
+        return const Center(child: Text(""));
       }
       contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
       return ListView(
@@ -218,13 +219,13 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
                   icon: const Icon(Icons.phone),
                 )
               : Container(),
-          contactFriendObj.isEmpty && talkObj['objId'] != uid
+          (contactFriendObj.isEmpty || contactFriendObj['joinTime'] == 0) && talkObj['objId'] != uid
               ? Container(
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                   child: const Divider(),
                 )
               : Container(),
-          contactFriendObj.isEmpty && talkObj['objId'] != uid
+          (contactFriendObj.isEmpty || contactFriendObj['joinTime'] == 0) && talkObj['objId'] != uid
               ? TextButton.icon(
                   onPressed: () {
                     Navigator.pushNamed(

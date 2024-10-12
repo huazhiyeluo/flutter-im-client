@@ -120,20 +120,20 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (talkObj.isEmpty) {
-        return const Center(child: Text("1"));
+        return const Center(child: Text(""));
       }
       userObj = userController.getOneUser(talkObj['objId']);
       if (userObj.isEmpty) {
-        return const Center(child: Text("2"));
+        return const Center(child: Text(""));
       }
 
       contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
       if (contactFriendObj.isEmpty) {
-        return const Center(child: Text("3"));
+        return const Center(child: Text(""));
       }
       friendGroupObj = friendGroupController.getOneFriendGroup(contactFriendObj['friendGroupId']);
       if (friendGroupObj.isEmpty) {
-        return const Center(child: Text("4"));
+        return const Center(child: Text(""));
       }
       return ListView(
         children: [
@@ -188,7 +188,7 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
               Navigator.pushNamed(
                 context,
                 '/share',
-                arguments: msgObj,
+                arguments: {"ttype": 1, "msgObj": msgObj},
               );
             },
           ),

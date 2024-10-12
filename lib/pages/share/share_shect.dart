@@ -65,7 +65,7 @@ class _ShareSelectState extends State<ShareSelect> {
       for (var val in v["children"]) {
         if (val['name'].contains(inputController.text) ||
             val['remark'].contains(inputController.text) ||
-            val['toId'].toString().contains(inputController.text)) {
+            val['objId'].toString().contains(inputController.text)) {
           val['isHidden'] = false;
         } else {
           val['isHidden'] = true;
@@ -91,6 +91,7 @@ class _ShareSelectState extends State<ShareSelect> {
           }
           Map userObj = userController.getOneUser(contactFriendObj['toId']);
           contactFriendObj['type'] = 1;
+          contactFriendObj['objId'] = contactFriendObj['toId'];
           contactFriendObj['name'] = userObj['nickname'];
           contactFriendObj['remark'] = contactFriendObj['remark'];
           contactFriendObj['icon'] = userObj['avatar'];
@@ -117,7 +118,7 @@ class _ShareSelectState extends State<ShareSelect> {
 
       temp['friendGroupId'] = 0;
       temp['type'] = 2;
-      temp['toId'] = groupObj['groupId'];
+      temp['objId'] = groupObj['groupId'];
       temp['name'] = groupObj['name'];
       temp['remark'] = groupObj['name'];
       temp['icon'] = groupObj['icon'];
@@ -160,12 +161,12 @@ class _ShareSelectState extends State<ShareSelect> {
     });
   }
 
-  void setSelected(int key, int toId, int type) {
+  void setSelected(int key, int objId, int type) {
     bool tempStatus = false;
     for (var item in _cateArrs) {
       if (item['friendGroupId'] == key) {
         for (var it in item['children']) {
-          if (it['toId'] == toId && it['type'] == type) {
+          if (it['objId'] == objId && it['type'] == type) {
             it['isSelect'] = !it['isSelect'];
             _getSelect(it, it['isSelect']);
 
@@ -188,7 +189,7 @@ class _ShareSelectState extends State<ShareSelect> {
     if (flag) {
       _userSelectArrs.add(item);
     } else {
-      final existingIndex = _userSelectArrs.indexWhere((c) => c['toId'] == item['toId'] && c['type'] == item['type']);
+      final existingIndex = _userSelectArrs.indexWhere((c) => c['objId'] == item['objId'] && c['type'] == item['type']);
       if (existingIndex != -1) {
         _userSelectArrs.removeAt(existingIndex);
       }
@@ -253,7 +254,7 @@ class _ShareSelectState extends State<ShareSelect> {
           children: visibleData.map((item) {
             return InkWell(
               onTap: () {
-                setSelected(item['friendGroupId'], item['toId'], item['type']);
+                setSelected(item['friendGroupId'], item['objId'], item['type']);
               },
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
@@ -267,7 +268,7 @@ class _ShareSelectState extends State<ShareSelect> {
                       child: Checkbox(
                         value: item['isSelect'],
                         onChanged: (bool? value) {
-                          setSelected(item['friendGroupId'], item['toId'], item['type']);
+                          setSelected(item['friendGroupId'], item['objId'], item['type']);
                         },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),

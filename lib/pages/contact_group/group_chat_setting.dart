@@ -2,12 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/common/utils/functions.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/group.dart';
 import 'package:qim/data/controller/message.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/save.dart';
@@ -86,6 +86,8 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
     return Obx(() {
       groupObj = groupController.getOneGroup(talkObj['objId']);
       final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
+      final int count = contactGroups.length >= 15 - optShow ? 15 : contactGroups.length + optShow;
+      logPrint(count);
       if (contactGroups.isEmpty) {
         return const Center(child: Text(""));
       }
@@ -136,10 +138,10 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                 mainAxisSpacing: 10.0,
                 childAspectRatio: 1.0,
               ),
-              itemCount: contactGroups.length > 15 - optShow ? 15 : contactGroups.length + optShow,
+              itemCount: count,
               itemBuilder: (BuildContext context, int index) {
-                if (index >= contactGroups.length) {
-                  if (index == contactGroups.length) {
+                if (index >= count - optShow) {
+                  if (index == count - optShow) {
                     return GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(
@@ -173,7 +175,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                         ],
                       ),
                     );
-                  } else if (index == contactGroups.length + 1) {
+                  } else if (index == count - optShow + 1) {
                     return GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(
@@ -241,6 +243,8 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                                 ? contactGroups[index]['nickname']
                                 : userObj['nickname'],
                             style: const TextStyle(fontSize: 12),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -326,6 +330,19 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
             ),
             onTap: () {
               Navigator.pushNamed(context, '/group-chat-setting-remark', arguments: talkObj);
+            },
+          ),
+          ListTile(
+            title: const Text("设置管理员"),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(contactGroupObj['remark'] == "" ? '未设置' : contactGroupObj['remark']),
+                const Icon(Icons.chevron_right),
+              ],
+            ),
+            onTap: () {
+              Navigator.pushNamed(context, '/group-manager', arguments: talkObj);
             },
           ),
           Container(

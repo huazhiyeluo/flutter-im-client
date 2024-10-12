@@ -158,7 +158,7 @@ class _ChatMessageState extends State<ChatMessage> {
         Map msgObj = {'content': data['content'], 'msgMedia': data['msgMedia']};
         Get.toNamed(
           '/share',
-          arguments: msgObj,
+          arguments: {"ttype": 1, "msgObj": msgObj},
         );
       }
       if (result == 2) {}

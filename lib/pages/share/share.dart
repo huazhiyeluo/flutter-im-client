@@ -1,7 +1,12 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/common/utils/tips.dart';
+import 'package:qim/data/api/common.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/controller/websocket.dart';
@@ -10,6 +15,8 @@ import 'package:qim/common/utils/date.dart';
 import 'package:qim/common/utils/functions.dart';
 import 'package:qim/common/widget/custom_search_field.dart';
 import 'package:qim/common/widget/dialog_confirm.dart';
+import 'package:dio/dio.dart' as dio;
+import 'package:path/path.dart' as path;
 
 class Share extends StatefulWidget {
   const Share({super.key});
@@ -31,6 +38,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
   Map msgObj = {};
   int uid = 0;
   Map userInfo = {};
+  int ttype = 1; //1、正常 2、要处理文件上传问题
 
   List _cateShareArrs = [];
   List _cateChatArrs = [];
@@ -41,7 +49,9 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
     super.initState();
 
     if (Get.arguments != null) {
-      msgObj = Get.arguments;
+      msgObj = Get.arguments['msgObj'];
+      ttype = Get.arguments['ttype'];
+      logPrint(ttype);
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
@@ -96,6 +106,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
     return temp;
   }
 
+  // 多选处理_userSelectArrs  ，如果是单选发送消息
   void _setSelected(int objId, int type) {
     if (isSingle) {
       _userSelectArrs.clear();
@@ -136,27 +147,48 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
     }
   }
 
+  Future<void> _updateUrl() async {
+    final String filePath = msgObj["content"]["url"];
+    final File tempFile = File(filePath);
+
+    final dio.MultipartFile file = await dio.MultipartFile.fromFile(
+      tempFile.path,
+      filename: path.basename(filePath), // 使用文件名
+    );
+
+    Completer<void> completer = Completer<void>();
+
+    CommonApi.upload({'file': file}, onSuccess: (res) async {
+      msgObj["content"]["url"] = res['data'];
+      setState(() {
+        msgObj = msgObj;
+      });
+      await tempFile.delete();
+      completer.complete();
+    }, onError: (res) {
+      TipHelper.instance.showToast(res['msg']);
+      completer.complete();
+    });
+
+    return completer.future;
+  }
+
+  // 创建新的聊天 -转发
   Future<void> _selectMore() async {
     final result = await Navigator.pushNamed(
       context,
       '/share-select',
     );
+
     if (result != null && result is Map) {
-      for (var it in result['_userSelectArrs']) {
-        msgObj["id"] = genGUID();
-        msgObj["fromId"] = uid;
-        msgObj["toId"] = it['toId'];
-        msgObj["msgType"] = it['type'];
-        msgObj['createTime'] = getTime();
-        webSocketController.sendMessage(msgObj);
-        if (![1, 2].contains(msgObj['msgType'])) {
-          return;
-        }
-        joinData(uid, msgObj);
-      }
+      setState(() {
+        _userSelectArrs.addAll(result['_userSelectArrs'] as List<Map>);
+      });
+      _send();
     }
   }
 
+  // 发送消息
   void _send() {
     showCustomDialog(
       context: context,
@@ -189,6 +221,9 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
         ),
       ),
       onConfirm: () async {
+        if (ttype == 2) {
+          await _updateUrl();
+        }
         for (var it in _userSelectArrs) {
           msgObj["id"] = genGUID();
           msgObj["fromId"] = uid;
@@ -201,21 +236,25 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
           }
           joinData(uid, msgObj);
 
-          Map msg = {
-            'id': genGUID(),
-            'fromId': uid,
-            'toId': it['objId'],
-            'content': {"data": nameCtr.text, "url": "", "name": ""},
-            'msgMedia': 1,
-            'msgType': it['type'],
-            'createTime': getTime()
-          };
-          webSocketController.sendMessage(msg);
-          if (![1, 2].contains(msg['msgType'])) {
-            return;
+          if (nameCtr.text.trim() != "") {
+            Map msg = {
+              'id': genGUID(),
+              'fromId': uid,
+              'toId': it['objId'],
+              'content': {"data": nameCtr.text, "url": "", "name": ""},
+              'msgMedia': 1,
+              'msgType': it['type'],
+              'createTime': getTime()
+            };
+            webSocketController.sendMessage(msg);
+            if (![1, 2].contains(msg['msgType'])) {
+              return;
+            }
+            joinData(uid, msg);
           }
-          joinData(uid, msg);
         }
+        if (!mounted) return;
+        _userSelectArrs.clear();
         Navigator.pop(context);
       },
       onConfirmText: "发送",
@@ -413,7 +452,9 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
                                   scale: 1.2,
                                   child: Checkbox(
                                     value: item['isSelect'],
-                                    onChanged: (bool? value) {},
+                                    onChanged: (bool? value) {
+                                      _setSelected(item['objId'], item['type']);
+                                    },
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                     ),

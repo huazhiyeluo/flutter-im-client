@@ -191,7 +191,7 @@ class _GroupUserPageState extends State<GroupUserPage> {
         chat.icon = userObj['avatar'];
         chat.info = userObj['info'];
         chat.remark = item['remark'];
-        chat.isContact = contactFriendObj.isEmpty ? 0 : 1;
+        chat.isContact = contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0 ? 1 : 0;
         chat.namePinyin = PinyinHelper.getPinyin(item['remark'] != '' ? item['remark'] : userObj['nickname']);
         String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
         chat.tagIndex = firstLetter.toUpperCase();

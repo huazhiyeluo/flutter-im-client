@@ -64,4 +64,22 @@ class ContactGroupApi {
       onError: onError,
     );
   }
+
+  static void addGroupManger(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.addGroupManger,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
+
+  static void delGroupManger(params, {Function? onSuccess, Function? onError}) {
+    RequestHelper.instance.request(
+      Apis.delGroupManger,
+      data: params,
+      onSuccess: onSuccess,
+      onError: onError,
+    );
+  }
 }
