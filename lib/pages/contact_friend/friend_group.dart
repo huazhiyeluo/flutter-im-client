@@ -49,9 +49,7 @@ class _FriendGroupState extends State<FriendGroup> {
     if (friendGroupId != 0) {
       title = "编辑分组";
     }
-    if (name != "") {
-      nameCtr.text = name;
-    }
+    nameCtr.text = name;
     showCustomDialog(
       title: title,
       context: context,
