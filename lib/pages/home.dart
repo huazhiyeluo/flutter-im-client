@@ -120,7 +120,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   Future<void> _initOnReceive() async {
     webSocketController.message.listen((msg) async {
       // 1、私聊和群聊消息到数据库  2、加入chat列表|保存chat数据到  3、obj对象
-      if ([1, 2].contains(msg['msgType']) || ([4].contains(msg['msgType']) && [0].contains(msg['msgMedia']))) {
+      if ([1, 2].contains(msg['msgType'])) {
         joinData(uid, msg, audioPlayerManager: _audioPlayerManager);
       }
       if ([3].contains(msg['msgType'])) {
@@ -160,7 +160,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         if ([21, 22, 23, 24].contains(msg['msgMedia'])) {
           loadFriendManage(uid, msg);
         }
-        if ([30, 31, 32, 33, 34, 35].contains(msg['msgMedia'])) {
+        if ([30, 31, 32, 33, 34, 35, 36].contains(msg['msgMedia'])) {
           loadGroupManage(uid, msg);
         }
       }

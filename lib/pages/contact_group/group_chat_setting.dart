@@ -59,6 +59,8 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
 
   int optShow = 1;
 
+  List contactGroups = [];
+
   @override
   void initState() {
     if (Get.arguments != null) {
@@ -81,12 +83,44 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
     await getGroupInfo(talkObj['objId']);
   }
 
+  List<Widget> _getManager() {
+    List<Widget> temp = [];
+    for (var contactGroup in contactGroups) {
+      if (contactGroup['groupPower'] == 2) {
+        Map userObj = userController.getOneUser(contactGroup['fromId']);
+        temp.add(
+          CircleAvatar(
+            radius: 10,
+            backgroundImage: CachedNetworkImageProvider(
+              userObj['avatar'],
+            ),
+          ),
+        );
+      }
+      if (contactGroup['groupPower'] == 1) {
+        Map userObj = userController.getOneUser(contactGroup['fromId']);
+        temp.add(
+          CircleAvatar(
+            radius: 10,
+            backgroundImage: CachedNetworkImageProvider(
+              userObj['avatar'],
+            ),
+          ),
+        );
+      }
+    }
+    temp.add(
+      const Icon(Icons.chevron_right),
+    );
+    return temp;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       groupObj = groupController.getOneGroup(talkObj['objId']);
-      final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
-      final int count = contactGroups.length >= 15 - optShow ? 15 : contactGroups.length + optShow;
+      contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
+      int count = contactGroups.length >= 15 - optShow ? 15 : contactGroups.length + optShow;
       logPrint(count);
       if (contactGroups.isEmpty) {
         return const Center(child: Text(""));
@@ -333,13 +367,10 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
             },
           ),
           ListTile(
-            title: const Text("设置管理员"),
+            title: Text(contactGroupObj['groupPower'] == 2 ? "设置管理员" : "查看管理员"),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(contactGroupObj['remark'] == "" ? '未设置' : contactGroupObj['remark']),
-                const Icon(Icons.chevron_right),
-              ],
+              children: _getManager(),
             ),
             onTap: () {
               Navigator.pushNamed(context, '/group-manager', arguments: talkObj);
@@ -457,12 +488,6 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
         await DBHelper.deleteData('message', [
           ['msgType', '=', talkObj['type']],
           ['toId', '=', talkObj['objId']],
-          ['fromId', '=', uid]
-        ]);
-        await DBHelper.deleteData('message', [
-          ['msgType', '=', talkObj['type']],
-          ['toId', '=', uid],
-          ['fromId', '=', talkObj['objId']]
         ]);
         messageController.delMessage(talkObj['type'], uid, talkObj['objId']);
         TipHelper.instance.showToast("删除成功");

@@ -392,6 +392,44 @@ class _ChatMessageState extends State<ChatMessage> {
           ),
         ),
       );
+    } else if ([23].contains(data['msgMedia'])) {
+      Map temp = json.decode(data['content']['data']);
+      // 邀请入群消息
+      item = GestureDetector(
+        onTap: () {
+          Map talkObj = {
+            "objId": temp['group']['groupId'],
+            "type": 2,
+          };
+          Navigator.pushNamed(context, '/group-detail', arguments: talkObj);
+        },
+        child: Container(
+          color: const Color.fromARGB(255, 247, 247, 247),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              ListTile(
+                leading: CircleAvatar(
+                  radius: 20,
+                  backgroundImage: CachedNetworkImageProvider(
+                    temp['group']['icon'],
+                  ),
+                ),
+                title: Text('${temp['group']['name']}'),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(18, 5, 0, 5),
+                child: Text(
+                  "群聊名片",
+                  textAlign: TextAlign.left,
+                  style: TextStyle(fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     return item;

@@ -58,12 +58,6 @@ class _GroupManagerAddState extends State<GroupManagerAdd> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("添加管理员"),
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: const Icon(Icons.more_horiz),
-          ),
-        ],
       ),
       body: const GroupManagerAddPage(),
     );

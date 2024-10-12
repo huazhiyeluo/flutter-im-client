@@ -29,6 +29,7 @@ class _GroupManagerState extends State<GroupManager> with TickerProviderStateMix
   Map userInfo = {};
 
   Map talkObj = {};
+  Map contactGroupObj = {};
   List contactGroups = [];
   bool isShowEdit = true;
   int num = 0;
@@ -44,7 +45,7 @@ class _GroupManagerState extends State<GroupManager> with TickerProviderStateMix
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    logPrint("initState");
+    contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
   }
 
   void _clearSlidable() {
@@ -77,7 +78,7 @@ class _GroupManagerState extends State<GroupManager> with TickerProviderStateMix
       if (contactGroup['groupPower'] == 2) {
         Map userObj = userController.getOneUser(contactGroup['fromId']);
         temp = ListTile(
-          title: Text(userObj['nickname']),
+          title: Text(contactGroup['nickname'] != '' ? contactGroup['nickname'] : userObj['nickname']),
           leading: CircleAvatar(
             radius: 20,
             backgroundImage: CachedNetworkImageProvider(
@@ -104,6 +105,7 @@ class _GroupManagerState extends State<GroupManager> with TickerProviderStateMix
           key: ValueKey(contactGroup['fromId']),
           controller: slidableControllers[contactGroup['fromId']],
           useTextDirection: false,
+          enabled: contactGroupObj['groupPower'] == 2,
           endActionPane: ActionPane(
             motion: const ScrollMotion(),
             extentRatio: 1.2 / 4,
@@ -186,19 +188,21 @@ class _GroupManagerState extends State<GroupManager> with TickerProviderStateMix
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("设置管理员"),
+        title: Text(contactGroupObj['groupPower'] == 2 ? "设置管理员" : "查看管理员"),
         actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                isShowEdit = !isShowEdit;
-              });
-            },
-            child: Text(
-              isShowEdit ? "编辑" : "完成",
-              style: const TextStyle(color: Colors.black87),
-            ),
-          ),
+          contactGroupObj['groupPower'] == 2
+              ? TextButton(
+                  onPressed: () {
+                    setState(() {
+                      isShowEdit = !isShowEdit;
+                    });
+                  },
+                  child: Text(
+                    isShowEdit ? "编辑" : "完成",
+                    style: const TextStyle(color: Colors.black87),
+                  ),
+                )
+              : Container(),
         ],
       ),
       body: Obx(() {
@@ -238,7 +242,7 @@ class _GroupManagerState extends State<GroupManager> with TickerProviderStateMix
                 children: [
                   ..._getManager(),
                   const Divider(),
-                  total > num
+                  total > num && contactGroupObj['groupPower'] == 2
                       ? Align(
                           alignment: Alignment.centerLeft, // 左对齐
                           child: TextButton.icon(

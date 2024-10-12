@@ -32,10 +32,6 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
   } else if (msg['msgType'] == 2) {
     objId = msg['toId'];
   }
-
-  if (msg['msgType'] == 4) {
-    msg['msgType'] = 1;
-  }
   Map chatData = {};
   chatData['objId'] = objId;
   chatData['type'] = msg['msgType'];
@@ -122,7 +118,7 @@ Future<void> joinMessage(int uid, Map temp) async {
       final ContactFriendController contactFriendController = Get.find();
       final UserController userController = Get.find();
 
-      initOneUser(msg['fromId']);
+      await initOneUser(msg['fromId']);
       Map userObj = userController.getOneUser(msg['fromId']);
       Map contactFriendObj = contactFriendController.getOneContactFriend(uid, msg['fromId']);
 
@@ -137,7 +133,7 @@ Future<void> joinMessage(int uid, Map temp) async {
       final ContactGroupController contactGroupController = Get.find();
       final UserController userController = Get.find();
 
-      initOneUser(msg['fromId']);
+      await initOneUser(msg['fromId']);
       Map userObj = userController.getOneUser(msg['fromId']);
       Map contactGroupObj = contactGroupController.getOneContactGroup(msg['fromId'], msg['toId']);
 

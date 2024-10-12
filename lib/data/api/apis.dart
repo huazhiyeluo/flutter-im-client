@@ -49,6 +49,8 @@ class Apis {
   static const String delContactGroup = '/user/delContactGroup';
   static const String quitContactGroup = '/user/quitContactGroup';
   static const String actContactGroup = '/user/actContactGroup';
+  static const String addGroupManger = '/user/addGroupManger';
+  static const String delGroupManger = '/user/delGroupManger';
 
   // apply
   static const String getApplyList = '/user/getApplyList';

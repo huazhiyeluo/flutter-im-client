@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -188,7 +190,19 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
               const SizedBox(width: 25),
               Expanded(
                 child: CustomButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Map msgObj = {
+                      'content': {
+                        "data": json.encode({"group": groupObj})
+                      },
+                      'msgMedia': 23
+                    };
+                    Navigator.pushNamed(
+                      context,
+                      '/share',
+                      arguments: {"ttype": 1, "msgObj": msgObj},
+                    );
+                  },
                   text: "分享群聊",
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black,

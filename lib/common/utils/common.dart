@@ -203,6 +203,12 @@ Future<void> loadGroupManage(int uid, Map msg) async {
     contactGroupController.delContactGroupByGroupId(data['group']['groupId']);
     delDbContactGroupByGroupId(data['group']['groupId']);
   }
+
+  //群联系人更新
+  if ([36].contains(msg['msgMedia'])) {
+    contactGroupController.upsetContactGroup(data['contactGroup']);
+    saveDbContactGroup(data['contactGroup']);
+  }
 }
 
 Future<XFile> compressImage(XFile pickedFile) async {
@@ -253,7 +259,10 @@ String getContent(int msgMedia, Map content) {
     return "邀请你加入群聊";
   }
   if (msgMedia == 22) {
-    return "个人名片";
+    return "[个人名片]";
+  }
+  if (msgMedia == 23) {
+    return "[群聊名片]";
   }
 
   return "";
