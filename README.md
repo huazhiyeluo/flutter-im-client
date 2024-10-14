@@ -51,14 +51,23 @@
 ##### 8. 扫码功能
 - 支持通过二维码扫描添加好友或加入群聊。
 
+#### 后端服务仓库地址：
 
+```
+https://github.com/huazhiyeluo/im-api
+```
+#### 支持联系方式：
 
+```
+370838500@qq.com
+```
 
-视频通话服务插件：webview_flutter
+#### 捐赠账号：
 
-后端服务仓库地址：https://github.com/huazhiyeluo/im-api
+<img src="https://github.com/user-attachments/assets/9cf0485d-4c96-499f-915a-d3c437bb40b7" alt="1-支付宝" width="180" style="padding:5px;" />
+<img src="https://github.com/user-attachments/assets/e7986b02-c09f-411b-ade0-f1940d92ad0e" alt="2-微信" width="180" style="padding:5px;" />
 
-基本界面：
+#### APP界面：
 
 <img src="https://github.com/user-attachments/assets/0c8508da-5c44-4d9e-bed8-eabb400d815a" alt="1-登录" width="220" style="padding:5px;" />
 <img src="https://github.com/user-attachments/assets/06a90572-9ffb-46e2-ad15-10b93f5fdc2d" alt="2-注册" width="220" style="padding:5px;" />
