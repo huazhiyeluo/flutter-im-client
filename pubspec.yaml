@@ -76,7 +76,7 @@ dependencies:
   webview_flutter_wkwebview: ^3.15.0
   uuid: ^4.5.1
   screenshot: ^3.0.0
-  image_gallery_saver: ^2.0.3
+  image_gallery_saver_plus: ^3.0.5
 
   
 

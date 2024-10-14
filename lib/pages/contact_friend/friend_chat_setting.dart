@@ -13,7 +13,6 @@ import 'package:qim/common/utils/db.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/common/widget/custom_button.dart';
 import 'package:qim/common/widget/dialog_confirm.dart';
-import 'package:qim/data/api/getdata.dart';
 
 class FriendSettingChat extends StatefulWidget {
   const FriendSettingChat({super.key});

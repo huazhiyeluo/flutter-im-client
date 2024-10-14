@@ -7,7 +7,6 @@ import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
-import 'package:qim/common/utils/functions.dart';
 import 'package:qim/common/widget/custom_search_field.dart';
 
 class UserModel extends ISuspensionBean {

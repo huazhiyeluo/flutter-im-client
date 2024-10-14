@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
-import 'package:qim/common/utils/functions.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/contact_group.dart';
@@ -49,7 +48,6 @@ class _GroupManagerState extends State<GroupManager> with TickerProviderStateMix
   }
 
   void _clearSlidable() {
-
     slidableControllers.forEach((key, tempSlidable) {
       tempSlidable.close();
     });

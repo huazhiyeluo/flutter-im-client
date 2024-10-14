@@ -1,15 +1,13 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/common/utils/functions.dart';
 import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
-import 'package:qim/common/utils/common.dart';
 import 'package:qim/data/controller/signaling.dart';
 import 'package:qim/common/utils/date.dart';
-import 'package:qim/common/utils/functions.dart';
 
 class FriendDetailMore extends StatefulWidget {
   const FriendDetailMore({super.key});
@@ -67,29 +65,40 @@ class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (talkObj.isEmpty) {
-        return const Center(child: Text(""));
+        return const Center(child: Text("1"));
       }
       userObj = userController.getOneUser(talkObj['objId']);
       if (userObj.isEmpty) {
-        return const Center(child: Text(""));
+        return const Center(child: Text("2"));
       }
+      logPrint(userObj);
       contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
       return ListView(
         children: [
           ListTile(
-            title: const Text("个性签名"),
-            trailing: Text(
+            leading: const Text(
+              "个性签名",
+              style: TextStyle(fontSize: 16),
+            ),
+            subtitle: Text(
               userObj['info'],
               style: const TextStyle(fontSize: 14),
+              maxLines: 5,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
             ),
             onTap: () {},
           ),
           contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0
               ? ListTile(
-                  title: const Text("加好友时间"),
-                  trailing: Text(
+                  leading: const Text(
+                    "加好友时间",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  subtitle: Text(
                     formatDate(contactFriendObj['joinTime']),
-                    style: const TextStyle(fontSize: 14),
+                    style: const TextStyle(fontSize: 16),
+                    textAlign: TextAlign.end,
                   ),
                   onTap: () {},
                 )

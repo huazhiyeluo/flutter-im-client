@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qim/common/utils/data.dart';
@@ -96,7 +96,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
       // 截取二维码图片
       final Uint8List? image = await screenshotController.capture();
       if (image != null) {
-        final result = await ImageGallerySaver.saveImage(image,
+        final result = await ImageGallerySaverPlus.saveImage(image,
             quality: 100, name: "qr_code_${DateTime.now().millisecondsSinceEpoch}");
         if (result["isSuccess"]) {
           TipHelper.instance.showToast("图片保存成功");

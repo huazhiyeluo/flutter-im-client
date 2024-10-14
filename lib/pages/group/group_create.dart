@@ -7,7 +7,6 @@ import 'package:qim/data/api/common.dart';
 import 'package:qim/data/api/group.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/common/utils/common.dart';
-import 'package:qim/common/utils/functions.dart';
 import 'package:qim/common/utils/permission.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/common/widget/custom_button.dart';

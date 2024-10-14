@@ -13,7 +13,6 @@ import 'package:qim/common/utils/date.dart';
 import 'package:qim/common/utils/db.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:qim/common/utils/functions.dart';
 import 'package:qim/common/widget/play_audio.dart';
 import 'package:qim/common/widget/play_video.dart';
 import 'package:url_launcher/url_launcher.dart';
