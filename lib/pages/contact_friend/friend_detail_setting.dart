@@ -64,7 +64,11 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    initOneUser(talkObj['objId']);
+    _initData();
+  }
+
+  void _initData() async {
+    await initOneUser(talkObj['objId']);
   }
 
   void _delContact() {

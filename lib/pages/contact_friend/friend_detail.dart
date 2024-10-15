@@ -93,7 +93,11 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
-    initOneUser(talkObj['objId']);
+    _initData();
+  }
+
+  void _initData() async {
+    await initOneUser(talkObj['objId']);
   }
 
   List<Widget> _getTitle() {

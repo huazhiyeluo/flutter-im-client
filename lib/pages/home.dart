@@ -84,9 +84,20 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void dispose() {
     logPrint("home-dispose");
     webSocketController.onClose();
+    Get.delete<FriendGroupController>();
+    Get.delete<ContactFriendController>();
+    Get.delete<ContactGroupController>();
+    Get.delete<UserController>();
+    Get.delete<GroupController>();
+    Get.delete<ChatController>();
+    Get.delete<ShareController>();
+    Get.delete<TalkobjController>();
+    Get.delete<ApplyController>();
+    Get.delete<UserInfoController>();
     Get.delete<WebSocketController>();
     Get.delete<SignalingController>();
     _audioPlayerManager.dispose();
+
     super.dispose();
   }
 

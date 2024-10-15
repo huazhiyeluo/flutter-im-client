@@ -48,10 +48,9 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
       final UserController userController = Get.find();
       final ContactFriendController contactFriendController = Get.find();
 
-      initOneUser(objId);
+      await initOneUser(objId);
       Map userObj = userController.getOneUser(objId);
       Map contactFriendObj = contactFriendController.getOneContactFriend(uid, objId);
-
       chatData['name'] = userObj['nickname'];
       chatData['info'] = userObj['info'];
       chatData['icon'] = userObj['avatar'];
@@ -71,7 +70,7 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
       final GroupController groupController = Get.find();
       final ContactGroupController contactGroupController = Get.find();
 
-      initOneGroup(objId);
+      await initOneGroup(objId);
       Map groupObj = groupController.getOneGroup(objId);
       Map contactGroupObj = contactGroupController.getOneContactGroup(uid, objId);
       chatData['name'] = groupObj['name'];

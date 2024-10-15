@@ -58,7 +58,11 @@ class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    initOneUser(talkObj['objId']);
+    _initData();
+  }
+
+  void _initData() async {
+    await initOneUser(talkObj['objId']);
   }
 
   @override

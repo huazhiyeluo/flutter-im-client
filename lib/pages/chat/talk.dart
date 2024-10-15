@@ -53,17 +53,20 @@ class _TalkState extends State<Talk> {
   @override
   void initState() {
     super.initState();
-
     if (Get.arguments != null) {
       talkObj = Get.arguments;
       talkobjController.setTalkObj(talkObj);
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
+    _initData();
+  }
+
+  void _initData() async {
     if (talkObj['type'] == 1) {
-      initOneUser(talkObj['objId']);
+      await initOneUser(talkObj['objId']);
     } else if (talkObj['type'] == 2) {
-      initOneGroup(talkObj['objId']);
+      await initOneGroup(talkObj['objId']);
     }
   }
 

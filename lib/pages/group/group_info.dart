@@ -74,7 +74,11 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    initOneGroup(talkObj['objId']);
+    _initData();
+  }
+
+  void _initData() async {
+    await initOneGroup(talkObj['objId']);
   }
 
   List<Widget> _getTitle() {

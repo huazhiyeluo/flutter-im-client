@@ -62,6 +62,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
 
   @override
   void initState() {
+    super.initState();
     if (Get.arguments != null) {
       talkObj = Get.arguments;
     }
@@ -72,14 +73,12 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
     if ([1, 2].contains(contactGroupObj['groupPower'])) {
       optShow = 2;
     }
-
-    _fetchData();
-    initOneGroup(talkObj['objId']);
-    super.initState();
+    _initData();
   }
 
-  void _fetchData() async {
+  void _initData() async {
     await getGroupInfo(talkObj['objId']);
+    await initOneGroup(talkObj['objId']);
   }
 
   List<Widget> _getManager() {
