@@ -59,7 +59,10 @@ AppBar chatBar() {
               );
             }).toList();
           },
-          icon: const Icon(Icons.add),
+          icon: const Icon(
+            Icons.add,
+            size: 28,
+          ),
           color: Colors.white,
         ),
       ]);

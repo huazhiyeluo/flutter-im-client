@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:qim/data/api/apis.dart';
+import 'package:qim/config/urls.dart';
 import 'package:qim/common/utils/device_info.dart';
 import 'package:qim/common/utils/functions.dart';
 
@@ -15,7 +15,7 @@ class RequestHelper {
 
   RequestHelper._() {
     BaseOptions options = BaseOptions(
-      baseUrl: Apis.apiPrefix,
+      baseUrl: Urls.apiPrefix,
       connectTimeout: const Duration(milliseconds: 5000),
       receiveTimeout: const Duration(milliseconds: 3000),
     );
@@ -45,18 +45,14 @@ class RequestHelper {
       mergedHeaders['deviceid'] = deviceInfo.deviceId;
 
       if (isUpload) {
-        // 如果是文件上传请求
         FormData formData = FormData.fromMap(data); // 将传入的数据转换为 FormData 对象
-
         response = await _dio.post(
           endpoint,
           data: formData,
           options: Options(),
         );
       } else {
-        logPrint("send-data:$data");
-        logPrint("send-headers:$mergedHeaders");
-        // 如果不是文件上传请求
+        logPrint("send-headers:$mergedHeaders | send-data:$data");
         response = await _dio.request(
           endpoint,
           data: data,
@@ -65,10 +61,10 @@ class RequestHelper {
       }
 
       if (response.data.containsKey('code') && response.data['code'] == 0) {
-        logPrint("response:$response");
+        logPrint("response-onSuccess: $response");
         onSuccess?.call(response.data);
       } else {
-        logPrint("response:$response");
+        logPrint("response-onError: $response");
         onError?.call(response.data);
       }
     } on DioException catch (e) {

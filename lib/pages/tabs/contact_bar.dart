@@ -24,13 +24,16 @@ AppBar contactBar() {
         ), // 聊天对象的名称
       ],
     ),
-
     actions: [
       IconButton(
+          padding: EdgeInsets.zero,
           onPressed: () {
             Get.toNamed('/add-contact');
           },
-          icon: const Icon(Icons.person_add_alt))
+          icon: const Icon(
+            Icons.person_add_alt,
+            size: 28,
+          ))
     ],
     // 其他属性设置...
   );

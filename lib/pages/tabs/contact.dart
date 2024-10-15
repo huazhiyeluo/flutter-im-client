@@ -52,7 +52,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
     _formatData(2);
   }
 
-  _formatData(int type) {
+  void _formatData(int type) {
     if (!mounted) return;
     setState(() {
       if (type == 1) {
@@ -70,6 +70,24 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
+  Widget _buildRedPoint(bool show) {
+    return show
+        ? Container(
+            height: 12,
+            padding: const EdgeInsets.all(0),
+            decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            constraints: const BoxConstraints(
+              maxWidth: 12,
+              minWidth: 12,
+              minHeight: 12,
+            ),
+          )
+        : const SizedBox.shrink();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,14 +98,15 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
             SliverAppBar(
               backgroundColor: Colors.grey[200],
               pinned: false,
-              expandedHeight: 168,
+              expandedHeight: 163,
               flexibleSpace: FlexibleSpaceBar(
                 background: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
-                      color: const Color.fromARGB(255, 255, 255, 255),
-                      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                      height: 60,
+                      color: Colors.white,
+                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 5),
                       child: CustomSearchField(
                         controller: inputController,
                         hintText: '搜索',
@@ -100,7 +119,12 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     Container(
-                      height: 45,
+                      height: 2,
+                      padding: EdgeInsets.zero,
+                      color: Colors.grey[200],
+                    ),
+                    Container(
+                      height: 44,
                       padding: EdgeInsets.zero,
                       color: const Color.fromARGB(255, 255, 255, 255),
                       margin: const EdgeInsets.fromLTRB(0, 3, 0, 0),
@@ -118,24 +142,10 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                             children: [
                               const Text(
                                 '新朋友',
-                                style: TextStyle(fontSize: 16.0), // 根据需要设置字体大小
+                                style: TextStyle(fontSize: 16.0),
                               ),
-                              Expanded(child: Container()),
-                              showFriendRedPoint
-                                  ? Container(
-                                      height: 12,
-                                      padding: const EdgeInsets.all(0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      constraints: const BoxConstraints(
-                                        maxWidth: 12,
-                                        minWidth: 12,
-                                        minHeight: 12,
-                                      ),
-                                    )
-                                  : Container(),
+                              const Expanded(child: SizedBox()),
+                              _buildRedPoint(showFriendRedPoint),
                               const Icon(Icons.chevron_right),
                             ],
                           ),
@@ -143,7 +153,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     Container(
-                      height: 45,
+                      height: 44,
                       padding: EdgeInsets.zero,
                       color: const Color.fromARGB(255, 255, 255, 255),
                       margin: const EdgeInsets.fromLTRB(0, 0, 0, 2),
@@ -161,24 +171,10 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                             children: [
                               const Text(
                                 '群通知',
-                                style: TextStyle(fontSize: 16.0), // 根据需要设置字体大小
+                                style: TextStyle(fontSize: 16.0),
                               ),
-                              Expanded(child: Container()),
-                              showGroupRedPoint
-                                  ? Container(
-                                      height: 12,
-                                      padding: const EdgeInsets.all(0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      constraints: const BoxConstraints(
-                                        maxWidth: 12,
-                                        minWidth: 12,
-                                        minHeight: 12,
-                                      ),
-                                    )
-                                  : Container(),
+                              const Expanded(child: SizedBox()),
+                              _buildRedPoint(showGroupRedPoint),
                               const Icon(Icons.chevron_right),
                             ],
                           ),
@@ -186,9 +182,9 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     Container(
-                      height: 10,
+                      height: 8,
                       padding: EdgeInsets.zero,
-                      color: const Color.fromARGB(136, 238, 237, 237),
+                      color: const Color.fromARGB(255, 237, 237, 237),
                     ),
                   ],
                 ),
@@ -280,8 +276,7 @@ class _ContactPageState extends State<ContactPage> {
       chat.info = userObj['info'];
       chat.remark = contactFriendObj['remark'];
       chat.isOnline = contactFriendObj['isOnline'];
-      chat.namePinyin =
-          PinyinHelper.getPinyin(contactFriendObj['remark'] != "" ? contactFriendObj['remark'] : userObj['nickname']);
+      chat.namePinyin = PinyinHelper.getPinyin(contactFriendObj['remark'] != "" ? contactFriendObj['remark'] : userObj['nickname']);
       String firstLetter = PinyinHelper.getFirstWordPinyin(chat.namePinyin!);
       chat.tagIndex = firstLetter.toUpperCase();
       _tabArr1.add(chat);

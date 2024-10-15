@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/apply.dart';
 import 'package:qim/data/controller/apply.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -32,7 +33,13 @@ class _NoticeFriendDetailState extends State<NoticeFriendDetail> {
             onPressed: () {
               _clearApply();
             },
-            child: const Text("清空"),
+            child: const Text(
+              "清空",
+              style: TextStyle(
+                color: AppColors.textButtonColor,
+                fontSize: 15,
+              ),
+            ),
           ),
         ],
       ),
@@ -82,13 +89,22 @@ class _NoticeFriendDetailPageState extends State<NoticeFriendDetailPage> {
   Widget _getStatusWidget(bool isFrom, int status, int id) {
     if (isFrom) {
       if (status == 0) {
-        return const Text("等待验证");
+        return const Text(
+          "等待验证",
+          style: TextStyle(fontSize: 14),
+        );
       }
       if (status == 1) {
-        return const Text("已被同意");
+        return const Text(
+          "已被同意",
+          style: TextStyle(fontSize: 14),
+        );
       }
       if (status == 2) {
-        return const Text("已被拒绝");
+        return const Text(
+          "已被拒绝",
+          style: TextStyle(fontSize: 14),
+        );
       }
     } else {
       if (status == 0) {
@@ -105,7 +121,7 @@ class _NoticeFriendDetailPageState extends State<NoticeFriendDetailPage> {
               padding: const EdgeInsets.all(0),
               textStyle: const TextStyle(fontSize: 14),
               borderRadius: const BorderRadius.all(
-                Radius.circular(10),
+                Radius.circular(5),
               ),
             ),
             const SizedBox(width: 8), // Add some spacing between the buttons
@@ -119,7 +135,7 @@ class _NoticeFriendDetailPageState extends State<NoticeFriendDetailPage> {
               padding: const EdgeInsets.all(0),
               textStyle: const TextStyle(fontSize: 14),
               borderRadius: const BorderRadius.all(
-                Radius.circular(10),
+                Radius.circular(5),
               ),
             ),
           ],

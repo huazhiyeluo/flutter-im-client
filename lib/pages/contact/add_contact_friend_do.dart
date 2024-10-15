@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/friend_group.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -25,7 +26,13 @@ class _AddContactFriendDoState extends State<AddContactFriendDo> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("取消"),
+          child: const Text(
+            "取消",
+            style: TextStyle(
+              color: AppColors.textButtonColor,
+              fontSize: 15,
+            ),
+          ),
         ),
       ),
       body: const AddContactFriendDoPage(),
@@ -54,15 +61,15 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
 
   @override
   void initState() {
+    super.initState();
+
     if (Get.arguments != null) {
       friendObj = Get.arguments;
     }
-
     friendGroupObj = friendGroupController.getOneDefaultFriendGroup();
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     _inputReasonController.text = "我是${userInfo['nickname']}";
-    super.initState();
   }
 
   _joinFriend() {
@@ -171,6 +178,7 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
                 text: "发送",
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(5)),
               ),
             ),
             const SizedBox(width: 20),

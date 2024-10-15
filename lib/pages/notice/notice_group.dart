@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/apply.dart';
 import 'package:qim/data/controller/apply.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -33,7 +34,13 @@ class _NoticeGroupState extends State<NoticeGroup> {
             onPressed: () {
               _clearApply();
             },
-            child: const Text("清空"),
+            child: const Text(
+              "清空",
+              style: TextStyle(
+                color: AppColors.textButtonColor,
+                fontSize: 15,
+              ),
+            ),
           ),
         ],
       ),
@@ -87,13 +94,22 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
   Widget _getStatusWidget(bool isFrom, int status, int id) {
     if (isFrom) {
       if (status == 0) {
-        return const Text("等待验证");
+        return const Text(
+          "等待验证",
+          style: TextStyle(fontSize: 14),
+        );
       }
       if (status == 1) {
-        return const Text("已被同意");
+        return const Text(
+          "已被同意",
+          style: TextStyle(fontSize: 14),
+        );
       }
       if (status == 2) {
-        return const Text("已被拒绝");
+        return const Text(
+          "已被拒绝",
+          style: TextStyle(fontSize: 14),
+        );
       }
     } else {
       if (status == 0) {
@@ -110,7 +126,7 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
               padding: const EdgeInsets.all(0),
               textStyle: const TextStyle(fontSize: 14),
               borderRadius: const BorderRadius.all(
-                Radius.circular(10),
+                Radius.circular(5),
               ),
             ),
             const SizedBox(width: 8), // Add some spacing between the buttons
@@ -124,7 +140,7 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
               padding: const EdgeInsets.all(0),
               textStyle: const TextStyle(fontSize: 14),
               borderRadius: const BorderRadius.all(
-                Radius.circular(10),
+                Radius.circular(5),
               ),
             ),
           ],
@@ -158,9 +174,7 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
               return ListTile(
                 contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
                 title: Text(_applys[index]['toName']),
-                subtitle: isFrom
-                    ? Text("请求加入群，附言：${_applys[index]['reason']}")
-                    : Text("${_applys[index]['fromName']} 请求加入群，附言：${_applys[index]['reason']}"),
+                subtitle: isFrom ? Text("请求加入群，附言：${_applys[index]['reason']}") : Text("${_applys[index]['fromName']} 请求加入群，附言：${_applys[index]['reason']}"),
                 leading: CircleAvatar(
                   // 聊天对象的头像
                   radius: 20,

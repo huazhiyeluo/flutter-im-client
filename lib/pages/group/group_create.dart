@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/common.dart';
 import 'package:qim/data/api/group.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -26,13 +27,19 @@ class _GroupCreateState extends State<GroupCreate> {
       backgroundColor: const Color.fromARGB(255, 243, 243, 243),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 243, 243, 243),
+        title: const Text("创建群"),
         leading: TextButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("取消"),
+          child: const Text(
+            "取消",
+            style: TextStyle(
+              color: AppColors.textButtonColor,
+              fontSize: 15,
+            ),
+          ),
         ),
-        title: const Text("创建群"),
       ),
       body: const GroupCreatePage(),
     );
@@ -166,7 +173,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                               onPressed: _clearInfo,
                             )
                           : const SizedBox.shrink(),
-                      hintText: '填写群名称(2-500个字)',
+                      hintText: '填写群介绍(2-500个字)',
                       border: UnderlineInputBorder(
                         borderSide: BorderSide.none,
                         borderRadius: BorderRadius.circular(0),
@@ -207,14 +214,13 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                 crossAxisSpacing: 20.0, // 每个头像之间的水平间距
                 mainAxisSpacing: 20.0, // 每个头像之间的垂直间距
               ),
-              itemCount: 10, // 总共8个头像（包括加号按钮）
+              itemCount: 10, // 总共10个头像（包括加号按钮）
               itemBuilder: (context, index) {
                 return _showAvatar(index);
               },
             ),
           ),
           const SizedBox(height: 10),
-          Expanded(child: Container()),
           CheckboxListTile(
             value: _isChecked,
             onChanged: (bool? value) {
@@ -260,13 +266,11 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
             ),
           ),
           const SizedBox(height: 10),
-          Expanded(child: Container()),
           const Text(
             "理性追星不盲从，文明表达互尊重,\n违法违规立举报，社群公约共遵守",
             style: TextStyle(fontSize: 11.5),
             textAlign: TextAlign.center,
           ),
-          Expanded(child: Container()),
           const SizedBox(height: 10),
         ],
       ),
@@ -416,25 +420,13 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
       XFile compressedFile = await compressImage(_imageFile!);
       dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) async {
-        var params = {
-          'ownerUid': uid,
-          'type': 0,
-          'name': nameController.text,
-          'icon': res['data'],
-          'info': infoController.text
-        };
+        var params = {'ownerUid': uid, 'type': 0, 'name': nameController.text, 'icon': res['data'], 'info': infoController.text};
         _createGroupDo(params);
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
     } else {
-      var params = {
-        'ownerUid': uid,
-        'type': 0,
-        'name': nameController.text,
-        'icon': "http://img.siyuwen.com/godata/avatar/$_defaultSelect.jpg",
-        'info': infoController.text
-      };
+      var params = {'ownerUid': uid, 'type': 0, 'name': nameController.text, 'icon': "http://img.siyuwen.com/godata/avatar/$_defaultSelect.jpg", 'info': infoController.text};
       _createGroupDo(params);
     }
   }

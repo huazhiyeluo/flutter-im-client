@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/common/utils/tips.dart';
@@ -24,7 +25,13 @@ class _AddContactGroupDoState extends State<AddContactGroupDo> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("取消"),
+          child: const Text(
+            "取消",
+            style: TextStyle(
+              color: AppColors.textButtonColor,
+              fontSize: 15,
+            ),
+          ),
         ),
       ),
       body: const AddContactGroupDoPage(),

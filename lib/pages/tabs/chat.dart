@@ -31,9 +31,11 @@ class _ChatState extends State<Chat> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(65),
         child: AppBar(
+          backgroundColor: Colors.grey[200],
           flexibleSpace: Container(
-            color: const Color.fromARGB(255, 255, 255, 255),
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+            height: 60,
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 5),
             child: CustomSearchField(
               controller: inputController,
               hintText: '搜索',
@@ -64,14 +66,40 @@ class _ChatPageState extends State<ChatPage> {
   final ChatController chatController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
-  int uid = 0;
-  Map userInfo = {};
+  late final int uid;
+  late final Map userInfo;
 
   @override
   void initState() {
     super.initState();
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
+  }
+
+  void _setTop(Map temp) {
+    Map chatData = {
+      'objId': temp['objId'],
+      'type': temp['type'],
+      'isTop': 1 - temp['isTop'],
+    };
+    chatController.upsetChat(chatData);
+    saveDbChat(chatData);
+    _actContact(temp['objId'], 'isTop', chatData['isTop'], temp['type']);
+  }
+
+  void _markAsRead(Map temp) {
+    Map chatData = {
+      'objId': temp['objId'],
+      'type': temp['type'],
+      'tips': 0,
+    };
+    chatController.upsetChat(chatData);
+    saveDbChat(chatData);
+  }
+
+  void _deleteChat(Map temp) {
+    chatController.delChat(temp['objId'], temp['type']);
+    delDbChat(temp['objId'], temp['type']);
   }
 
   @override
@@ -81,167 +109,101 @@ class _ChatPageState extends State<ChatPage> {
         itemCount: chatController.allShowChats.length,
         itemBuilder: (BuildContext context, int index) {
           var temp = chatController.allShowChats[index];
-          double extentRatioTop = 2.0;
-          String textTop = "置顶";
-          int flexTop = 3;
-          if (temp['isTop'] == 1) {
-            extentRatioTop = 2.2;
-            textTop = '取消置顶';
-            flexTop = 4;
-          }
-
+          bool isTop = temp['isTop'] == 1;
           return Slidable(
-            key: const ValueKey(0),
+            key: ValueKey(temp['objId']),
             useTextDirection: false,
             endActionPane: ActionPane(
               motion: const ScrollMotion(),
-              extentRatio: extentRatioTop / 3,
+              extentRatio: isTop ? 0.75 : 0.6,
               children: [
-                CustomSlidableAction(
-                  padding: EdgeInsets.zero,
-                  flex: flexTop,
-                  onPressed: (slidCtx) {
-                    _setTop(temp);
-                  },
+                _buildSlidableAction(
+                  onPressed: () => _setTop(temp),
                   backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center, // 水平居中对齐
-                    children: [
-                      Text(
-                        textTop,
-                        textDirection: TextDirection.ltr,
-                        textAlign: TextAlign.center,
-                      )
-                    ],
-                  ),
+                  text: isTop ? '取消置顶' : '置顶',
                 ),
-                CustomSlidableAction(
-                  flex: 4,
-                  onPressed: (slidCtx) {
-                    Map chatData = {};
-                    chatData['objId'] = temp['objId'];
-                    chatData['type'] = temp['type'];
-                    chatData['tips'] = 0;
-                    chatController.upsetChat(chatData);
-                    saveDbChat(chatData);
-                  },
+                _buildSlidableAction(
+                  onPressed: () => _markAsRead(temp),
                   backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center, // 水平居中对齐
-                    children: [
-                      Text(
-                        '标为已读',
-                        textDirection: TextDirection.ltr,
-                        textAlign: TextAlign.center,
-                      )
-                    ],
-                  ),
+                  text: '标为已读',
                 ),
-                CustomSlidableAction(
-                  flex: 3,
-                  onPressed: (slidCtx) {
-                    chatController.delChat(temp['objId'], temp['type']);
-                    delDbChat(temp['objId'], temp['type']);
-                  },
+                _buildSlidableAction(
+                  onPressed: () => _deleteChat(temp),
                   backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center, // 水平居中对齐
-                    children: [
-                      Text(
-                        '删除',
-                        textDirection: TextDirection.ltr,
-                        textAlign: TextAlign.center,
-                      )
-                    ],
-                  ),
+                  text: '删除',
                 ),
               ],
             ),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(5, 0, 10, 0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                border: const Border(
-                  bottom: BorderSide(color: Color.fromARGB(255, 203, 201, 201), width: 1.0),
-                ),
-              ),
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: CircleAvatar(
-                      radius: 20,
-                      backgroundImage: CachedNetworkImageProvider(temp["icon"]),
-                    ),
-                    title: Text(temp["remark"] != '' ? temp["remark"] : temp["name"]),
-                    subtitle: Text(
-                      getContent(temp["msgMedia"], temp["content"]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: Column(children: [
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        getSpecialDate(temp["operateTime"]),
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                      const SizedBox(height: 3),
-                      temp['isQuiet'] == 1
-                          ? const Icon(Icons.notifications_off_outlined)
-                          : Container(
-                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                              decoration: BoxDecoration(
-                                color: temp["type"] == 1 ? Colors.red[200] : Colors.grey[200],
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                '${temp["tips"]}',
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                ),
-                              )),
-                    ]),
-                    onTap: () {
-                      Map talkObj = {
-                        "objId": temp["objId"],
-                        "type": temp["type"],
-                      };
-
-                      Map chatData = {};
-                      chatData['objId'] = temp["objId"];
-                      chatData['type'] = temp["type"];
-                      chatData['tips'] = 0;
-                      chatController.upsetChat(chatData);
-                      saveDbChat(chatData);
-
-                      Navigator.pushNamed(
-                        context,
-                        '/talk',
-                        arguments: talkObj,
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
+            child: _buildChatItem(temp),
           );
         },
       );
     });
   }
 
-  void _setTop(Map temp) {
-    Map chatData = {};
-    chatData['objId'] = temp['objId'];
-    chatData['type'] = temp['type'];
-    chatData['isTop'] = 1 - temp['isTop'];
-    chatController.upsetChat(chatData);
-    saveDbChat(chatData);
-    _actContact(temp['objId'], 'isTop', chatData['isTop'], temp['type']);
+  Widget _buildSlidableAction({required Function onPressed, required Color backgroundColor, required String text}) {
+    return CustomSlidableAction(
+      padding: EdgeInsets.zero,
+      flex: 4,
+      onPressed: (slidCtx) => onPressed(),
+      backgroundColor: backgroundColor,
+      foregroundColor: Colors.white,
+      child: Center(child: Text(text, textDirection: TextDirection.ltr, textAlign: TextAlign.center)),
+    );
+  }
+
+  Widget _buildChatItem(Map temp) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(5, 0, 10, 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        border: const Border(
+          bottom: BorderSide(color: Color.fromARGB(255, 203, 201, 201), width: 1.0),
+        ),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          radius: 20,
+          backgroundImage: CachedNetworkImageProvider(temp["icon"]),
+        ),
+        title: Text(temp["remark"].isNotEmpty ? temp["remark"] : temp["name"]),
+        subtitle: Text(
+          getContent(temp["msgMedia"], temp["content"]),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: Column(
+          children: [
+            const SizedBox(height: 5),
+            Text(
+              getSpecialDate(temp["operateTime"]),
+              style: const TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 5),
+            temp['isQuiet'] == 1
+                ? const Icon(Icons.notifications_off_outlined)
+                : Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    decoration: BoxDecoration(
+                      color: temp["type"] == 1 ? Colors.red[200] : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '${temp["tips"]}',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                  ),
+          ],
+        ),
+        onTap: () {
+          _markAsRead(temp);
+          Navigator.pushNamed(context, '/talk', arguments: {
+            "objId": temp["objId"],
+            "type": temp["type"],
+          });
+        },
+      ),
+    );
   }
 
   void _actContact(int toId, String field, int value, int type) {
@@ -257,8 +219,7 @@ class _ChatPageState extends State<ChatPage> {
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
-    }
-    if (type == 2) {
+    } else if (type == 2) {
       ContactGroupApi.actContactGroup(params, onSuccess: (res) {
         contactGroupController.upsetContactGroup(res['data']);
         saveDbContactGroup(res['data']);

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:qim/config/constants.dart';
 import 'routes/route.dart';
 import 'common/utils/cache.dart';
 import 'package:get/get.dart';
@@ -7,20 +10,29 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 void main() async {
-  /// 确保初始化完成
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    systemNavigationBarColor: Color.fromRGBO(237, 237, 237, 1),
-    systemNavigationBarIconBrightness: Brightness.dark,
-  ));
-
   await CacheHelper.getInstance();
 
   runApp(const MyApp());
+
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    systemNavigationBarColor: AppColors.systemNavigationBarColor,
+    systemNavigationBarIconBrightness: Brightness.light,
+  ));
+
+  if (Platform.isAndroid) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  }
+
+  ErrorWidget.builder = (FlutterErrorDetails flutterErrorDetails) {
+    debugPrint(flutterErrorDetails.toString());
+    return const Center(child: Text("App错误,快去反馈给开发者!"));
+  };
 }
 
 class MyApp extends StatefulWidget {
@@ -36,41 +48,48 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    initData();
+    _initData();
   }
 
-  initData() async {
+  void _initData() async {
     String initialRouteData = await initialRoute();
     setState(() {
       _initialRoute = initialRouteData;
     });
   }
 
+  ThemeData _buildAppTheme() {
+    return ThemeData(
+      scaffoldBackgroundColor: AppColors.backgroundColor,
+      hintColor: Colors.grey.withOpacity(0.3),
+      splashColor: Colors.transparent,
+      canvasColor: Colors.transparent,
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: AppColors.bottomBackgroundColor,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.appBackgroundColor,
+        elevation: 1,
+        titleTextStyle: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.normal,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_initialRoute == null) {
-      return const CircularProgressIndicator(); // 显示加载指示器等待数据初始化完成
+      return const Center(child: CircularProgressIndicator());
     } else {
       return GetMaterialApp(
-        title: "QIM",
-        theme: ThemeData(
-          scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          hintColor: Colors.grey.withOpacity(0.3),
-          splashColor: const Color.fromARGB(0, 37, 15, 15),
-          canvasColor: Colors.transparent,
-          appBarTheme: AppBarTheme(
-            backgroundColor: Colors.grey[200], // 设置 AppBar 背景色
-            elevation: 1, // 如果你想要去掉 AppBar 的阴影，可以设置为 0
-            titleTextStyle: const TextStyle(
-              fontSize: 18, // 设置文字大小
-              fontWeight: FontWeight.normal,
-              color: Colors.black,
-            ),
-          ),
-        ),
+        title: AppConstants.appName,
+        theme: _buildAppTheme(),
         debugShowCheckedModeBanner: false,
-        initialRoute: _initialRoute,
         defaultTransition: Transition.rightToLeft,
+        initialRoute: _initialRoute,
         getPages: AppPage.routes,
       );
     }
