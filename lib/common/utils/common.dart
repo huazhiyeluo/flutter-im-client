@@ -11,7 +11,7 @@ import 'package:qim/data/controller/apply.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/group.dart';
-import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/talk.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/websocket.dart';
@@ -101,9 +101,9 @@ Future<void> loadFriendManage(int uid, Map msg) async {
     chatController.delChat(data['user']['uid'], 1);
     delDbChat(data['user']['uid'], 1);
 
-    final TalkobjController talkobjController = Get.put(TalkobjController());
-    if (talkobjController.talkObj['objId'] == data['user']['uid']) {
-      talkobjController.setTalkObj({});
+    final TalkController talkController = Get.put(TalkController());
+    if (talkController.talkObj['objId'] == data['user']['uid']) {
+      talkController.setTalk({});
       Get.until((route) => route.settings.name == '/');
       Get.toNamed('/');
     }

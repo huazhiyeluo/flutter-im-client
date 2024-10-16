@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/friend_group.dart';
-import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/talk.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -41,7 +42,7 @@ class FriendDetailSettingPage extends StatefulWidget {
 }
 
 class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
-  final TalkobjController talkobjController = Get.find();
+  final TalkController talkController = Get.find();
   final UserInfoController userInfoController = Get.find();
 
   final UserController userController = Get.find();
@@ -84,7 +85,7 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
           'toId': talkObj['objId'],
         };
         ContactFriendApi.delContactFriend(params, onSuccess: (res) {
-          talkobjController.setTalkObj({});
+          talkController.setTalk({});
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/',
@@ -192,7 +193,7 @@ class _FriendDetailSettingPageState extends State<FriendDetailSettingPage> {
               Navigator.pushNamed(
                 context,
                 '/share',
-                arguments: {"ttype": 1, "msgObj": msgObj},
+                arguments: {"ttype": ShareTypes.single, "msgObj": msgObj},
               );
             },
           ),

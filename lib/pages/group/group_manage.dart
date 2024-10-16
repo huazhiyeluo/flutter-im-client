@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:qim/common/utils/tips.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/contact_group.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/save.dart';
@@ -18,7 +17,6 @@ class GroupManager extends StatefulWidget {
 }
 
 class _GroupManagerState extends State<GroupManager> with TickerProviderStateMixin {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/contact_group.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/save.dart';
@@ -16,7 +15,6 @@ class GroupChatSettingNickname extends StatefulWidget {
 }
 
 class _GroupChatSettingNicknameState extends State<GroupChatSettingNickname> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
 

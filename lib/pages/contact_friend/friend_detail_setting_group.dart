@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/friend_group.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/save.dart';
@@ -17,7 +16,6 @@ class FriendDetailSettingGroup extends StatefulWidget {
 }
 
 class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
@@ -31,13 +29,13 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
 
   @override
   void initState() {
+    super.initState();
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     if (Get.arguments != null) {
       talkObj = Get.arguments;
-      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
     }
-    super.initState();
+    contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
   }
 
   @override

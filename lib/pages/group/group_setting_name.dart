@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/group.dart';
 import 'package:qim/data/controller/group.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/save.dart';
@@ -16,7 +15,6 @@ class GroupSettingName extends StatefulWidget {
 }
 
 class _GroupSettingNameState extends State<GroupSettingName> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final GroupController groupController = Get.find();
 

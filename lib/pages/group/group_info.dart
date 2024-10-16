@@ -10,8 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qim/common/utils/data.dart';
 import 'package:qim/common/utils/tips.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/controller/group.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -53,7 +53,6 @@ class GroupInfoPage extends StatefulWidget {
 }
 
 class _GroupInfoPageState extends State<GroupInfoPage> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final GroupController groupController = Get.find();
 
@@ -100,8 +99,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
       // 截取二维码图片
       final Uint8List? image = await screenshotController.capture();
       if (image != null) {
-        final result = await ImageGallerySaverPlus.saveImage(image,
-            quality: 100, name: "qr_code_${DateTime.now().millisecondsSinceEpoch}");
+        final result = await ImageGallerySaverPlus.saveImage(image, quality: 100, name: "qr_code_${DateTime.now().millisecondsSinceEpoch}");
         if (result["isSuccess"]) {
           TipHelper.instance.showToast("图片保存成功");
         } else {
@@ -133,7 +131,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
         };
         Get.toNamed(
           '/share',
-          arguments: {"ttype": 2, "msgObj": msgObj},
+          arguments: {"ttype": ShareTypes.complex, "msgObj": msgObj},
         );
       } else {
         TipHelper.instance.showToast("生成图片失败");

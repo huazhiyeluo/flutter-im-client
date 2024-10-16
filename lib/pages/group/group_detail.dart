@@ -4,8 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/controller/group.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/common/utils/date.dart';
@@ -85,7 +85,6 @@ class GroupDetailPage extends StatefulWidget {
 }
 
 class _GroupDetailPageState extends State<GroupDetailPage> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final GroupController groupController = Get.find();
 
@@ -204,7 +203,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                     Navigator.pushNamed(
                       context,
                       '/share',
-                      arguments: {"ttype": 1, "msgObj": msgObj},
+                      arguments: {"ttype": ShareTypes.single, "msgObj": msgObj},
                     );
                   },
                   text: "分享群聊",

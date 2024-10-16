@@ -12,7 +12,7 @@ import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/group.dart';
 import 'package:qim/data/controller/message.dart';
 import 'package:qim/data/controller/share.dart';
-import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/talk.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/get.dart';
@@ -91,12 +91,17 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
     chatData['isQuiet'] = lastChat['isQuiet'];
   }
 
-  final TalkobjController talkobjController = Get.put(TalkobjController());
-  if (talkobjController.talkObj['objId'] == msg['fromId'] || talkobjController.talkObj['objId'] == msg['toId']) {
-    chatData['tips'] = 0;
+  final TalkController talkObjController = Get.find();
+  if (talkObjController.talkObj.isNotEmpty) {
+    if (uid == msg['fromId'] || talkObjController.talkObj['objId'] == msg['toId']) {
+      chatData['tips'] = 0;
+    } else {
+      chatData['tips'] = (lastChat['tips'] ?? 0) + 1;
+      audioPlayerManager ??= AudioPlayerManager();
+      await audioPlayerManager.playSound("2.mp3");
+    }
   } else {
     chatData['tips'] = (lastChat['tips'] ?? 0) + 1;
-
     audioPlayerManager ??= AudioPlayerManager();
     await audioPlayerManager.playSound("2.mp3");
   }
@@ -139,9 +144,7 @@ Future<void> joinMessage(int uid, Map temp) async {
       Map contactGroupObj = contactGroupController.getOneContactGroup(msg['fromId'], msg['toId']);
 
       msg['avatar'] = userObj['avatar'];
-      msg['nickname'] = contactGroupObj.isNotEmpty && contactGroupObj['nickname'] != ""
-          ? contactGroupObj['nickname']
-          : userObj['nickname'];
+      msg['nickname'] = contactGroupObj.isNotEmpty && contactGroupObj['nickname'] != "" ? contactGroupObj['nickname'] : userObj['nickname'];
     }
   }
   messageController.addMessage(msg);

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/friend_group.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/del.dart';
@@ -18,7 +17,6 @@ class FriendGroup extends StatefulWidget {
 }
 
 class _FriendGroupState extends State<FriendGroup> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
@@ -127,8 +125,7 @@ class _FriendGroupState extends State<FriendGroup> {
       delDbFriendGroup(friendGroupId);
       friendGroupController.delFriendGroup(friendGroupId);
       updateDbContactFriendByFriendGroupId(friendGroupId, {"friendGroupId": res['data']['friendGroupId']});
-      contactFriendController
-          .upsetContactFriendByFriendGroupId(friendGroupId, {"friendGroupId": res['data']['friendGroupId']});
+      contactFriendController.upsetContactFriendByFriendGroupId(friendGroupId, {"friendGroupId": res['data']['friendGroupId']});
       Navigator.pop(context);
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);

@@ -249,14 +249,14 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                     alignment: Alignment.center,
                     child: GestureDetector(
                       onTap: () {
-                        Map talkobj = {
+                        Map talkObj = {
                           "objId": contactGroups[index]['fromId'],
                           "type": 1,
                         };
                         Navigator.pushNamed(
                           context,
                           '/friend-detail',
-                          arguments: talkobj,
+                          arguments: talkObj,
                         );
                       },
                       child: Column(
@@ -271,9 +271,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                             height: 1,
                           ), // 添加一个间距
                           Text(
-                            contactGroups[index]['nickname'] != ""
-                                ? contactGroups[index]['nickname']
-                                : userObj['nickname'],
+                            contactGroups[index]['nickname'] != "" ? contactGroups[index]['nickname'] : userObj['nickname'],
                             style: const TextStyle(fontSize: 12),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -296,7 +294,11 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
               ],
             ),
             onTap: () {
-              Navigator.pushNamed(context, '/group-setting-name', arguments: talkObj);
+              Navigator.pushNamed(
+                context,
+                '/group-setting-name',
+                arguments: talkObj,
+              );
             },
           ),
           Container(

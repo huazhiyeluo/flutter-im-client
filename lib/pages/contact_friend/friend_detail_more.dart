@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
 import 'package:qim/common/utils/functions.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -37,7 +36,6 @@ class FriendDetailMorePage extends StatefulWidget {
 
 class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
   final SignalingController signalingController = Get.find();
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
 
   final UserController userController = Get.find();
@@ -69,11 +67,11 @@ class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (talkObj.isEmpty) {
-        return const Center(child: Text("1"));
+        return const Center(child: Text(""));
       }
       userObj = userController.getOneUser(talkObj['objId']);
       if (userObj.isEmpty) {
-        return const Center(child: Text("2"));
+        return const Center(child: Text(""));
       }
       logPrint(userObj);
       contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);

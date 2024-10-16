@@ -15,7 +15,7 @@ import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/friend_group.dart';
 import 'package:qim/data/controller/group.dart';
 import 'package:qim/data/controller/share.dart';
-import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/talk.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/controller/websocket.dart';
@@ -59,7 +59,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   final ChatController chatController = Get.put(ChatController());
   final ShareController shareController = Get.put(ShareController());
 
-  final TalkobjController talkobjController = Get.put(TalkobjController());
+  final TalkController talkController = Get.put(TalkController());
   final UserInfoController userInfoController = Get.put(UserInfoController());
 
   final List<Function> _pagesBar = [chatBar, contactBar, settingBar];
@@ -98,7 +98,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     Get.delete<ApplyController>();
     Get.delete<ChatController>();
     Get.delete<ShareController>();
-    Get.delete<TalkobjController>();
+    Get.delete<TalkController>();
     Get.delete<UserInfoController>();
     Get.delete<WebSocketController>();
     Get.delete<SignalingController>();

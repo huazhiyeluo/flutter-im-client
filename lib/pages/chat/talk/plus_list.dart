@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PlusList extends StatefulWidget {
-  final int isShowPlus;
+  final bool isShowPlus;
   final double keyboardHeight;
   final bool isneedphone;
   final Function(int) onPlus;
@@ -20,17 +20,17 @@ class PlusList extends StatefulWidget {
 
 class _PlusListState extends State<PlusList> {
   final List<Map<String, dynamic>> icons = [
-    {"val": 1, "icon": Icons.image},
-    {"val": 2, "icon": Icons.camera_alt},
-    {"val": 4, "icon": Icons.audio_file},
-    {"val": 5, "icon": Icons.videocam},
-    {"val": 6, "icon": Icons.folder},
+    {"val": 1, "icon": Icons.image}, //图片
+    {"val": 2, "icon": Icons.camera_alt}, //相机
+    {"val": 4, "icon": Icons.audio_file}, //音频
+    {"val": 5, "icon": Icons.videocam}, //视频
+    {"val": 6, "icon": Icons.folder}, //文件
   ];
 
   @override
   void initState() {
     if (widget.isneedphone) {
-      icons.add({"val": 3, "icon": Icons.call});
+      icons.add({"val": 3, "icon": Icons.call}); //电话
       icons.sort((a, b) {
         return a['val'].compareTo(b['val']);
       });
@@ -41,7 +41,7 @@ class _PlusListState extends State<PlusList> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.isShowPlus == 1 ? widget.keyboardHeight : 0,
+      height: widget.isShowPlus ? widget.keyboardHeight : 0,
       padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
       color: const Color.fromARGB(255, 237, 237, 237),
       child: GridView.builder(

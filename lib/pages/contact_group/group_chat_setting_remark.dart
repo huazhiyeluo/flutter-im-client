@@ -5,7 +5,6 @@ import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/group.dart';
-import 'package:qim/data/controller/talkobj.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/save.dart';
@@ -20,7 +19,6 @@ class GroupChatSettingRemark extends StatefulWidget {
 }
 
 class _GroupChatSettingRemarkState extends State<GroupChatSettingRemark> {
-  final TalkobjController talkobjController = Get.find();
   final UserInfoController userInfoController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
   final GroupController groupController = Get.find();

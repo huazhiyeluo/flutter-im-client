@@ -20,6 +20,12 @@ class ObjectTypes {
   static const int group = 2; // 群
 }
 
+// 对象类型
+class ShareTypes {
+  static const int single = 1; // 简单
+  static const int complex = 2; //复杂
+}
+
 // 消息类型
 class AppWebsocket {
   // type 消息类型
@@ -42,7 +48,8 @@ class AppWebsocket {
   static const int msgMediaTimes = 12; // 通话时长
   static const int msgMediaOff = 13; // 挂断电话
   static const int msgMediaInvite = 21; // 邀请入群消息
-  static const int msgMediaPerson = 22; // 个人名片消息
+  static const int msgMediaUser = 22; // 个人名片消息
+  static const int msgMediaGroup = 23; // 群名片消息
 
   // media（type 3） 消息展示样式
   static const int msgMediaOfflinePack = 10; // 挤下线

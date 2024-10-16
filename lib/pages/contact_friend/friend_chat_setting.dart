@@ -4,7 +4,7 @@ import 'package:qim/common/utils/data.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/message.dart';
-import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/talk.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -41,7 +41,7 @@ class FriendSettingChatPage extends StatefulWidget {
 }
 
 class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
-  final TalkobjController talkobjController = Get.find();
+  final TalkController talkController = Get.find();
   final MessageController messageController = Get.find();
   final ChatController chatController = Get.find();
   final UserController userController = Get.find();
@@ -97,14 +97,10 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
                 backgroundImage: NetworkImage(userObj['avatar'] ?? ''),
               ),
               onTap: () {
-                Map talkobj = {
-                  "objId": talkObj['objId'],
-                  "type": 1,
-                };
                 Navigator.pushNamed(
                   context,
                   '/friend-detail',
-                  arguments: talkobj,
+                  arguments: talkObj,
                 );
               },
             ),
@@ -286,7 +282,7 @@ class _FriendSettingChatPageState extends State<FriendSettingChatPage> {
           'toId': talkObj['objId'],
         };
         ContactFriendApi.delContactFriend(params, onSuccess: (res) {
-          talkobjController.setTalkObj({});
+          talkController.setTalk({});
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/',

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class EmojiList extends StatefulWidget {
-  final int isShowEmoji;
+  final bool isShowEmoji;
   final double keyboardHeight;
   final Function(String) onEmoji;
 
@@ -16,7 +16,6 @@ class _EmojiListState extends State<EmojiList> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     for (var i = 0; i <= 124; i++) {
       String temp = i < 10 ? '0$i' : '$i';
@@ -27,7 +26,7 @@ class _EmojiListState extends State<EmojiList> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.isShowEmoji == 1 ? widget.keyboardHeight : 0,
+      height: widget.isShowEmoji ? widget.keyboardHeight : 0,
       padding: const EdgeInsets.fromLTRB(10, 0, 10, 20),
       color: const Color.fromARGB(255, 237, 237, 237),
       child: GridView.builder(

@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 
-class TalkobjController extends GetxController {
+class TalkController extends GetxController {
   final RxMap talkObj = {}.obs;
 
-  void setTalkObj(Map obj) {
+  void setTalk(Map obj) {
     talkObj.value = obj.obs;
   }
 }

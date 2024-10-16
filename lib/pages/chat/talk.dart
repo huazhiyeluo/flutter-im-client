@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/common.dart';
-import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/group.dart';
 import 'package:qim/data/controller/message.dart';
-import 'package:qim/data/controller/talkobj.dart';
+import 'package:qim/data/controller/talk.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/controller/websocket.dart';
@@ -33,14 +33,12 @@ class Talk extends StatefulWidget {
 }
 
 class _TalkState extends State<Talk> {
-  final TalkobjController talkobjController = Get.find();
+  final UserInfoController userInfoController = Get.find();
+  final TalkController talkObjController = Get.find();
   final UserController userController = Get.find();
   final GroupController groupController = Get.find();
-
   final ContactFriendController contactFriendController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
-  final UserInfoController userInfoController = Get.find();
-  final ChatController chatController = Get.find();
 
   Map talkObj = {};
   Map userInfo = {};
@@ -53,31 +51,72 @@ class _TalkState extends State<Talk> {
   @override
   void initState() {
     super.initState();
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-      talkobjController.setTalkObj(talkObj);
-    }
+    talkObj = Get.arguments ?? {};
+    talkObjController.setTalk(talkObj);
+
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     _initData();
   }
 
   void _initData() async {
-    if (talkObj['type'] == 1) {
+    if (talkObj['type'] == ObjectTypes.user) {
       await initOneUser(talkObj['objId']);
-    } else if (talkObj['type'] == 2) {
+    } else if (talkObj['type'] == ObjectTypes.group) {
       await initOneGroup(talkObj['objId']);
     }
   }
 
   @override
   void dispose() {
-    talkobjController.setTalkObj({"objId": 0});
+    talkObjController.setTalk({});
     super.dispose();
+  }
+
+  Widget _buildTitle() {
+    if (talkObj['type'] == ObjectTypes.user) {
+      return _buildUserTitle();
+    } else if (talkObj['type'] == ObjectTypes.group) {
+      return _buildGroupTitle();
+    }
+    return Container();
+  }
+
+  Row _buildUserTitle() {
+    Map userObj = userController.getOneUser(talkObj['objId']);
+    iconObj = userObj['avatar'];
+    nickname = userObj['nickname'];
+
+    Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
+    textObj = contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0 ? (contactFriendObj['remark'].isNotEmpty ? contactFriendObj['remark'] : nickname) : (talkObj['objId'] == uid ? nickname : "$nickname(临时聊天)");
+
+    return _buildTitleRow(iconObj, textObj);
+  }
+
+  Row _buildGroupTitle() {
+    Map groupObj = groupController.getOneGroup(talkObj['objId']);
+    Map contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
+    iconObj = groupObj['icon'];
+    textObj = "${contactGroupObj['remark'].isNotEmpty ? contactGroupObj['remark'] : groupObj['name']}(${groupObj['num']})";
+
+    return _buildTitleRow(iconObj, textObj);
+  }
+
+  Row _buildTitleRow(String icon, String text) {
+    return Row(
+      children: [
+        CircleAvatar(radius: 15, backgroundImage: NetworkImage(icon)),
+        const SizedBox(width: 8),
+        Text(text, style: const TextStyle(fontSize: 20)),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (talkObj.isEmpty) {
+      return const Center(child: Text(""));
+    }
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -86,57 +125,19 @@ class _TalkState extends State<Talk> {
             Navigator.pop(context); // Navigate back to previous route
           },
         ),
-        title: Obx(() {
-          if (talkObj['type'] == 1) {
-            Map userObj = userController.getOneUser(talkObj['objId']);
-            iconObj = userObj['avatar'];
-            nickname = userObj['nickname'];
-
-            Map contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
-            if (contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0) {
-              textObj = contactFriendObj['remark'] != '' ? contactFriendObj['remark'] : nickname;
-            } else {
-              if (talkObj['objId'] == uid) {
-                textObj = nickname;
-              } else {
-                textObj = "$nickname(临时聊天)";
-              }
-            }
-          } else if (talkObj['type'] == 2) {
-            Map groupObj = groupController.getOneGroup(talkObj['objId']);
-            Map contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
-            iconObj = groupObj['icon'];
-            textObj =
-                "${contactGroupObj['remark'] != '' ? contactGroupObj['remark'] : groupObj['name']}(${groupObj['num']})";
-          }
-          return Row(
-            children: [
-              CircleAvatar(
-                radius: 15,
-                backgroundImage: NetworkImage(iconObj),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                textObj,
-                style: const TextStyle(
-                  fontSize: 20,
-                ),
-              ),
-            ],
-          );
-        }),
+        title: Obx(() => _buildTitle()),
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () {
               // 更多选项的操作
-              if (talkObj['type'] == 1) {
+              if (talkObj['type'] == ObjectTypes.user) {
                 Navigator.pushNamed(
                   context,
                   '/friend-chat-setting',
                   arguments: talkObj,
                 );
-              } else if (talkObj['type'] == 2) {
+              } else if (talkObj['type'] == ObjectTypes.group) {
                 Navigator.pushNamed(
                   context,
                   '/group-chat-setting',
@@ -160,13 +161,12 @@ class TalkPage extends StatefulWidget {
 }
 
 class _TalkPageState extends State<TalkPage> {
+  final TalkController talkObjController = Get.find();
+  final UserInfoController userInfoController = Get.find();
   final WebSocketController webSocketController = Get.find();
   final SignalingController signalingController = Get.find();
   final MessageController messageController = Get.find();
-  final TalkobjController talkobjController = Get.find();
-  final UserInfoController userInfoController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
-
   final TextEditingController _inputController = TextEditingController();
 
   double keyboardHeight = 270.0;
@@ -174,8 +174,8 @@ class _TalkPageState extends State<TalkPage> {
   Map userInfo = {};
   Map talkObj = {};
   Map talkCommonObj = {};
-  int isShowEmoji = 0;
-  int isShowPlus = 0;
+  bool isShowEmoji = false;
+  bool isShowPlus = false;
 
   final FocusNode _focusNode = FocusNode();
 
@@ -183,26 +183,24 @@ class _TalkPageState extends State<TalkPage> {
   void initState() {
     super.initState();
 
-    talkObj = talkobjController.talkObj;
+    talkObj = talkObjController.talkObj;
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     talkCommonObj = getTalkCommonObj(talkObj);
 
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
-        isShowEmoji = 0;
-        isShowPlus = 0;
+        isShowEmoji = false;
+        isShowPlus = false;
       }
     });
   }
 
-  final ImagePicker _picker = ImagePicker();
-
   @override
   void dispose() {
-    _inputController.dispose();
-    talkobjController.setTalkObj({"objId": 0});
     super.dispose();
+    _inputController.dispose();
+    talkObjController.setTalk({});
   }
 
   @override
@@ -214,97 +212,95 @@ class _TalkPageState extends State<TalkPage> {
       decoration: const BoxDecoration(color: Color(0xffefefef)),
       height: double.infinity,
       width: double.infinity,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-          setState(() {
-            isShowEmoji = 0;
-            isShowPlus = 0;
-          });
-        },
-        child: Column(
-          children: [
-            const Expanded(
-              child: ChatMessage(),
+      child: Column(
+        children: [
+          const Expanded(
+            child: ChatMessage(),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            constraints: const BoxConstraints(
+              minHeight: 45.0,
+              maxHeight: 135.0,
             ),
-            Container(
-              height: 45.0,
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              decoration: const BoxDecoration(
-                color: Color(0xfff7f7f7),
-                border: Border(
-                  top: BorderSide(color: Colors.grey, width: 0.2),
-                  bottom: BorderSide(color: Colors.grey, width: 0.2),
-                ),
+            decoration: const BoxDecoration(
+              color: Color(0xfff7f7f7),
+              border: Border(
+                top: BorderSide(color: Colors.grey, width: 0.2),
+                bottom: BorderSide(color: Colors.grey, width: 0.2),
               ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
-                        child: ExtendedTextField(
-                          onTap: () => setState(() {
-                            if (_focusNode.hasFocus) isShowEmoji = 0;
-                          }),
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(5.0),
-                          ),
-                          onChanged: (v) => setState(() {}),
-                          controller: _inputController,
-                          focusNode: _focusNode,
-                          maxLines: 10,
-                          cursorColor: const Color(0xff07c160),
-                          style: const TextStyle(
-                            textBaseline: TextBaseline.alphabetic,
-                            fontSize: 20,
-                            color: Color(0xff181818),
-                          ),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: ExtendedTextField(
+                        onTap: () => setState(() {
+                          if (_focusNode.hasFocus) {
+                            isShowEmoji = false;
+                            isShowPlus = false;
+                          }
+                        }),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(5.0),
+                        ),
+                        onChanged: (v) => setState(() {}),
+                        controller: _inputController,
+                        focusNode: _focusNode,
+                        minLines: 1,
+                        maxLines: 5,
+                        cursorColor: const Color(0xff07c160),
+                        style: const TextStyle(
+                          textBaseline: TextBaseline.alphabetic,
+                          fontSize: 20,
+                          color: Color(0xff181818),
                         ),
                       ),
-                      _showEmoji(),
-                      _inputController.text.trim() == "" ? _showPlus() : _showSend(),
-                    ],
-                  );
-                },
-              ),
+                    ),
+                    _showEmoji(),
+                    _inputController.text.trim() == "" ? _showPlus() : _showSend(),
+                  ],
+                );
+              },
             ),
-            Visibility(
-              visible: isShowEmoji == 1,
-              child: EmojiList(
-                  isShowEmoji: isShowEmoji,
-                  keyboardHeight: keyboardHeight,
-                  onEmoji: (String image) {
-                    _sendEmoji(image);
-                    setState(() {
-                      isShowEmoji = 1 - isShowEmoji;
-                    });
-                  }),
-            ),
-            Visibility(
-              visible: isShowPlus == 1,
-              child: PlusList(
-                isShowPlus: isShowPlus,
+          ),
+          Visibility(
+            visible: isShowEmoji,
+            child: EmojiList(
+                isShowEmoji: isShowEmoji,
                 keyboardHeight: keyboardHeight,
-                isneedphone: talkObj['type'] == 1 && talkObj['objId'] != uid,
-                onPlus: (int index) {
+                onEmoji: (String image) {
+                  _sendEmoji(image);
                   setState(() {
-                    _pick(index);
-                    isShowPlus = 1 - isShowPlus;
+                    isShowEmoji = !isShowEmoji;
                   });
-                },
-              ),
+                }),
+          ),
+          Visibility(
+            visible: isShowPlus,
+            child: PlusList(
+              isShowPlus: isShowPlus,
+              keyboardHeight: keyboardHeight,
+              isneedphone: talkObj['type'] == ObjectTypes.user && talkObj['objId'] != uid,
+              onPlus: (int index) {
+                _pick(index);
+                setState(() {
+                  isShowPlus = !isShowPlus;
+                });
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  SizedBox _showEmoji() {
+  //显示表情
+  Widget _showEmoji() {
     return SizedBox(
       width: 31,
       child: IconButton(
@@ -314,15 +310,15 @@ class _TalkPageState extends State<TalkPage> {
         onPressed: () {
           setState(() {
             _focusNode.unfocus();
-            isShowEmoji = 1 - isShowEmoji;
-            isShowPlus = 0;
+            isShowEmoji = !isShowEmoji;
+            isShowPlus = false;
           });
         },
       ),
     );
   }
 
-  //发送添加按钮
+  //显示加号
   Widget _showPlus() {
     return SizedBox(
       width: 31,
@@ -333,15 +329,15 @@ class _TalkPageState extends State<TalkPage> {
         onPressed: () {
           setState(() {
             _focusNode.unfocus();
-            isShowPlus = 1 - isShowPlus;
-            isShowEmoji = 0;
+            isShowPlus = !isShowPlus;
+            isShowEmoji = false;
           });
         },
       ),
     );
   }
 
-  //发送按钮
+  //显示发送
   Widget _showSend() {
     return SizedBox(
       width: 31,
@@ -359,108 +355,98 @@ class _TalkPageState extends State<TalkPage> {
     );
   }
 
+  // 发送文本
   void _sendText() async {
     if (_inputController.text.trim() == "") {
       TipHelper.instance.showToast("消息不得为空");
       return;
     }
-    // 发送按钮的操作
     Map msg = {
       'fromId': uid,
       'toId': talkObj['objId'],
       'content': {"data": _inputController.text, "url": "", "name": ""},
-      'msgMedia': 1,
-      'msgType': talkObj['type']
+      'msgType': talkObj['type'],
+      'msgMedia': AppWebsocket.msgMediaText
     };
     _send(msg);
     _inputController.text = "";
   }
 
+  // 发送表情
   void _sendEmoji(String url) async {
-    // 发送按钮的操作
     Map msg = {
       'fromId': uid,
       'toId': talkObj['objId'],
       'content': {"data": "", "url": url, "name": ""},
-      'msgMedia': 6,
-      'msgType': talkObj['type']
+      'msgType': talkObj['type'],
+      'msgMedia': AppWebsocket.msgMediaEmoji
     };
     _send(msg);
   }
 
+  // 发送文件
   void _sendFile(String url, int msgMedia, String name) async {
-    // 发送按钮的操作
     Map msg = {
       'fromId': uid,
       'toId': talkObj['objId'],
       'content': {"data": "", "url": url, "name": name},
-      'msgMedia': msgMedia,
-      'msgType': talkObj['type']
+      'msgType': talkObj['type'],
+      'msgMedia': msgMedia
     };
     _send(msg);
   }
 
+  // 实际发送
   void _send(Map msg) async {
     msg["id"] = genGUID();
     msg['createTime'] = getTime();
     webSocketController.sendMessage(msg);
-    if (![1, 2].contains(msg['msgType'])) {
+    if (![
+      AppWebsocket.msgTypeSingle,
+      AppWebsocket.msgTypeRoom,
+    ].contains(msg['msgType'])) {
       return;
     }
     joinData(uid, msg);
   }
 
-  //----------------------------------------------------------------文件处理----------------------------------------------------------------
+  //----------------------------------------------------------------➕处理----------------------------------------------------------------
 
+  // 1,图片
+  // 2,相机
+  // 3,电话
+  // 4,音频
+  // 5,视频
+  // 6,文件
   Future<void> _pick(int val) async {
     if (val == 1) {
-      _pickPhoto(2);
+      _pickPicture(AppWebsocket.msgMediaImage, ImageSource.gallery);
     }
     if (val == 2) {
-      _pickCamera(2);
+      _pickPicture(AppWebsocket.msgMediaImage, ImageSource.camera);
     }
     if (val == 3) {
       _invite();
     }
     if (val == 4) {
-      _pickFile(3);
+      _pickFile(AppWebsocket.msgMediaAudio);
     }
     if (val == 5) {
-      _pickFile(4);
+      _pickFile(AppWebsocket.msgMediaVideo);
     }
     if (val == 6) {
-      _pickFile(5);
+      _pickFile(AppWebsocket.msgMediaFile);
     }
   }
 
-  Future<void> _pickCamera(int msgMedia) async {
-    var isGrantedCamera = await PermissionUtil.requestCameraPermission();
-    if (!isGrantedCamera) {
-      TipHelper.instance.showToast("未允许相机权限");
-      return;
-    }
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      XFile compressedFile = await compressImage(pickedFile);
-      dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
-      CommonApi.upload({'file': file}, onSuccess: (res) {
-        setState(() {
-          _sendFile(res['data'], msgMedia, pickedFile.name);
-        });
-      }, onError: (res) {
-        TipHelper.instance.showToast(res['msg']);
-      });
-    }
-  }
-
-  Future<void> _pickPhoto(int msgMedia) async {
+  Future<void> _pickPicture(int msgMedia, ImageSource imageSource) async {
     var isGrantedStorage = await PermissionUtil.requestStoragePermission();
     if (!isGrantedStorage) {
       TipHelper.instance.showToast("未允许存储读写权限");
       return;
     }
-
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: imageSource);
     if (pickedFile != null) {
       XFile compressedFile = await compressImage(pickedFile);
       dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
@@ -481,20 +467,19 @@ class _TalkPageState extends State<TalkPage> {
       return;
     }
 
-    FilePickerResult? result;
+    FilePickerResult? filePickerResult;
+    if (msgMedia == AppWebsocket.msgMediaAudio) {
+      filePickerResult = await FilePicker.platform.pickFiles(type: FileType.audio);
+    }
+    if (msgMedia == AppWebsocket.msgMediaVideo) {
+      filePickerResult = await FilePicker.platform.pickFiles(type: FileType.video);
+    }
+    if (msgMedia == AppWebsocket.msgMediaFile) {
+      filePickerResult = await FilePicker.platform.pickFiles(type: FileType.any);
+    }
 
-    if (msgMedia == 3) {
-      result = await FilePicker.platform.pickFiles(type: FileType.audio);
-    }
-    if (msgMedia == 4) {
-      result = await FilePicker.platform.pickFiles(type: FileType.video);
-    }
-    if (msgMedia == 5) {
-      result = await FilePicker.platform.pickFiles(type: FileType.image);
-    }
-
-    if (result != null) {
-      PlatformFile pickedFile = result.files.first;
+    if (filePickerResult != null) {
+      PlatformFile pickedFile = filePickerResult.files.first;
       dio.MultipartFile file = await dio.MultipartFile.fromFile(pickedFile.path!);
       CommonApi.upload({'file': file}, onSuccess: (res) {
         setState(() {
@@ -506,9 +491,8 @@ class _TalkPageState extends State<TalkPage> {
     }
   }
 
-  //----------------------------------------------------------------通话----------------------------------------------------------------
-
-  //邀请
+  //----------------------------------------------------------------拨打电话处理----------------------------------------------------------------
+  //邀请通话
   void _invite() async {
     signalingController.invite(talkCommonObj);
   }
