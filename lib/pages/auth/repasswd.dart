@@ -16,9 +16,7 @@ class _RepasswdState extends State<Repasswd> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 243, 243, 243),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 243, 243, 243),
         title: const Text("重置密码"),
       ),
       body: const RepasswdPage(),

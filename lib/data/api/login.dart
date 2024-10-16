@@ -13,7 +13,7 @@ class LoginApi {
 
   static void repassword(params, {Function? onSuccess, Function? onError}) {
     RequestHelper.instance.request(
-      Apis.login,
+      Apis.repassword,
       data: params,
       onSuccess: onSuccess,
       onError: onError,

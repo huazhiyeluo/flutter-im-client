@@ -10,16 +10,17 @@ class AppColors {
   static const Color backgroundColor = Color.fromARGB(255, 255, 255, 255);
   static const Color systemNavigationBarColor = Color.fromARGB(255, 255, 255, 255);
   static const Color appBackgroundColor = Color.fromARGB(255, 224, 224, 224);
-  static const Color bottomBackgroundColor = Color.fromARGB(255, 237, 237, 237);
-
+  static const Color bottomBackgroundColor = Color.fromARGB(255, 247, 247, 247);
   static const Color textButtonColor = Color.fromARGB(255, 20, 20, 20);
 }
 
-class ChatTypes {
-  static const int chatSingle = 1; // 个人
-  static const int chatRoom = 2; // 群
+// 对象类型
+class ObjectTypes {
+  static const int user = 1; // 个人
+  static const int group = 2; // 群
 }
 
+// 消息类型
 class AppWebsocket {
   // type 消息类型
   static const int msgTypeHeart = 0; // 心跳消息

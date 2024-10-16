@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:qim/common/utils/cache.dart';
 import 'package:qim/config/urls.dart';
 import 'package:qim/common/utils/device_info.dart';
 import 'package:qim/common/utils/functions.dart';
+import 'package:qim/data/cache/keys.dart';
 
 class RequestHelper {
   late final Dio _dio;
@@ -43,6 +45,7 @@ class RequestHelper {
       DeviceInfo deviceInfo = await DeviceInfo.getDeviceInfo();
       mergedHeaders['devname'] = deviceInfo.deviceName;
       mergedHeaders['deviceid'] = deviceInfo.deviceId;
+      mergedHeaders['token'] = CacheHelper.getStringData(Keys.token);
 
       if (isUpload) {
         FormData formData = FormData.fromMap(data); // 将传入的数据转换为 FormData 对象

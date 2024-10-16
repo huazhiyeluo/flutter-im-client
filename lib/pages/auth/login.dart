@@ -25,7 +25,6 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color.fromARGB(255, 243, 243, 243),
       body: LoginPage(),
     );
   }
@@ -208,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
             const Text("|"),
             TextButton(
               onPressed: () {
-                _signInWithGoogle();
+                _loginGoogleAction();
               },
               child: const Text(
                 '谷歌登录',
@@ -231,6 +230,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  //1、账号登录
   _loginAction() async {
     var params = {
       'platform': "account",
@@ -244,6 +244,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  //2、游客登录
   _loginVisitorAction() async {
     var params = {
       'platform': "visitor",
@@ -255,7 +256,8 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  _signInWithGoogle() async {
+  //3、谷歌登录
+  _loginGoogleAction() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     if (googleUser == null) {
@@ -284,6 +286,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  // 设置设备token
   Future<void> _setFcm(int uid) async {
     final fcmToken = await FirebaseMessaging.instance.getToken();
     final type = await DeviceInfo.getPlatformType();
@@ -297,6 +300,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  // 登录后操作
   Future<void> _loginAfter(Map data) async {
     _setFcm(data['user']['uid']);
     CacheHelper.saveData(Keys.userInfo, data['user']);

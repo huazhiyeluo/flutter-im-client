@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qim/common/widget/custom_text_field_more.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/common.dart';
 import 'package:qim/data/api/register.dart';
 import 'package:qim/common/utils/common.dart';
@@ -24,14 +24,18 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 243, 243, 243),
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 243, 243, 243),
         leading: TextButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("取消"),
+          child: const Text(
+            "取消",
+            style: TextStyle(
+              color: AppColors.textButtonColor,
+              fontSize: 15,
+            ),
+          ),
         ),
       ),
       body: const RegisterPage(),
@@ -204,11 +208,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   ? Image.asset("lib/assets/images/upload.jpg", width: 75, height: 75)
                   : Stack(
                       children: [
-                        Image.file(
-                          width: 75,
-                          height: 75,
-                          File(_imageFile!.path),
-                          fit: BoxFit.cover,
+                        ClipOval(
+                          child: Image.file(
+                            File(_imageFile!.path),
+                            width: 75,
+                            height: 75,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                         Positioned(
                           right: -15,
@@ -493,13 +499,7 @@ class _RegisterPageState extends State<RegisterPage> {
     XFile compressedFile = await compressImage(_imageFile!);
     dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
     CommonApi.upload({'file': file}, onSuccess: (res) async {
-      var params = {
-        'avatar': res['data'],
-        'nickname': _nicknameController.text,
-        'username': _usernameController.text,
-        'password': _passwordController.text,
-        'repassword': _repasswordController.text
-      };
+      var params = {'avatar': res['data'], 'nickname': _nicknameController.text, 'username': _usernameController.text, 'password': _passwordController.text, 'repassword': _repasswordController.text};
       RegisterApi.register(params, onSuccess: (res) async {
         Navigator.of(context).pop(false);
       }, onError: (res) {

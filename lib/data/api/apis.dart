@@ -1,6 +1,7 @@
 class Apis {
   //login
   static const String login = '/user/login';
+  static const String repassword = '/user/repassword';
 
   //register
   static const String register = '/user/register';

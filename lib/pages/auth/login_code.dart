@@ -16,10 +16,7 @@ class _LoginCodeState extends State<LoginCode> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 243, 243, 243),
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 243, 243, 243),
-      ),
+      appBar: AppBar(),
       body: const LoginCodePage(),
     );
   }
@@ -88,13 +85,12 @@ class _LoginCodePageState extends State<LoginCodePage> {
       padding: const EdgeInsets.all(20),
       children: [
         const SizedBox(height: 30),
-        Row(
+        const Row(
           children: [
-            const Text(
+            Text(
               "验证码登录",
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
-            Expanded(child: Container()),
           ],
         ),
         const SizedBox(height: 20),
