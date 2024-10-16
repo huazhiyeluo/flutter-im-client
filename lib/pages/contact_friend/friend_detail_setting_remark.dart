@@ -19,8 +19,8 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
   final ChatController chatController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
 
-  final TextEditingController remarkCtr = TextEditingController();
-  final TextEditingController descCtr = TextEditingController();
+  final TextEditingController _remarkController = TextEditingController();
+  final TextEditingController _descController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -31,28 +31,26 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
   @override
   void initState() {
     super.initState();
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
 
-      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
-      remarkCtr.text = contactFriendObj['remark'];
-      descCtr.text = contactFriendObj['desc'];
-    }
+    contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
+    _remarkController.text = contactFriendObj['remark'];
+    _descController.text = contactFriendObj['desc'];
   }
 
   @override
   void dispose() {
-    remarkCtr.dispose();
-    descCtr.dispose();
+    _remarkController.dispose();
+    _descController.dispose();
     super.dispose();
   }
 
-  _doneAction() async {
-    var params = {'fromId': uid, 'toId': talkObj['objId'], 'remark': remarkCtr.text, "desc": descCtr.text};
+  void _doneAction() async {
+    var params = {'fromId': uid, 'toId': talkObj['objId'], 'remark': _remarkController.text, "desc": _descController.text};
     ContactFriendApi.actContactFriend(params, onSuccess: (res) async {
-      Map data = {"fromId": uid, "toId": talkObj['objId'], "remark": remarkCtr.text, "desc": descCtr.text};
+      Map data = {"fromId": uid, "toId": talkObj['objId'], "remark": _remarkController.text, "desc": _descController.text};
       contactFriendController.upsetContactFriend(data);
       saveDbContactFriend(data);
 
@@ -61,8 +59,8 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
         Map chatData = {};
         chatData['objId'] = talkObj['objId'];
         chatData['type'] = 1;
-        chatData['remark'] = remarkCtr.text;
-        chatData['desc'] = descCtr.text;
+        chatData['remark'] = _remarkController.text;
+        chatData['desc'] = _descController.text;
         chatController.upsetChat(chatData);
         saveDbChat(chatData);
       }
@@ -100,7 +98,7 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
               ),
               Expanded(
                 child: TextField(
-                  controller: remarkCtr,
+                  controller: _remarkController,
                   decoration: const InputDecoration(
                     hintText: '填写备注名',
                   ),
@@ -116,7 +114,7 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
               ),
               Expanded(
                 child: TextField(
-                  controller: descCtr,
+                  controller: _descController,
                   textAlignVertical: TextAlignVertical.center,
                   minLines: 1,
                   maxLines: null,

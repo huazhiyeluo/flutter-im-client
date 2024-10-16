@@ -86,11 +86,9 @@ class _FriendDetailPageState extends State<FriendDetailPage> {
   @override
   void initState() {
     super.initState();
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
     _initData();
   }
 

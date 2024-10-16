@@ -19,7 +19,7 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
   final UserInfoController userInfoController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
-  final TextEditingController nameCtr = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -30,17 +30,16 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
   @override
   void initState() {
     super.initState();
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
     contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
   }
 
   @override
   void dispose() {
     super.dispose();
+    _nameController.dispose();
   }
 
   void _doneAction(int friendGroupId) async {
@@ -56,17 +55,17 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
       title = "编辑分组";
     }
     if (name != "") {
-      nameCtr.text = name;
+      _nameController.text = name;
     }
     showCustomDialog(
       title: title,
       context: context,
       content: TextField(
-        controller: nameCtr,
+        controller: _nameController,
         decoration: const InputDecoration(hintText: "分组名"),
       ),
       onConfirm: () async {
-        var params = {'friendGroupId': friendGroupId, 'ownerUid': uid, 'name': nameCtr.text};
+        var params = {'friendGroupId': friendGroupId, 'ownerUid': uid, 'name': _nameController.text};
         ContactFriendApi.editContactFriendGroup(params, onSuccess: (res) async {
           friendGroupController.upsetFriendGroup(res['data']);
           saveDbFriendGroup(res['data']);

@@ -17,7 +17,6 @@ class AddContact extends StatefulWidget {
 
 class _AddContactDetailState extends State<AddContact> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  Map talkObj = {};
 
   @override
   void initState() {
@@ -100,13 +99,15 @@ class AddContactDetailPage extends StatefulWidget {
 }
 
 class _AddContactDetailPageState extends State<AddContactDetailPage> {
-  final ScrollController _scrollUserController = ScrollController();
-  final ScrollController _scrollGroupController = ScrollController();
-  final TextEditingController _inputUserController = TextEditingController();
-  final TextEditingController _inputGroupController = TextEditingController();
   final UserInfoController userInfoController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
   final GroupController groupController = Get.find();
+
+  final ScrollController _scrollUserController = ScrollController();
+  final ScrollController _scrollGroupController = ScrollController();
+
+  final TextEditingController _inputUserController = TextEditingController();
+  final TextEditingController _inputGroupController = TextEditingController();
 
   bool _isUserLoading = false;
   bool _hasUserMore = true;
@@ -152,7 +153,16 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
     });
   }
 
-  _searchUser() {
+  @override
+  void dispose() {
+    super.dispose();
+    _inputUserController.dispose();
+    _inputGroupController.dispose();
+    _scrollUserController.dispose();
+    _scrollGroupController.dispose();
+  }
+
+  void _searchUser() {
     setState(() {
       _isUserLoading = true;
     });
@@ -184,7 +194,7 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
     return existingFriendIndex == -1;
   }
 
-  _searchGroup() {
+  void _searchGroup() {
     setState(() {
       _isGroupLoading = true;
     });
@@ -293,8 +303,8 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
                                       minimumSize: WidgetStateProperty.all<Size>(const Size(40, 25)),
                                       shape: WidgetStateProperty.all<OutlinedBorder>(
                                         RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(1.0), // 设置按钮的圆角
-                                          side: const BorderSide(color: Colors.grey), // 设置按钮的边框颜色和宽度
+                                          borderRadius: BorderRadius.circular(1.0),
+                                          side: const BorderSide(color: Colors.grey),
                                         ),
                                       ),
                                     ),
@@ -386,8 +396,8 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
                                   minimumSize: WidgetStateProperty.all<Size>(const Size(40, 25)),
                                   shape: WidgetStateProperty.all<OutlinedBorder>(
                                     RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(1.0), // 设置按钮的圆角
-                                      side: const BorderSide(color: Colors.grey), // 设置按钮的边框颜色和宽度
+                                      borderRadius: BorderRadius.circular(1.0),
+                                      side: const BorderSide(color: Colors.grey),
                                     ),
                                   ),
                                 ),

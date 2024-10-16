@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:qim/common/utils/date.dart';
 import 'package:qim/common/utils/play.dart';
 import 'package:qim/common/utils/tips.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/api/getdata.dart';
 import 'package:qim/data/controller/chat.dart';
@@ -19,7 +20,7 @@ import 'package:qim/data/db/get.dart';
 import 'package:qim/data/db/save.dart';
 
 Future<void> joinData(int uid, Map msg, {AudioPlayerManager? audioPlayerManager}) async {
-  if ([1, 2].contains(msg['msgType'])) {
+  if ([AppWebsocket.msgTypeSingle, AppWebsocket.msgTypeRoom].contains(msg['msgType'])) {
     joinMessage(uid, msg);
   }
   joinChat(uid, msg, audioPlayerManager);
@@ -29,9 +30,9 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
   Map msg = Map.from(temp);
 
   int objId = 0;
-  if ([1, 4].contains(msg['msgType'])) {
+  if ([AppWebsocket.msgTypeSingle].contains(msg['msgType'])) {
     objId = uid == msg['fromId'] ? msg['toId'] : msg['fromId'];
-  } else if (msg['msgType'] == 2) {
+  } else if ([AppWebsocket.msgTypeRoom].contains(msg['msgType'])) {
     objId = msg['toId'];
   }
   Map chatData = {};
@@ -44,7 +45,7 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
   final ChatController chatController = Get.find();
   Map lastChat = chatController.getOneChat(objId, msg['msgType']);
   if (lastChat.isEmpty) {
-    if ([1].contains(msg['msgType'])) {
+    if ([AppWebsocket.msgTypeSingle].contains(msg['msgType'])) {
       final UserController userController = Get.find();
       final ContactFriendController contactFriendController = Get.find();
 
@@ -66,7 +67,7 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
         chatData['isQuiet'] = 0;
       }
     }
-    if ([2].contains(msg['msgType'])) {
+    if ([AppWebsocket.msgTypeRoom].contains(msg['msgType'])) {
       final GroupController groupController = Get.find();
       final ContactGroupController contactGroupController = Get.find();
 
@@ -120,7 +121,7 @@ Future<void> joinMessage(int uid, Map temp) async {
     msg['avatar'] = userInfo['avatar'];
     msg['nickname'] = userInfo['nickname'];
   } else {
-    if (msg['msgType'] == 1) {
+    if (msg['msgType'] == AppWebsocket.msgTypeSingle) {
       final ContactFriendController contactFriendController = Get.find();
       final UserController userController = Get.find();
 
@@ -135,7 +136,7 @@ Future<void> joinMessage(int uid, Map temp) async {
         msg['nickname'] = userObj['nickname'];
       }
     }
-    if (msg['msgType'] == 2) {
+    if (msg['msgType'] == AppWebsocket.msgTypeRoom) {
       final ContactGroupController contactGroupController = Get.find();
       final UserController userController = Get.find();
 

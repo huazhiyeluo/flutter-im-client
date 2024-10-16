@@ -54,7 +54,7 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
   final TextEditingController _inputReasonController = TextEditingController();
   final TextEditingController _inputRemarkController = TextEditingController();
 
-  Map friendObj = {};
+  Map userObj = {};
   int uid = 0;
   Map userInfo = {};
   Map friendGroupObj = {};
@@ -62,20 +62,24 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
   @override
   void initState() {
     super.initState();
-
-    if (Get.arguments != null) {
-      friendObj = Get.arguments;
-    }
+    userObj = Get.arguments ?? {};
     friendGroupObj = friendGroupController.getOneDefaultFriendGroup();
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     _inputReasonController.text = "我是${userInfo['nickname']}";
   }
 
-  _joinFriend() {
+  @override
+  void dispose() {
+    _inputReasonController.dispose();
+    _inputRemarkController.dispose();
+    super.dispose();
+  }
+
+  void _joinFriend() {
     var params = {
       'fromId': uid,
-      'toId': friendObj['uid'],
+      'toId': userObj['uid'],
       'reason': _inputReasonController.text,
       'remark': _inputRemarkController.text,
       'friendGroupId': friendGroupObj['friendGroupId'],
@@ -105,15 +109,15 @@ class _AddContactFriendDoPageState extends State<AddContactFriendDoPage> {
     return ListView(
       children: [
         ListTile(
-          title: Text(friendObj['nickname']),
+          title: Text(userObj['nickname']),
           subtitle: Text(
-            friendObj['info'],
+            userObj['info'],
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           leading: CircleAvatar(
             radius: 30,
-            backgroundImage: NetworkImage(friendObj['avatar'] ?? ''),
+            backgroundImage: NetworkImage(userObj['avatar'] ?? ''),
           ),
         ),
         Container(

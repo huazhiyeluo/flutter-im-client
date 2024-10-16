@@ -31,19 +31,8 @@ class GroupUserAddFriend extends StatefulWidget {
 }
 
 class _GroupUserAddFriendState extends State<GroupUserAddFriend> {
-  final UserInfoController userInfoController = Get.find();
-
-  int uid = 0;
-  Map userInfo = {};
-  Map talkObj = {};
-
   @override
   void initState() {
-    userInfo = userInfoController.userInfo;
-    uid = userInfo['uid'];
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
     super.initState();
   }
 
@@ -66,11 +55,12 @@ class GroupUserAddFriendPage extends StatefulWidget {
 }
 
 class _GroupUserAddFriendPageState extends State<GroupUserAddFriendPage> {
-  final TextEditingController inputController = TextEditingController();
   final UserInfoController userInfoController = Get.find();
   final UserController userController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
+
+  final TextEditingController _inputController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -80,13 +70,18 @@ class _GroupUserAddFriendPageState extends State<GroupUserAddFriendPage> {
 
   @override
   void initState() {
+    super.initState();
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
+
     _formatData();
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _inputController.dispose();
   }
 
   void _formatData() {
@@ -95,9 +90,7 @@ class _GroupUserAddFriendPageState extends State<GroupUserAddFriendPage> {
     for (var item in contactGroups) {
       Map userObj = userController.getOneUser(item['fromId']);
       Map contactFriendObj = contactFriendController.getOneContactFriend(uid, item['fromId']);
-      if (userObj['nickname'].contains(inputController.text) ||
-          item['remark'].contains(inputController.text) ||
-          item['fromId'].toString().contains(inputController.text)) {
+      if (userObj['nickname'].contains(_inputController.text) || item['remark'].contains(_inputController.text) || item['fromId'].toString().contains(_inputController.text)) {
         UserModel chat = UserModel();
         chat.uid = item['fromId'];
         chat.name = userObj['nickname'];
@@ -127,7 +120,7 @@ class _GroupUserAddFriendPageState extends State<GroupUserAddFriendPage> {
         child: AppBar(
           automaticallyImplyLeading: false,
           title: CustomSearchField(
-            controller: inputController,
+            controller: _inputController,
             hintText: '搜索',
             expands: false,
             maxHeight: 40,

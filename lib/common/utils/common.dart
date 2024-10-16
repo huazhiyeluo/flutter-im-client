@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qim/common/utils/data.dart';
 import 'package:qim/common/utils/functions.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/controller/apply.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/contact_group.dart';
@@ -39,13 +40,13 @@ bool isImageFile(String path) {
 Map getTalkCommonObj(Map talkObj) {
   Map talkCommonObj = {};
   talkCommonObj['objId'] = talkObj['objId'];
-  if (talkObj['type'] == 1) {
+  if (talkObj['type'] == ObjectTypes.user) {
     final UserController userController = Get.find();
     Map userObj = userController.getOneUser(talkObj['objId']);
     talkCommonObj['icon'] = userObj['avatar'];
     talkCommonObj['name'] = userObj['nickname'];
     talkCommonObj['num'] = 1;
-  } else if (talkObj['type'] == 2) {
+  } else if (talkObj['type'] == ObjectTypes.group) {
     final GroupController groupController = Get.find();
     Map groupObj = groupController.getOneGroup(talkObj['objId']);
     talkCommonObj['icon'] = groupObj['icon'];
@@ -63,12 +64,16 @@ Future<void> loadFriendManage(int uid, Map msg) async {
   final ApplyController applyController = Get.find();
   final ChatController chatController = Get.find();
   Map data = json.decode(msg['content']['data']);
-  if ([21, 22, 23].contains(msg['msgMedia'])) {
+  if ([
+    AppWebsocket.msgMediaFriendAdd,
+    AppWebsocket.msgMediaFriendAgree,
+    AppWebsocket.msgMediaFriendRefuse,
+  ].contains(msg['msgMedia'])) {
     applyController.upsetApply(data['apply']);
     saveDbApply(data['apply']);
   }
   //同意
-  if ([22].contains(msg['msgMedia'])) {
+  if ([AppWebsocket.msgMediaFriendAgree].contains(msg['msgMedia'])) {
     if (data['user'] != null) {
       userController.upsetUser(data['user']);
       saveDbUser(data['user']);
@@ -94,12 +99,12 @@ Future<void> loadFriendManage(int uid, Map msg) async {
     }
   }
   //删除
-  if ([24].contains(msg['msgMedia'])) {
+  if ([AppWebsocket.msgMediaFriendDelete].contains(msg['msgMedia'])) {
     contactFriendController.delContactFriend(data['contactFriend']['fromId'], data['contactFriend']['toId']);
     delDbContactFriend(data['contactFriend']['fromId'], data['contactFriend']['toId']);
 
-    chatController.delChat(data['user']['uid'], 1);
-    delDbChat(data['user']['uid'], 1);
+    chatController.delChat(data['user']['uid'], ObjectTypes.user);
+    delDbChat(data['user']['uid'], ObjectTypes.user);
 
     final TalkController talkController = Get.put(TalkController());
     if (talkController.talkObj['objId'] == data['user']['uid']) {
@@ -119,7 +124,7 @@ Future<void> loadGroupManage(int uid, Map msg) async {
   final ApplyController applyController = Get.find();
   final ChatController chatController = Get.find();
   Map data = json.decode(msg['content']['data']);
-  if ([31, 32, 33].contains(msg['msgMedia'])) {
+  if ([AppWebsocket.msgMediaGroupJoin, AppWebsocket.msgMediaGroupAgree, AppWebsocket.msgMediaGroupRefuse].contains(msg['msgMedia'])) {
     if (data['apply'] != null) {
       applyController.upsetApply(data['apply']);
       saveDbApply(data['apply']);
@@ -127,7 +132,7 @@ Future<void> loadGroupManage(int uid, Map msg) async {
   }
 
   //创建
-  if ([30].contains(msg['msgMedia'])) {
+  if ([AppWebsocket.msgMediaGroupCreate].contains(msg['msgMedia'])) {
     if (data['group'] != null) {
       groupController.upsetGroup(data['group']);
       saveDbGroup(data['group']);
@@ -143,7 +148,7 @@ Future<void> loadGroupManage(int uid, Map msg) async {
   }
 
   //同意
-  if ([32].contains(msg['msgMedia'])) {
+  if ([AppWebsocket.msgMediaGroupAgree].contains(msg['msgMedia'])) {
     if (data['group'] != null) {
       groupController.upsetGroup(data['group']);
       saveDbGroup(data['group']);
@@ -174,7 +179,7 @@ Future<void> loadGroupManage(int uid, Map msg) async {
   }
 
   //退出
-  if ([34].contains(msg['msgMedia'])) {
+  if ([AppWebsocket.msgMediaGroupDelete].contains(msg['msgMedia'])) {
     if (uid == data['user']['uid']) {
       groupController.delGroup(data['group']['groupId']);
       delDbGroup(data['group']['groupId']);
@@ -193,7 +198,7 @@ Future<void> loadGroupManage(int uid, Map msg) async {
   }
 
   //解散
-  if ([35].contains(msg['msgMedia'])) {
+  if ([AppWebsocket.msgMediaGroupDisband].contains(msg['msgMedia'])) {
     groupController.delGroup(data['group']['groupId']);
     delDbGroup(data['group']['groupId']);
 
@@ -205,7 +210,7 @@ Future<void> loadGroupManage(int uid, Map msg) async {
   }
 
   //群联系人更新
-  if ([36].contains(msg['msgMedia'])) {
+  if ([AppWebsocket.msgMediaContactGroupUpdate].contains(msg['msgMedia'])) {
     contactGroupController.upsetContactGroup(data['contactGroup']);
     saveDbContactGroup(data['contactGroup']);
   }
@@ -228,40 +233,45 @@ Future<XFile> compressImage(XFile pickedFile) async {
 }
 
 String getContent(int msgMedia, Map content) {
-  if ([1, 10, 11, 13].contains(msgMedia)) {
+  if ([
+    AppWebsocket.msgMediaText,
+    AppWebsocket.msgMediaNotOnline,
+    AppWebsocket.msgMediaNoConnect,
+    AppWebsocket.msgMediaOff,
+  ].contains(msgMedia)) {
     return content['data'];
   }
 
-  if (msgMedia == 2) {
+  if (msgMedia == AppWebsocket.msgMediaImage) {
     return "[图片]";
   }
 
-  if (msgMedia == 3) {
+  if (msgMedia == AppWebsocket.msgMediaAudio) {
     return "[音频]";
   }
 
-  if (msgMedia == 4) {
+  if (msgMedia == AppWebsocket.msgMediaVideo) {
     return "[视频]";
   }
 
-  if (msgMedia == 5) {
+  if (msgMedia == AppWebsocket.msgMediaFile) {
     return "[文件]";
   }
 
-  if (msgMedia == 6) {
+  if (msgMedia == AppWebsocket.msgMediaEmoji) {
     return "[表情]";
   }
 
-  if (msgMedia == 12) {
+  if (msgMedia == AppWebsocket.msgMediaTimes) {
     return "通话时长: ${formatSecondsToHMS(int.parse(content['data']))}";
   }
-  if (msgMedia == 21) {
+  if (msgMedia == AppWebsocket.msgMediaInvite) {
     return "邀请你加入群聊";
   }
-  if (msgMedia == 22) {
+  if (msgMedia == AppWebsocket.msgMediaUser) {
     return "[个人名片]";
   }
-  if (msgMedia == 23) {
+  if (msgMedia == AppWebsocket.msgMediaGroup) {
     return "[群聊名片]";
   }
 

@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lpinyin/lpinyin.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/user.dart';
@@ -41,13 +42,11 @@ class _GroupUserState extends State<GroupUser> {
 
   @override
   void initState() {
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
+    super.initState();
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
-    super.initState();
   }
 
   Future _operateList() {
@@ -56,7 +55,7 @@ class _GroupUserState extends State<GroupUser> {
         builder: (BuildContext context) {
           return Container(
             padding: const EdgeInsets.all(10.0),
-            height: [1, 2].contains(contactGroupObj['groupPower']) ? 250 : 200,
+            height: [GroupPowers.admin, GroupPowers.owner].contains(contactGroupObj['groupPower']) ? 250 : 200,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -152,11 +151,12 @@ class GroupUserPage extends StatefulWidget {
 }
 
 class _GroupUserPageState extends State<GroupUserPage> {
-  final TextEditingController inputController = TextEditingController();
   final UserInfoController userInfoController = Get.find();
   final UserController userController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
+
+  final TextEditingController _inputController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -166,13 +166,17 @@ class _GroupUserPageState extends State<GroupUserPage> {
 
   @override
   void initState() {
+    super.initState();
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
     _formatData();
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _inputController.dispose();
   }
 
   void _formatData() {
@@ -181,9 +185,7 @@ class _GroupUserPageState extends State<GroupUserPage> {
     for (var item in contactGroups) {
       Map userObj = userController.getOneUser(item['fromId']);
       Map contactFriendObj = contactFriendController.getOneContactFriend(uid, item['fromId']);
-      if (userObj['nickname'].contains(inputController.text) ||
-          item['remark'].contains(inputController.text) ||
-          item['fromId'].toString().contains(inputController.text)) {
+      if (userObj['nickname'].contains(_inputController.text) || item['remark'].contains(_inputController.text) || item['fromId'].toString().contains(_inputController.text)) {
         UserModel chat = UserModel();
         chat.uid = item['fromId'];
         chat.name = item['nickname'] != "" ? item['nickname'] : userObj['nickname'];
@@ -213,7 +215,7 @@ class _GroupUserPageState extends State<GroupUserPage> {
         child: AppBar(
           automaticallyImplyLeading: false,
           title: CustomSearchField(
-            controller: inputController,
+            controller: _inputController,
             hintText: '搜索',
             expands: false,
             maxHeight: 40,
@@ -275,7 +277,7 @@ class _GroupUserPageState extends State<GroupUserPage> {
                   onTap: () {
                     Map talkObj = {
                       "objId": _userArr[index].uid,
-                      "type": 1,
+                      "type": ObjectTypes.user,
                     };
                     Navigator.pushNamed(
                       context,

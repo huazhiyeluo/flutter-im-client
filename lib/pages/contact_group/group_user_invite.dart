@@ -25,15 +25,17 @@ class GroupUserInvite extends StatefulWidget {
 }
 
 class _GroupUserInviteState extends State<GroupUserInvite> {
-  final TextEditingController inputController = TextEditingController();
   final UserInfoController userInfoController = Get.find();
   final UserController userController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
   final ContactFriendController contactFriendController = Get.find();
   final GroupController groupController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
-  final ScrollController _scrollController = ScrollController();
   final WebSocketController webSocketController = Get.find();
+
+  final ScrollController _scrollController = ScrollController();
+
+  final TextEditingController _inputController = TextEditingController();
 
   late Offset _tapPosition;
 
@@ -56,16 +58,19 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
   @override
   void initState() {
     super.initState();
-
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToEnd();
     });
     _formatData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _inputController.dispose();
   }
 
   // 自动滚动到最右边的方法
@@ -103,12 +108,6 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
       _userArrs = _userArrs;
       _status = _status;
     });
-  }
-
-  @override
-  void dispose() {
-    inputController.dispose();
-    super.dispose();
   }
 
   void selectGroup(int key) {
@@ -405,7 +404,7 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: CustomSearchField(
-                      controller: inputController,
+                      controller: _inputController,
                       hintText: '搜索',
                       expands: false,
                       maxHeight: 40,

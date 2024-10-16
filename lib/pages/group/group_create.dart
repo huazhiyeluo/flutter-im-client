@@ -56,8 +56,8 @@ class GroupCreatePage extends StatefulWidget {
 class _GroupCreatePageState extends State<GroupCreatePage> {
   final UserInfoController userInfoController = Get.find();
 
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController infoController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _infoController = TextEditingController();
 
   bool _isChecked = false;
 
@@ -82,6 +82,8 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
   @override
   void dispose() {
     super.dispose();
+    _nameController.dispose();
+    _infoController.dispose();
   }
 
   @override
@@ -106,7 +108,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                 ),
                 Expanded(
                   child: TextField(
-                    controller: nameController,
+                    controller: _nameController,
                     keyboardType: TextInputType.text,
                     onChanged: (val) {
                       _checkName(val);
@@ -157,7 +159,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                 Expanded(
                   child: TextField(
                     maxLines: 5,
-                    controller: infoController,
+                    controller: _infoController,
                     keyboardType: TextInputType.text,
                     onChanged: (val) {
                       _checkInfo(val);
@@ -277,7 +279,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
     );
   }
 
-  _showAvatar(int index) {
+  Widget _showAvatar(int index) {
     if (index == 0) {
       // 加号按钮
       return GestureDetector(
@@ -347,13 +349,13 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
     }
   }
 
-  _selectAvatar(index) {
+  void _selectAvatar(index) {
     setState(() {
       _defaultSelect = index;
     });
   }
 
-  _checkName(val) {
+  void _checkName(val) {
     if (val != "") {
       setState(() {
         _isShowNameClear = true;
@@ -365,14 +367,14 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
     }
   }
 
-  _clearName() {
-    nameController.text = "";
+  void _clearName() {
+    _nameController.text = "";
     setState(() {
       _isShowNameClear = false;
     });
   }
 
-  _checkInfo(val) {
+  void _checkInfo(val) {
     if (val != "") {
       setState(() {
         _isShowInfoClear = true;
@@ -384,8 +386,8 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
     }
   }
 
-  _clearInfo() {
-    infoController.text = "";
+  void _clearInfo() {
+    _infoController.text = "";
     setState(() {
       _isShowInfoClear = false;
     });
@@ -420,13 +422,13 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
       XFile compressedFile = await compressImage(_imageFile!);
       dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) async {
-        var params = {'ownerUid': uid, 'type': 0, 'name': nameController.text, 'icon': res['data'], 'info': infoController.text};
+        var params = {'ownerUid': uid, 'type': 0, 'name': _nameController.text, 'icon': res['data'], 'info': _infoController.text};
         _createGroupDo(params);
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
     } else {
-      var params = {'ownerUid': uid, 'type': 0, 'name': nameController.text, 'icon': "http://img.siyuwen.com/godata/avatar/$_defaultSelect.jpg", 'info': infoController.text};
+      var params = {'ownerUid': uid, 'type': 0, 'name': _nameController.text, 'icon': "http://img.siyuwen.com/godata/avatar/$_defaultSelect.jpg", 'info': _infoController.text};
       _createGroupDo(params);
     }
   }
@@ -435,7 +437,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
     GroupApi.createGroup(params, onSuccess: (res) async {
       Map talkObj = {
         "objId": res['data']['groupId'],
-        "type": 2,
+        "type": ObjectTypes.group,
       };
       Navigator.pushNamed(
         context,

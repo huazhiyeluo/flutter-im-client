@@ -17,11 +17,13 @@ class GroupUserDelete extends StatefulWidget {
 }
 
 class _GroupUserDeleteState extends State<GroupUserDelete> {
-  final TextEditingController inputController = TextEditingController();
   final UserInfoController userInfoController = Get.find();
   final UserController userController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
+
   final ScrollController _scrollController = ScrollController();
+
+  final TextEditingController _inputController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -40,16 +42,19 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
   @override
   void initState() {
     super.initState();
-
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToEnd();
     });
     _formatData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _inputController.dispose();
   }
 
   // 自动滚动到最右边的方法
@@ -65,9 +70,7 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
     final contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
     for (var item in contactGroups) {
       Map userObj = userController.getOneUser(item['fromId']);
-      if (userObj['nickname'].contains(inputController.text) ||
-          item['remark'].contains(inputController.text) ||
-          item['fromId'].toString().contains(inputController.text)) {
+      if (userObj['nickname'].contains(_inputController.text) || item['remark'].contains(_inputController.text) || item['fromId'].toString().contains(_inputController.text)) {
         item['isHidden'] = false;
       } else {
         item['isHidden'] = true;
@@ -112,12 +115,6 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
       _userArrs = _userArrs;
       _status = _status;
     });
-  }
-
-  @override
-  void dispose() {
-    inputController.dispose();
-    super.dispose();
   }
 
   void selectGroup(String key) {
@@ -267,7 +264,7 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: CustomSearchField(
-                      controller: inputController,
+                      controller: _inputController,
                       hintText: '搜索',
                       expands: false,
                       maxHeight: 40,

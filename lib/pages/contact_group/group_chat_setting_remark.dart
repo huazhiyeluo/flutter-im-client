@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/contact_group.dart';
@@ -26,7 +27,7 @@ class _GroupChatSettingRemarkState extends State<GroupChatSettingRemark> {
   final UserController userController = Get.find();
   final ChatController chatController = Get.find();
 
-  final TextEditingController remarkCtr = TextEditingController();
+  final TextEditingController _remarkController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -40,28 +41,26 @@ class _GroupChatSettingRemarkState extends State<GroupChatSettingRemark> {
   @override
   void initState() {
     super.initState();
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 
     groupObj = groupController.getOneGroup(talkObj['objId']);
     contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
-    remarkCtr.text = contactGroupObj['remark'];
-    characterCount = remarkCtr.text.characters.length;
+    _remarkController.text = contactGroupObj['remark'];
+    characterCount = _remarkController.text.characters.length;
   }
 
   @override
   void dispose() {
-    remarkCtr.dispose();
+    _remarkController.dispose();
     super.dispose();
   }
 
   _doneAction() async {
-    var params = {'fromId': uid, 'toId': talkObj['objId'], 'remark': remarkCtr.text};
+    var params = {'fromId': uid, 'toId': talkObj['objId'], 'remark': _remarkController.text};
     ContactGroupApi.actContactGroup(params, onSuccess: (res) async {
-      Map data = {'fromId': uid, 'toId': talkObj['objId'], 'remark': remarkCtr.text};
+      Map data = {'fromId': uid, 'toId': talkObj['objId'], 'remark': _remarkController.text};
       contactGroupController.upsetContactGroup(data);
       saveDbContactGroup(data);
 
@@ -69,8 +68,8 @@ class _GroupChatSettingRemarkState extends State<GroupChatSettingRemark> {
       if (chat.isNotEmpty) {
         Map chatData = {};
         chatData['objId'] = talkObj['objId'];
-        chatData['type'] = 2;
-        chatData['remark'] = remarkCtr.text;
+        chatData['type'] = ObjectTypes.group;
+        chatData['remark'] = _remarkController.text;
         chatController.upsetChat(chatData);
         saveDbChat(chatData);
       }
@@ -115,7 +114,7 @@ class _GroupChatSettingRemarkState extends State<GroupChatSettingRemark> {
               const SizedBox(width: 8),
               Expanded(
                 child: TextField(
-                  controller: remarkCtr,
+                  controller: _remarkController,
                   decoration: const InputDecoration(
                     hintText: '填写群聊备注',
                     border: InputBorder.none,
@@ -139,7 +138,7 @@ class _GroupChatSettingRemarkState extends State<GroupChatSettingRemark> {
               ),
               TextButton(
                 onPressed: () {
-                  remarkCtr.text = groupObj['name'];
+                  _remarkController.text = groupObj['name'];
                 },
                 child: const Text(
                   "填入",

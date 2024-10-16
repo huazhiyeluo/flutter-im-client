@@ -16,17 +16,14 @@ class _GroupJoinShowState extends State<GroupJoinShow> {
   int uid = 0;
   Map userInfo = {};
 
-  Map toObj = {};
+  Map groupObj = {};
 
   @override
   void initState() {
     super.initState();
-
+    groupObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    if (Get.arguments != null) {
-      toObj = Get.arguments;
-    }
   }
 
   @override
@@ -62,7 +59,7 @@ class _GroupJoinShowState extends State<GroupJoinShow> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0), // 设置圆角半径
                 child: Image(
-                  image: CachedNetworkImageProvider(toObj['icon'] ?? ""), // 使用 CachedNetworkImageProvider
+                  image: CachedNetworkImageProvider(groupObj['icon'] ?? ""), // 使用 CachedNetworkImageProvider
                   width: 60.0,
                   height: 60.0,
                   fit: BoxFit.cover,
@@ -72,7 +69,7 @@ class _GroupJoinShowState extends State<GroupJoinShow> {
                 height: 10,
               ),
               Text(
-                "${toObj['name']}(${toObj['num']})",
+                "${groupObj['name']}(${groupObj['num']})",
                 style: const TextStyle(fontSize: 17),
               ),
               Expanded(child: Container()),

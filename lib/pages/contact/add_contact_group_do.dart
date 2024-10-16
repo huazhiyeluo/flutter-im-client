@@ -59,16 +59,22 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
 
   @override
   void initState() {
-    if (Get.arguments != null) {
-      groupObj = Get.arguments;
-    }
+    super.initState();
+    groupObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     _inputReasonController.text = "我是${userInfo['nickname']}";
-    super.initState();
   }
 
-  _joinGroup() {
+  @override
+  void dispose() {
+    _inputReasonController.dispose();
+    _inputRemarkController.dispose();
+    _inputInfoController.dispose();
+    super.dispose();
+  }
+
+  void _joinGroup() {
     var params = {
       'fromId': uid,
       'toId': groupObj['groupId'],

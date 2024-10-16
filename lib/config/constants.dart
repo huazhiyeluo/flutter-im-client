@@ -26,6 +26,13 @@ class ShareTypes {
   static const int complex = 2; //复杂
 }
 
+// 群对象类型
+class GroupPowers {
+  static const int normal = 1; // 普通用户
+  static const int admin = 2; // 管理员
+  static const int owner = 3; // 群主
+}
+
 // 消息类型
 class AppWebsocket {
   // type 消息类型

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/contact_group.dart';
@@ -63,14 +64,12 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
   @override
   void initState() {
     super.initState();
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 
     contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
-    if ([1, 2].contains(contactGroupObj['groupPower'])) {
+    if ([GroupPowers.admin, GroupPowers.owner].contains(contactGroupObj['groupPower'])) {
       optShow = 2;
     }
     _initData();
@@ -84,7 +83,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
   List<Widget> _getManager() {
     List<Widget> temp = [];
     for (var contactGroup in contactGroups) {
-      if (contactGroup['groupPower'] == 2) {
+      if (contactGroup['groupPower'] == GroupPowers.owner) {
         Map userObj = userController.getOneUser(contactGroup['fromId']);
         temp.add(
           CircleAvatar(
@@ -95,7 +94,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
           ),
         );
       }
-      if (contactGroup['groupPower'] == 1) {
+      if (contactGroup['groupPower'] == GroupPowers.admin) {
         Map userObj = userController.getOneUser(contactGroup['fromId']);
         temp.add(
           CircleAvatar(
@@ -251,7 +250,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                       onTap: () {
                         Map talkObj = {
                           "objId": contactGroups[index]['fromId'],
-                          "type": 1,
+                          "type": ObjectTypes.user,
                         };
                         Navigator.pushNamed(
                           context,
@@ -269,7 +268,7 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
                           ),
                           const SizedBox(
                             height: 1,
-                          ), // 添加一个间距
+                          ),
                           Text(
                             contactGroups[index]['nickname'] != "" ? contactGroups[index]['nickname'] : userObj['nickname'],
                             style: const TextStyle(fontSize: 12),

@@ -20,7 +20,7 @@ class _GroupChatSettingNicknameState extends State<GroupChatSettingNickname> {
 
   final UserController userController = Get.find();
 
-  final TextEditingController nicknameCtr = TextEditingController();
+  final TextEditingController _nicknameController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -33,27 +33,25 @@ class _GroupChatSettingNicknameState extends State<GroupChatSettingNickname> {
   @override
   void initState() {
     super.initState();
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 
     contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
-    nicknameCtr.text = contactGroupObj['nickname'];
-    characterCount = nicknameCtr.text.characters.length;
+    _nicknameController.text = contactGroupObj['nickname'];
+    characterCount = _nicknameController.text.characters.length;
   }
 
   @override
   void dispose() {
-    nicknameCtr.dispose();
+    _nicknameController.dispose();
     super.dispose();
   }
 
   _doneAction() async {
-    var params = {'fromId': uid, 'toId': talkObj['objId'], 'nickname': nicknameCtr.text};
+    var params = {'fromId': uid, 'toId': talkObj['objId'], 'nickname': _nicknameController.text};
     ContactGroupApi.actContactGroup(params, onSuccess: (res) async {
-      Map data = {'fromId': uid, 'toId': talkObj['objId'], 'nickname': nicknameCtr.text};
+      Map data = {'fromId': uid, 'toId': talkObj['objId'], 'nickname': _nicknameController.text};
       contactGroupController.upsetContactGroup(data);
       saveDbContactGroup(data);
       Navigator.pop(context);
@@ -78,7 +76,7 @@ class _GroupChatSettingNicknameState extends State<GroupChatSettingNickname> {
         padding: const EdgeInsets.all(10),
         children: [
           TextField(
-            controller: nicknameCtr,
+            controller: _nicknameController,
             decoration: const InputDecoration(
               hintText: '填写群昵称',
             ),
