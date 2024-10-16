@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/controller/group.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -37,7 +38,7 @@ class _QrViewState extends State<QrView> {
           Map result = json.decode(scanData.code!);
           // 在这里可以使用 msg 进行后续处理
           if (result.containsKey('type') && result.containsKey('content')) {
-            if (result['type'] == 1) {
+            if (result['type'] == ObjectTypes.user) {
               initOneUser(result['content']['uid']);
               final UserController userController = Get.find();
               Map userObj = userController.getOneUser(result['content']['uid']);
@@ -46,7 +47,7 @@ class _QrViewState extends State<QrView> {
                 arguments: userObj,
               );
             }
-            if (result['type'] == 2) {
+            if (result['type'] == ObjectTypes.group) {
               initOneGroup(result['content']['groupId']);
               final GroupController groupController = Get.find();
               Map groupObj = groupController.getOneGroup(result['content']['groupId']);

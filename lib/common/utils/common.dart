@@ -86,11 +86,13 @@ Future<void> loadFriendManage(int uid, Map msg) async {
     if (data['apply'] != null) {
       if (uid == data['apply']['fromId']) {
         Map msg = {
+          'id': genGUID(),
           'fromId': uid,
           'toId': data['apply']['toId'],
           'content': {"data": data['apply']['reason']},
-          'msgMedia': 1,
-          'msgType': 1
+          'msgMedia': AppWebsocket.msgMediaText,
+          'msgType': AppWebsocket.msgTypeSingle,
+          'createTime': getTime()
         };
         webSocketController.sendMessage(msg);
         msg['createTime'] = getTime();
@@ -168,8 +170,8 @@ Future<void> loadGroupManage(int uid, Map msg) async {
           'fromId': uid,
           'toId': data['apply']['toId'],
           'content': {"data": data['apply']['info']},
-          'msgMedia': 1,
-          'msgType': 2,
+          'msgMedia': AppWebsocket.msgMediaText,
+          'msgType': AppWebsocket.msgTypeRoom,
           'createTime': getTime()
         };
         webSocketController.sendMessage(msg);
@@ -184,8 +186,8 @@ Future<void> loadGroupManage(int uid, Map msg) async {
       groupController.delGroup(data['group']['groupId']);
       delDbGroup(data['group']['groupId']);
 
-      chatController.delChat(data['group']['groupId'], 2);
-      delDbChat(data['group']['groupId'], 2);
+      chatController.delChat(data['group']['groupId'], ObjectTypes.group);
+      delDbChat(data['group']['groupId'], ObjectTypes.group);
 
       contactGroupController.delContactGroupByGroupId(data['group']['groupId']);
       delDbContactGroupByGroupId(data['group']['groupId']);
@@ -202,8 +204,8 @@ Future<void> loadGroupManage(int uid, Map msg) async {
     groupController.delGroup(data['group']['groupId']);
     delDbGroup(data['group']['groupId']);
 
-    chatController.delChat(data['group']['groupId'], 2);
-    delDbChat(data['group']['groupId'], 2);
+    chatController.delChat(data['group']['groupId'], ObjectTypes.group);
+    delDbChat(data['group']['groupId'], ObjectTypes.group);
 
     contactGroupController.delContactGroupByGroupId(data['group']['groupId']);
     delDbContactGroupByGroupId(data['group']['groupId']);
