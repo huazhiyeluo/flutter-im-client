@@ -11,7 +11,6 @@ AppBar contactBar() {
     title: Row(
       children: [
         CircleAvatar(
-          // 聊天对象的头像
           radius: 14,
           backgroundImage: NetworkImage(avatar),
         ),
@@ -21,7 +20,7 @@ AppBar contactBar() {
           style: TextStyle(
             fontSize: 20,
           ),
-        ), // 聊天对象的名称
+        ),
       ],
     ),
     actions: [
@@ -35,6 +34,5 @@ AppBar contactBar() {
             size: 28,
           ))
     ],
-    // 其他属性设置...
   );
 }

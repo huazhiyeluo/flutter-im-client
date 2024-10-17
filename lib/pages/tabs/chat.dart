@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/chat.dart';
@@ -23,7 +24,13 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  final TextEditingController inputController = TextEditingController();
+  final TextEditingController _inputController = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _inputController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,14 +44,12 @@ class _ChatState extends State<Chat> {
             color: Colors.white,
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 5),
             child: CustomSearchField(
-              controller: inputController,
+              controller: _inputController,
               hintText: '搜索',
               expands: false,
               maxHeight: 40,
               minHeight: 40,
-              onTap: () {
-                // 处理点击事件的逻辑
-              },
+              onTap: () {},
             ),
           ),
         ),
@@ -197,10 +202,11 @@ class _ChatPageState extends State<ChatPage> {
         ),
         onTap: () {
           _markAsRead(temp);
-          Navigator.pushNamed(context, '/talk', arguments: {
+          Map talkObj = {
             "objId": temp["objId"],
             "type": temp["type"],
-          });
+          };
+          Navigator.pushNamed(context, '/talk', arguments: talkObj);
         },
       ),
     );
@@ -212,14 +218,14 @@ class _ChatPageState extends State<ChatPage> {
       'toId': toId,
       field: value,
     };
-    if (type == 1) {
+    if (type == ObjectTypes.user) {
       ContactFriendApi.actContactFriend(params, onSuccess: (res) {
         contactFriendController.upsetContactFriend(res['data']);
         saveDbContactFriend(res['data']);
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
-    } else if (type == 2) {
+    } else if (type == ObjectTypes.group) {
       ContactGroupApi.actContactGroup(params, onSuccess: (res) {
         contactGroupController.upsetContactGroup(res['data']);
         saveDbContactGroup(res['data']);

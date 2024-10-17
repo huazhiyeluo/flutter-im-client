@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/controller/apply.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/friend_group.dart';
@@ -35,8 +36,10 @@ class Contact extends StatefulWidget {
 
 class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
   final ApplyController applyController = Get.find();
-  final TextEditingController inputController = TextEditingController();
+
+  final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+
   late TabController _tabController;
   bool showFriendRedPoint = false;
   bool showGroupRedPoint = false;
@@ -46,19 +49,19 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
 
-    ever(applyController.showFriendRedPoint, (_) => _formatData(1));
-    ever(applyController.showGroupRedPoint, (_) => _formatData(2));
-    _formatData(1);
-    _formatData(2);
+    ever(applyController.showFriendRedPoint, (_) => _formatData(ObjectTypes.user));
+    ever(applyController.showGroupRedPoint, (_) => _formatData(ObjectTypes.group));
+    _formatData(ObjectTypes.user);
+    _formatData(ObjectTypes.group);
   }
 
   void _formatData(int type) {
     if (!mounted) return;
     setState(() {
-      if (type == 1) {
+      if (type == ObjectTypes.user) {
         showFriendRedPoint = applyController.showFriendRedPoint.value;
       }
-      if (type == 2) {
+      if (type == ObjectTypes.group) {
         showGroupRedPoint = applyController.showGroupRedPoint.value;
       }
     });
@@ -66,6 +69,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
+    _inputController.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -108,7 +112,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                       color: Colors.white,
                       padding: const EdgeInsets.fromLTRB(12, 8, 12, 5),
                       child: CustomSearchField(
-                        controller: inputController,
+                        controller: _inputController,
                         hintText: '搜索',
                         expands: false,
                         maxHeight: 40,
@@ -381,7 +385,7 @@ class _ContactPageState extends State<ContactPage> {
             onTap: () {
               Map talkObj = {
                 "objId": itemFriend.toId,
-                "type": 1,
+                "type": ObjectTypes.user,
               };
               Navigator.pushNamed(context, '/friend-detail', arguments: talkObj);
             },
@@ -493,7 +497,7 @@ class _ContactPageState extends State<ContactPage> {
                             onTap: () {
                               Map talkObj = {
                                 "objId": itemFriend['toId'],
-                                "type": 1,
+                                "type": ObjectTypes.user,
                               };
                               Navigator.pushNamed(
                                 context,
@@ -534,7 +538,7 @@ class _ContactPageState extends State<ContactPage> {
                 onTap: () {
                   Map talkObj = {
                     "objId": itemGroup['toId'],
-                    "type": 2,
+                    "type": ObjectTypes.group,
                   };
                   Navigator.pushNamed(
                     context,

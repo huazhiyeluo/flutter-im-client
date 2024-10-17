@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:qim/common/utils/data.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/controller/user.dart';
 import 'package:qim/data/controller/websocket.dart';
 import 'package:qim/pages/chat/talk/phone_from.dart';
@@ -123,7 +124,7 @@ class SignalingController extends GetxController {
     await logPrint("handinvite: 1 ,$msg");
     if (msg['msgMedia'] == 1) {
       final UserController userController = Get.find();
-      Map userObj = userController.getOneUser(msg['fromId']) as Map;
+      Map userObj = userController.getOneUser(msg['fromId']);
       if (userObj.isEmpty) {
         return;
       }
@@ -149,7 +150,7 @@ class SignalingController extends GetxController {
   // 拒绝通话
   void _reject() {
     if (_session != null) {
-      _signaling?.onSendMsg!(fromId, toId, 1, 13, "挂断电话");
+      _signaling?.onSendMsg!(fromId, toId, AppWebsocket.msgTypeSingle, AppWebsocket.msgMediaOff, "挂断电话");
       _signaling?.reject(fromId, toId);
     }
   }
@@ -157,7 +158,7 @@ class SignalingController extends GetxController {
   // 取消通话
   void _cancel(int num) {
     if (_session != null) {
-      _signaling?.onSendMsg!(fromId, toId, 1, 12, "$num");
+      _signaling?.onSendMsg!(fromId, toId, AppWebsocket.msgTypeSingle, AppWebsocket.msgMediaTimes, "$num");
       _signaling?.bye(fromId, toId);
     }
   }

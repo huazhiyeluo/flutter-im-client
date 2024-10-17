@@ -57,11 +57,7 @@ class _PersonState extends State<Person> {
               IconButton(
                 icon: const Icon(Icons.qr_code),
                 onPressed: () {
-                  Map talkObj = {
-                    "objId": uid,
-                    "type": 1,
-                  };
-                  Navigator.pushNamed(context, '/user-info', arguments: talkObj);
+                  Navigator.pushNamed(context, '/user-info');
                 },
               ),
               IconButton(

@@ -16,12 +16,10 @@ class Setting extends StatefulWidget {
 
 class _SettingState extends State<Setting> {
   final UserInfoController userInfoController = Get.find();
-  Map userInfo = {};
 
   @override
   void initState() {
     super.initState();
-    userInfo = userInfoController.userInfo;
   }
 
   @override

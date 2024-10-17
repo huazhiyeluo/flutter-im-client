@@ -483,7 +483,7 @@ class _ChatMessageState extends State<ChatMessage> {
         messages.sort((a, b) => a['createTime'].compareTo(b['createTime']));
       }
 
-      if (talkObj['type'] == ObjectTypes.user) {
+      if (talkObj['type'] == ObjectTypes.group) {
         messages = await DBHelper.getData('message', [
           ['msgType', '=', talkObj['type']],
           ['toId', '=', talkObj['objId']]

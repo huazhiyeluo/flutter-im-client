@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:qim/common/utils/functions.dart';
+import 'package:qim/config/constants.dart';
 
 class Session {
   Session({required this.fromId, required this.toId});
@@ -119,7 +120,7 @@ class Signaling {
         'sdp': s.sdp,
         'type': s.type,
       };
-      onSendMsg?.call(session.fromId, session.toId, 4, 1, json.encode(offerMap));
+      onSendMsg?.call(session.fromId, session.toId, AppWebsocket.msgTypeAck, AppWebsocket.msgMediaPhoneOffer, json.encode(offerMap));
     } catch (e) {
       await logPrint("createOffer: error ,$e");
     }
@@ -135,7 +136,7 @@ class Signaling {
         'sdp': s.sdp,
         'type': s.type,
       };
-      onSendMsg?.call(session.fromId, session.toId, 4, 2, json.encode(answerMap));
+      onSendMsg?.call(session.fromId, session.toId, AppWebsocket.msgTypeAck, AppWebsocket.msgMediaPhoneAnswer, json.encode(answerMap));
     } catch (e) {
       await logPrint("createAnswer: error ,$e");
     }
@@ -149,7 +150,7 @@ class Signaling {
         'sdpMid': candidate.sdpMid,
         'candidate': candidate.candidate,
       };
-      onSendMsg?.call(fromId, toId, 4, 3, json.encode(candidateMap));
+      onSendMsg?.call(fromId, toId, AppWebsocket.msgTypeAck, AppWebsocket.msgMediaPhoneIce, json.encode(candidateMap));
     });
   }
 
@@ -232,7 +233,7 @@ class Signaling {
   //结束通话
   Future<void> bye(int fromId, int toId) async {
     await logPrint("bye");
-    onSendMsg?.call(fromId, toId, 4, 4, "");
+    onSendMsg?.call(fromId, toId, AppWebsocket.msgTypeAck, AppWebsocket.msgMediaPhoneQuit, "");
     var session = _sessions[fromId];
     if (session != null) {
       closeSession(session);
@@ -242,21 +243,21 @@ class Signaling {
   void onReceive(msg) {
     if ([4].contains(msg['msgType'])) {
       //收到offer代表有人邀请你通话
-      if (msg['msgMedia'] == 1) {
+      if (msg['msgMedia'] == AppWebsocket.msgMediaPhoneOffer) {
         _handleOffer(msg);
       }
       //收到answer代表对方接通 （接通后发送answer）
-      if (msg['msgMedia'] == 2) {
+      if (msg['msgMedia'] == AppWebsocket.msgMediaPhoneAnswer) {
         _handleAnswer(msg);
       }
 
       //收到IceCandidate （发送IceCandidate）
-      if (msg['msgMedia'] == 3) {
+      if (msg['msgMedia'] == AppWebsocket.msgMediaPhoneIce) {
         _handleIceCandidate(msg);
       }
 
       //挂断
-      if (msg['msgMedia'] == 4) {
+      if (msg['msgMedia'] == AppWebsocket.msgMediaPhoneQuit) {
         Session? session = _sessions.remove(msg['toId']);
         if (session != null) {
           onCallStateChange?.call(session, CallState.callStateBye);
@@ -315,8 +316,7 @@ class Signaling {
       Session? session = _sessions[msg['toId']];
 
       Map candidateMap = json.decode(msg['content']['data']);
-      RTCIceCandidate candidate =
-          RTCIceCandidate(candidateMap['candidate'], candidateMap['sdpMid'], candidateMap['sdpMLineIndex']);
+      RTCIceCandidate candidate = RTCIceCandidate(candidateMap['candidate'], candidateMap['sdpMid'], candidateMap['sdpMLineIndex']);
 
       if (session != null) {
         if (session.pc != null) {

@@ -16,7 +16,7 @@ class UserNickname extends StatefulWidget {
 
 class _UserNicknameState extends State<UserNickname> {
   final UserInfoController userInfoController = Get.find();
-  final TextEditingController nicknameController = TextEditingController();
+  final TextEditingController _nicknameController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -29,7 +29,7 @@ class _UserNicknameState extends State<UserNickname> {
     super.initState();
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    nicknameController.text = userInfo['nickname'];
+    _nicknameController.text = userInfo['nickname'];
 
     // 监听焦点变化事件
     _focusNode1.addListener(() {
@@ -43,6 +43,12 @@ class _UserNicknameState extends State<UserNickname> {
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _nicknameController.dispose();
   }
 
   @override
@@ -72,7 +78,7 @@ class _UserNicknameState extends State<UserNickname> {
           SizedBox(
             height: 50, // 设置TextField的高度
             child: TextField(
-              controller: nicknameController, // 用户名控制器
+              controller: _nicknameController, // 用户名控制器
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
                 hintText: '请输入昵称',
@@ -109,7 +115,7 @@ class _UserNicknameState extends State<UserNickname> {
 
   void _actUser() {
     var params = {
-      'nickname': nicknameController.text,
+      'nickname': _nicknameController.text,
       'uid': uid,
     };
     UserApi.actUser(params, onSuccess: (res) async {

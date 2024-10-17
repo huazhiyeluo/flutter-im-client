@@ -52,9 +52,9 @@ class _UserDetailPageState extends State<UserDetailPage> {
 
   @override
   void initState() {
+    super.initState();
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    super.initState();
   }
 
   @override

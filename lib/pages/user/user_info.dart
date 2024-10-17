@@ -24,14 +24,9 @@ class UserInfo extends StatefulWidget {
 }
 
 class _UserInfoState extends State<UserInfo> {
-  Map talkObj = {};
-
   @override
   void initState() {
     super.initState();
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
   }
 
   @override
@@ -61,15 +56,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
   int uid = 0;
   Map userInfo = {};
 
-  Map talkObj = {};
-  Map userObj = {};
-
   @override
   void initState() {
     super.initState();
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
   }
@@ -77,12 +66,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
   List<Widget> _getTitle() {
     List<Widget> data = [];
     data.add(Text(
-      '${userObj['nickname']}',
+      '${userInfo['nickname']}',
       style: const TextStyle(
         fontSize: 24,
       ),
     ));
-    data.add(Text('UID: ${userObj['uid']}'));
+    data.add(Text('UID: ${userInfo['uid']}'));
     return data;
   }
 
@@ -120,7 +109,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
         // 将图像字节写入临时文件
         await tempFile.writeAsBytes(image);
         Map msgObj = {
-          'content': {"data": "", "url": filePath, "name": userObj['nickname']},
+          'content': {"data": "", "url": filePath, "name": userInfo['nickname']},
           'msgMedia': 2
         };
         Get.toNamed(
@@ -139,13 +128,9 @@ class _UserInfoPageState extends State<UserInfoPage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     return Obx(() {
-      if (talkObj.isEmpty) {
-        return const Center(child: Text(""));
-      }
-      userObj = userController.getOneUser(talkObj['objId']);
       Map result = {};
       result['type'] = 1;
-      result['content'] = {"uid": talkObj['objId']};
+      result['content'] = {"uid": userInfo['uid']};
 
       return Column(
         children: [
@@ -163,7 +148,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(60.0),
                         child: CachedNetworkImage(
-                          imageUrl: userObj['avatar'],
+                          imageUrl: userInfo['avatar'],
                           width: 60.0,
                           height: 60.0,
                           fit: BoxFit.cover,
@@ -184,7 +169,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                       version: QrVersions.auto,
                       size: screenSize.width * 0.75,
                       backgroundColor: Colors.white, // 设置二维码背景色
-                      semanticsLabel: userObj['nickname'],
+                      semanticsLabel: userInfo['nickname'],
                     ),
                     const SizedBox(
                       height: 20,
@@ -204,7 +189,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
             children: [
               GestureDetector(
                 onTap: () async {
-                  // 点击事件的逻辑
                   _saveQrCode();
                 },
                 child: const Column(
@@ -222,8 +206,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  // 点击事件的逻辑
-                  print("点击了!");
                   _shareQrCode();
                 },
                 child: const Column(
