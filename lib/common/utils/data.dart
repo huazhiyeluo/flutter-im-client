@@ -93,6 +93,7 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
   }
 
   final TalkController talkObjController = Get.find();
+
   if (talkObjController.talkObj.isNotEmpty) {
     if (uid == msg['fromId'] || talkObjController.talkObj['objId'] == msg['toId']) {
       chatData['tips'] = 0;
@@ -102,9 +103,13 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
       await audioPlayerManager.playSound("2.mp3");
     }
   } else {
-    chatData['tips'] = (lastChat['tips'] ?? 0) + 1;
-    audioPlayerManager ??= AudioPlayerManager();
-    await audioPlayerManager.playSound("2.mp3");
+    if (uid == msg['fromId']) {
+      chatData['tips'] = 0;
+    } else {
+      chatData['tips'] = (lastChat['tips'] ?? 0) + 1;
+      audioPlayerManager ??= AudioPlayerManager();
+      await audioPlayerManager.playSound("2.mp3");
+    }
   }
 
   chatController.upsetChat(chatData);

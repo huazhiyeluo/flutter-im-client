@@ -47,8 +47,10 @@ class _LoginPageState extends State<LoginPage> {
   bool _isFocusNode1 = false;
   bool _isFocusNode2 = false;
 
-  bool _obscureText = true; // 用于控制密码是否显示
+  bool _obscureText = true;
   bool _isDelayed = false;
+
+  bool isButtonEnabled = true;
 
   @override
   void initState() {
@@ -137,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
         Image.asset("lib/assets/images/person.png", width: 80, height: 80),
         const SizedBox(height: 25),
         SizedBox(
-          height: 50, // 设置TextField的高度
+          height: 50,
           child: CustomTextFieldMore(
             focusNode: _focusNode1,
             isFocused: _isFocusNode1,
@@ -145,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
             hintText: '请输入用户名',
             keyboardType: TextInputType.text,
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')), // 只允许字母和数字
+              FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
             ],
             prefixIcon: Icon(
               Icons.person,
@@ -157,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         const SizedBox(height: 20),
         SizedBox(
-          height: 50, // 设置TextField的高度
+          height: 50,
           child: CustomTextFieldMore(
             focusNode: _focusNode2,
             isFocused: _isFocusNode2,
@@ -183,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 20),
         CustomButton(
           onPressed: () {
-            _loginAction();
+            isButtonEnabled ? _loginAction() : null;
           },
           text: "登录",
           backgroundColor: const Color.fromARGB(255, 60, 183, 21),
@@ -196,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             TextButton(
               onPressed: () {
-                _loginVisitorAction();
+                isButtonEnabled ? _loginVisitorAction() : null;
               },
               child: const Text(
                 '游客登录',
@@ -206,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
             const Text("|"),
             TextButton(
               onPressed: () {
-                _loginGoogleAction();
+                isButtonEnabled ? _loginGoogleAction() : null;
               },
               child: const Text(
                 '谷歌登录',
@@ -231,20 +233,48 @@ class _LoginPageState extends State<LoginPage> {
 
   //1、账号登录
   _loginAction() async {
+    if (!isButtonEnabled) return;
+    setState(() {
+      isButtonEnabled = false;
+    });
+
+    if (_usernameController.text.trim() == "") {
+      TipHelper.instance.showToast("请输入用户名");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+
+    if (_passwordController.text.trim() == "") {
+      TipHelper.instance.showToast("请输入密码");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+
     var params = {
       'platform': "account",
-      'username': _usernameController.text,
-      'password': _passwordController.text,
+      'username': _usernameController.text.trim(),
+      'password': _passwordController.text.trim(),
     };
     LoginApi.login(params, onSuccess: (res) async {
       _loginAfter(res['data']);
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
+      setState(() {
+        isButtonEnabled = true;
+      });
     });
   }
 
   //2、游客登录
   _loginVisitorAction() async {
+    if (!isButtonEnabled) return;
+    setState(() {
+      isButtonEnabled = false;
+    });
     var params = {
       'platform': "visitor",
     };
@@ -252,15 +282,25 @@ class _LoginPageState extends State<LoginPage> {
       _loginAfter(res['data']);
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
+      setState(() {
+        isButtonEnabled = true;
+      });
     });
   }
 
   //3、谷歌登录
   _loginGoogleAction() async {
+    if (!isButtonEnabled) return;
+    setState(() {
+      isButtonEnabled = false;
+    });
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     if (googleUser == null) {
       TipHelper.instance.showToast("用户取消登录，请重试");
+      setState(() {
+        isButtonEnabled = true;
+      });
       return;
     }
 
@@ -282,6 +322,9 @@ class _LoginPageState extends State<LoginPage> {
       _loginAfter(res['data']);
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
+      setState(() {
+        isButtonEnabled = true;
+      });
     });
   }
 

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/user.dart';
@@ -221,7 +222,6 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
       if (leftWidth > screenWidth - 120 - 35) {
         leftWidth = screenWidth - 120 - 35;
       }
-      rightWidth = screenWidth - 35 - leftWidth;
     });
     return Scaffold(
       appBar: AppBar(
@@ -230,7 +230,13 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("取消"),
+          child: const Text(
+            "取消",
+            style: TextStyle(
+              color: AppColors.textButtonColor,
+              fontSize: 15,
+            ),
+          ),
         ),
         actions: [
           TextButton(
@@ -241,28 +247,34 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
       ),
       body: Scaffold(
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
+          preferredSize: const Size.fromHeight(61),
           child: AppBar(
             automaticallyImplyLeading: false,
-            title: Row(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            flexibleSpace: Row(
               children: [
-                // 左侧的横向滚动区域，占据整行的最大 5/6
-                SizedBox(
+                _userSelectArrs.isNotEmpty
+                    ? const SizedBox(
+                        width: 12,
+                      )
+                    : Container(),
+                Container(
                   width: leftWidth,
-                  child: SizedBox(
-                    height: 40, // 设置高度以保证滚动区域可见
-                    child: ListView(
-                      scrollDirection: Axis.horizontal, // 横向滚动
-                      controller: _scrollController,
-                      children: _getSelectAll(),
-                    ),
+                  height: 56,
+                  color: Colors.white,
+                  padding: const EdgeInsets.fromLTRB(12, 7, 12, 5),
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    controller: _scrollController,
+                    children: _getSelectAll(),
                   ),
                 ),
-                // 右侧的搜索框，占据整行的最小 1/6
-                SizedBox(
-                  width: rightWidth,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                Expanded(
+                  child: Container(
+                    height: 56,
+                    color: Colors.white,
+                    padding: const EdgeInsets.fromLTRB(12, 7, 12, 5),
                     child: CustomSearchField(
                       controller: _inputController,
                       hintText: '搜索',
@@ -274,7 +286,7 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
                       },
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),

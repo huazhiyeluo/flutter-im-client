@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
 import 'package:qim/common/utils/db.dart';
 import 'package:qim/common/utils/tips.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/common.dart';
 import 'package:qim/data/controller/chat.dart';
 import 'package:qim/data/controller/share.dart';
@@ -30,7 +31,7 @@ class Share extends StatefulWidget {
 class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
   final WebSocketController webSocketController = Get.find();
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController inputController = TextEditingController();
+  final TextEditingController _inputController = TextEditingController();
   final ChatController chatController = Get.find();
   final ShareController shareController = Get.find();
   final TextEditingController nameCtr = TextEditingController();
@@ -41,7 +42,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
   Map msgObj = {};
   int uid = 0;
   Map userInfo = {};
-  int ttype = 1; //1、正常 2、要处理文件上传问题
+  int ttype = ShareTypes.single; // 1、正常 2、要处理文件上传问题
 
   List _cateShareArrs = [];
   List _cateChatArrs = [];
@@ -54,12 +55,17 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
     if (Get.arguments != null) {
       msgObj = Get.arguments['msgObj'];
       ttype = Get.arguments['ttype'];
-
     }
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 
     _initData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _inputController.dispose();
   }
 
   void _initData() async {
@@ -242,7 +248,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
         ),
       ),
       onConfirm: () async {
-        if (ttype == 2) {
+        if (ttype == ShareTypes.complex) {
           await _updateUrl();
         }
         for (var it in _userSelectArrs) {
@@ -252,7 +258,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
           msgObj["msgType"] = it['type'];
           msgObj['createTime'] = getTime();
           webSocketController.sendMessage(msgObj);
-          if (![1, 2].contains(msgObj['msgType'])) {
+          if (![AppWebsocket.msgTypeSingle, AppWebsocket.msgTypeRoom].contains(msgObj['msgType'])) {
             return;
           }
           joinData(uid, msgObj);
@@ -263,12 +269,12 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
               'fromId': uid,
               'toId': it['objId'],
               'content': {"data": nameCtr.text, "url": "", "name": ""},
-              'msgMedia': 1,
+              'msgMedia': AppWebsocket.msgMediaText,
               'msgType': it['type'],
               'createTime': getTime()
             };
             webSocketController.sendMessage(msg);
-            if (![1, 2].contains(msg['msgType'])) {
+            if (![AppWebsocket.msgTypeSingle, AppWebsocket.msgTypeRoom].contains(msg['msgType'])) {
               return;
             }
             joinData(uid, msg);
@@ -311,16 +317,17 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
               automaticallyImplyLeading: false,
               backgroundColor: Colors.grey[200],
               pinned: false,
-              expandedHeight: 210,
+              expandedHeight: 215,
               flexibleSpace: FlexibleSpaceBar(
                 background: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      color: const Color.fromARGB(255, 255, 255, 255),
-                      padding: const EdgeInsets.all(10),
+                      height: 56,
+                      color: Colors.white,
+                      padding: const EdgeInsets.fromLTRB(12, 7, 12, 5),
                       child: CustomSearchField(
-                        controller: inputController,
+                        controller: _inputController,
                         hintText: '搜索',
                         expands: false,
                         maxHeight: 40,
@@ -329,7 +336,7 @@ class _ShareState extends State<Share> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                       color: Colors.white,
                       child: const Row(
                         children: [

@@ -20,7 +20,7 @@ class _GroupSettingInfoState extends State<GroupSettingInfo> {
 
   final UserController userController = Get.find();
 
-  final TextEditingController infoCtr = TextEditingController();
+  final TextEditingController _infoController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -33,27 +33,25 @@ class _GroupSettingInfoState extends State<GroupSettingInfo> {
   @override
   void initState() {
     super.initState();
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 
     groupObj = groupController.getOneGroup(talkObj['objId']);
-    infoCtr.text = groupObj['info'];
-    characterCount = infoCtr.text.characters.length;
+    _infoController.text = groupObj['info'];
+    characterCount = _infoController.text.characters.length;
   }
 
   @override
   void dispose() {
-    infoCtr.dispose();
+    _infoController.dispose();
     super.dispose();
   }
 
   _doneAction() async {
-    var params = {'groupId': talkObj['objId'], 'info': infoCtr.text};
+    var params = {'groupId': talkObj['objId'], 'info': _infoController.text};
     GroupApi.actGroup(params, onSuccess: (res) async {
-      Map data = {'groupId': talkObj['objId'], 'info': infoCtr.text};
+      Map data = {'groupId': talkObj['objId'], 'info': _infoController.text};
       groupController.upsetGroup(data);
       saveDbGroup(data);
       Navigator.pop(context);
@@ -78,7 +76,7 @@ class _GroupSettingInfoState extends State<GroupSettingInfo> {
         padding: const EdgeInsets.all(10),
         children: [
           TextField(
-            controller: infoCtr,
+            controller: _infoController,
             minLines: 1,
             maxLines: null,
             decoration: const InputDecoration(

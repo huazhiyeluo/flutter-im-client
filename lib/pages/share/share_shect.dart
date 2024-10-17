@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/config/constants.dart';
 import 'package:qim/data/controller/contact_friend.dart';
 import 'package:qim/data/controller/contact_group.dart';
 import 'package:qim/data/controller/friend_group.dart';
@@ -18,7 +19,7 @@ class ShareSelect extends StatefulWidget {
 }
 
 class _ShareSelectState extends State<ShareSelect> {
-  final TextEditingController inputController = TextEditingController();
+  final TextEditingController _inputController = TextEditingController();
   final UserInfoController userInfoController = Get.find();
   final UserController userController = Get.find();
   final FriendGroupController friendGroupController = Get.find();
@@ -63,9 +64,7 @@ class _ShareSelectState extends State<ShareSelect> {
   void _search() {
     for (var v in _cateArrs) {
       for (var val in v["children"]) {
-        if (val['name'].contains(inputController.text) ||
-            val['remark'].contains(inputController.text) ||
-            val['objId'].toString().contains(inputController.text)) {
+        if (val['name'].contains(_inputController.text) || val['remark'].contains(_inputController.text) || val['objId'].toString().contains(_inputController.text)) {
           val['isHidden'] = false;
         } else {
           val['isHidden'] = true;
@@ -90,7 +89,7 @@ class _ShareSelectState extends State<ShareSelect> {
             friendGroupObj['children'] = [];
           }
           Map userObj = userController.getOneUser(contactFriendObj['toId']);
-          contactFriendObj['type'] = 1;
+          contactFriendObj['type'] = ObjectTypes.user;
           contactFriendObj['objId'] = contactFriendObj['toId'];
           contactFriendObj['name'] = userObj['nickname'];
           contactFriendObj['remark'] = contactFriendObj['remark'];
@@ -103,21 +102,13 @@ class _ShareSelectState extends State<ShareSelect> {
       }
     }
 
-    var groupArrs = {
-      "name": "群聊",
-      "friendGroupId": 0,
-      "ownerUid": 34,
-      "isDefault": 1,
-      "sort": 0,
-      "controller": ExpansionTileController(),
-      "children": []
-    };
+    var groupArrs = {"name": "群聊", "friendGroupId": 0, "ownerUid": 34, "isDefault": 1, "sort": 0, "controller": ExpansionTileController(), "children": []};
     _status[0] = false;
     for (var groupObj in groupController.allGroups) {
       Map temp = {};
 
       temp['friendGroupId'] = 0;
-      temp['type'] = 2;
+      temp['type'] = ObjectTypes.group;
       temp['objId'] = groupObj['groupId'];
       temp['name'] = groupObj['name'];
       temp['remark'] = groupObj['name'];
@@ -138,7 +129,7 @@ class _ShareSelectState extends State<ShareSelect> {
 
   @override
   void dispose() {
-    inputController.dispose();
+    _inputController.dispose();
     super.dispose();
   }
 
@@ -318,7 +309,11 @@ class _ShareSelectState extends State<ShareSelect> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("取消"),
+          child: const Text("取消",
+              style: TextStyle(
+                color: AppColors.textButtonColor,
+                fontSize: 15,
+              )),
         ),
         actions: [
           TextButton(
@@ -329,30 +324,36 @@ class _ShareSelectState extends State<ShareSelect> {
       ),
       body: Scaffold(
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
+          preferredSize: const Size.fromHeight(61),
           child: AppBar(
             automaticallyImplyLeading: false,
-            title: Row(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            flexibleSpace: Row(
               children: [
-                // 左侧的横向滚动区域，占据整行的最大 5/6
-                SizedBox(
+                _userSelectArrs.isNotEmpty
+                    ? const SizedBox(
+                        width: 12,
+                      )
+                    : Container(),
+                Container(
                   width: leftWidth,
-                  child: SizedBox(
-                    height: 40, // 设置高度以保证滚动区域可见
-                    child: ListView(
-                      scrollDirection: Axis.horizontal, // 横向滚动
-                      controller: _scrollController,
-                      children: _getSelectAll(),
-                    ),
+                  height: 56,
+                  color: Colors.white,
+                  padding: const EdgeInsets.fromLTRB(12, 7, 12, 5),
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    controller: _scrollController,
+                    children: _getSelectAll(),
                   ),
                 ),
-                // 右侧的搜索框，占据整行的最小 1/6
-                SizedBox(
-                  width: rightWidth,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                Expanded(
+                  child: Container(
+                    height: 56,
+                    color: Colors.white,
+                    padding: const EdgeInsets.fromLTRB(12, 7, 12, 5),
                     child: CustomSearchField(
-                      controller: inputController,
+                      controller: _inputController,
                       hintText: '搜索',
                       expands: false,
                       maxHeight: 40,

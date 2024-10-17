@@ -72,7 +72,7 @@ class GroupManagerAddPage extends StatefulWidget {
 }
 
 class _GroupManagerAddPageState extends State<GroupManagerAddPage> {
-  final TextEditingController inputController = TextEditingController();
+  final TextEditingController _inputController = TextEditingController();
   final UserInfoController userInfoController = Get.find();
   final UserController userController = Get.find();
   final ContactGroupController contactGroupController = Get.find();
@@ -86,13 +86,17 @@ class _GroupManagerAddPageState extends State<GroupManagerAddPage> {
 
   @override
   void initState() {
+    super.initState();
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
     _formatData();
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _inputController.dispose();
   }
 
   void _formatData() {
@@ -102,9 +106,7 @@ class _GroupManagerAddPageState extends State<GroupManagerAddPage> {
       if (item['groupPower'] == 0) {
         Map userObj = userController.getOneUser(item['fromId']);
         Map contactFriendObj = contactFriendController.getOneContactFriend(uid, item['fromId']);
-        if (userObj['nickname'].contains(inputController.text) ||
-            item['remark'].contains(inputController.text) ||
-            item['fromId'].toString().contains(inputController.text)) {
+        if (userObj['nickname'].contains(_inputController.text) || item['remark'].contains(_inputController.text) || item['fromId'].toString().contains(_inputController.text)) {
           UserModel chat = UserModel();
           chat.uid = item['fromId'];
           chat.name = item['nickname'] != "" ? item['nickname'] : userObj['nickname'];
@@ -143,18 +145,23 @@ class _GroupManagerAddPageState extends State<GroupManagerAddPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
+        preferredSize: const Size.fromHeight(61),
         child: AppBar(
           automaticallyImplyLeading: false,
-          title: CustomSearchField(
-            controller: inputController,
-            hintText: '搜索',
-            expands: false,
-            maxHeight: 40,
-            minHeight: 40,
-            onSubmitted: (val) {
-              _formatData();
-            },
+          flexibleSpace: Container(
+            height: 56,
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(12, 7, 12, 5),
+            child: CustomSearchField(
+              controller: _inputController,
+              hintText: '搜索',
+              expands: false,
+              maxHeight: 40,
+              minHeight: 40,
+              onTap: () {
+                _formatData();
+              },
+            ),
           ),
         ),
       ),

@@ -60,12 +60,7 @@ class _PersonState extends State<Person> {
                   Navigator.pushNamed(context, '/user-info');
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.chevron_right),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/user-detail');
-                },
-              ),
+              const Icon(Icons.chevron_right),
             ],
           ),
           onTap: () {

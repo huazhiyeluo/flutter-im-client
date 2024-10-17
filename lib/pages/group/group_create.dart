@@ -69,6 +69,8 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
 
   int _defaultSelect = 0;
 
+  bool isButtonEnabled = true;
+
   int uid = 0;
   Map userInfo = {};
 
@@ -212,11 +214,11 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 5, // 每行显示5个
-                crossAxisSpacing: 20.0, // 每个头像之间的水平间距
-                mainAxisSpacing: 20.0, // 每个头像之间的垂直间距
+                crossAxisCount: 5,
+                crossAxisSpacing: 20.0,
+                mainAxisSpacing: 20.0,
               ),
-              itemCount: 10, // 总共10个头像（包括加号按钮）
+              itemCount: 10,
               itemBuilder: (context, index) {
                 return _showAvatar(index);
               },
@@ -231,9 +233,9 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               });
             },
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            controlAffinity: ListTileControlAffinity.leading, // 勾选框在前面
+            controlAffinity: ListTileControlAffinity.leading,
             contentPadding: EdgeInsets.zero,
-            visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0), // 紧凑显示
+            visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
             title: Text.rich(
               TextSpan(
                 children: [
@@ -260,7 +262,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
             width: double.infinity,
             child: CustomButton(
               onPressed: () {
-                _createGroup();
+                isButtonEnabled ? _createGroup() : null;
               },
               text: "立即创建",
               backgroundColor: const Color.fromARGB(255, 60, 183, 21),
@@ -409,26 +411,66 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
   }
 
   _createGroup() async {
-    if (!_isChecked) {
-      TipHelper.instance.showToast("请勾选同意条款");
+    if (!isButtonEnabled) return;
+    setState(() {
+      isButtonEnabled = false;
+    });
+    if (_nameController.text.trim() == "") {
+      TipHelper.instance.showToast("请输入群名称");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+    if (_infoController.text.trim() == "") {
+      TipHelper.instance.showToast("请输入群介绍");
+      setState(() {
+        isButtonEnabled = true;
+      });
       return;
     }
 
     if (_defaultSelect == 0) {
       if (_imageFile == null) {
         TipHelper.instance.showToast("请选择头像");
+        setState(() {
+          isButtonEnabled = true;
+        });
         return;
       }
+    }
+
+    if (!_isChecked) {
+      TipHelper.instance.showToast("请勾选同意条款");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+
+    if (_defaultSelect == 0) {
       XFile compressedFile = await compressImage(_imageFile!);
       dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
       CommonApi.upload({'file': file}, onSuccess: (res) async {
-        var params = {'ownerUid': uid, 'type': 0, 'name': _nameController.text, 'icon': res['data'], 'info': _infoController.text};
+        var params = {
+          'ownerUid': uid,
+          'type': 0,
+          'name': _nameController.text,
+          'icon': res['data'],
+          'info': _infoController.text,
+        };
         _createGroupDo(params);
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
     } else {
-      var params = {'ownerUid': uid, 'type': 0, 'name': _nameController.text, 'icon': "http://img.siyuwen.com/godata/avatar/$_defaultSelect.jpg", 'info': _infoController.text};
+      var params = {
+        'ownerUid': uid,
+        'type': 0,
+        'name': _nameController.text,
+        'icon': "http://img.siyuwen.com/godata/avatar/$_defaultSelect.jpg",
+        'info': _infoController.text,
+      };
       _createGroupDo(params);
     }
   }
@@ -446,6 +488,9 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
       );
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);
+      setState(() {
+        isButtonEnabled = true;
+      });
     });
   }
 }

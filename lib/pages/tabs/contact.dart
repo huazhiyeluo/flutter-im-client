@@ -102,15 +102,15 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
             SliverAppBar(
               backgroundColor: Colors.grey[200],
               pinned: false,
-              expandedHeight: 163,
+              expandedHeight: 159,
               flexibleSpace: FlexibleSpaceBar(
                 background: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
-                      height: 60,
+                      height: 56,
                       color: Colors.white,
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 5),
+                      padding: const EdgeInsets.fromLTRB(12, 7, 12, 5),
                       child: CustomSearchField(
                         controller: _inputController,
                         hintText: '搜索',

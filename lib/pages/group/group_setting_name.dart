@@ -20,7 +20,7 @@ class _GroupSettingNameState extends State<GroupSettingName> {
 
   final UserController userController = Get.find();
 
-  final TextEditingController nameCtr = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
   int uid = 0;
   Map userInfo = {};
@@ -33,27 +33,25 @@ class _GroupSettingNameState extends State<GroupSettingName> {
   @override
   void initState() {
     super.initState();
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 
     groupObj = groupController.getOneGroup(talkObj['objId']);
-    nameCtr.text = groupObj['name'];
-    characterCount = nameCtr.text.characters.length;
+    _nameController.text = groupObj['name'];
+    characterCount = _nameController.text.characters.length;
   }
 
   @override
   void dispose() {
-    nameCtr.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
   _doneAction() async {
-    var params = {'groupId': talkObj['objId'], 'name': nameCtr.text};
+    var params = {'groupId': talkObj['objId'], 'name': _nameController.text};
     GroupApi.actGroup(params, onSuccess: (res) async {
-      Map data = {'groupId': talkObj['objId'], 'name': nameCtr.text};
+      Map data = {'groupId': talkObj['objId'], 'name': _nameController.text};
       groupController.upsetGroup(data);
       saveDbGroup(data);
       Navigator.pop(context);
@@ -78,7 +76,7 @@ class _GroupSettingNameState extends State<GroupSettingName> {
         padding: const EdgeInsets.all(10),
         children: [
           TextField(
-            controller: nameCtr,
+            controller: _nameController,
             decoration: const InputDecoration(
               hintText: '填写群名称',
             ),

@@ -80,6 +80,8 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isShowNicknameClear = false;
   bool _isShowUsernameClear = false;
 
+  bool isButtonEnabled = true;
+
   @override
   void initState() {
     super.initState();
@@ -418,7 +420,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         CustomButton(
           onPressed: () {
-            _registerAction();
+            isButtonEnabled ? _registerAction() : null;
           },
           text: "注册",
           backgroundColor: const Color.fromARGB(255, 60, 183, 21),
@@ -488,24 +490,76 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   _registerAction() async {
+    if (!isButtonEnabled) return;
+    setState(() {
+      isButtonEnabled = false;
+    });
     if (_imageFile == null) {
       TipHelper.instance.showToast("请选择头像");
+      setState(() {
+        isButtonEnabled = true;
+      });
       return;
     }
+
+    if (_nicknameController.text.trim() == "") {
+      TipHelper.instance.showToast("请输入昵称");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+
+    if (_usernameController.text.trim() == "") {
+      TipHelper.instance.showToast("请输入用户名");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+
+    if (_passwordController.text.trim() == "") {
+      TipHelper.instance.showToast("请输入密码");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+
+    if (_repasswordController.text.trim() == "") {
+      TipHelper.instance.showToast("请输入确认密码");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+
     if (!_isChecked) {
       TipHelper.instance.showToast("请勾选同意条款");
+      setState(() {
+        isButtonEnabled = true;
+      });
       return;
     }
     XFile compressedFile = await compressImage(_imageFile!);
     dio.MultipartFile file = await dio.MultipartFile.fromFile(compressedFile.path);
     CommonApi.upload({'file': file}, onSuccess: (res) async {
-      var params = {'avatar': res['data'], 'nickname': _nicknameController.text, 'username': _usernameController.text, 'password': _passwordController.text, 'repassword': _repasswordController.text};
+      var params = {
+        'avatar': res['data'],
+        'nickname': _nicknameController.text.trim(),
+        'username': _usernameController.text.trim(),
+        'password': _passwordController.text.trim(),
+        'repassword': _repasswordController.text.trim(),
+      };
       RegisterApi.register(params, onSuccess: (res) async {
         Navigator.of(context).pop(false);
       }, onError: (res) {
         TipHelper.instance.showToast(res['msg']);
       });
     }, onError: (res) {
+      setState(() {
+        isButtonEnabled = true;
+      });
       TipHelper.instance.showToast(res['msg']);
     });
   }

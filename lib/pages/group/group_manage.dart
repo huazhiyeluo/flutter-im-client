@@ -37,9 +37,7 @@ class _GroupManagerState extends State<GroupManager> with TickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    if (Get.arguments != null) {
-      talkObj = Get.arguments;
-    }
+    talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);

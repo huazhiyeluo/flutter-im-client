@@ -233,8 +233,8 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 50,
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+            height: 56,
+            padding: const EdgeInsets.fromLTRB(12, 7, 12, 5),
             child: CustomSearchField(
               controller: _inputUserController,
               hintText: 'QID/昵称',
@@ -328,8 +328,8 @@ class _AddContactDetailPageState extends State<AddContactDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 50,
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+            height: 56,
+            padding: const EdgeInsets.fromLTRB(12, 7, 12, 5),
             child: CustomSearchField(
               controller: _inputGroupController,
               hintText: '群号/群名称',

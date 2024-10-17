@@ -211,18 +211,21 @@ class _GroupUserPageState extends State<GroupUserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
+        preferredSize: const Size.fromHeight(61),
         child: AppBar(
           automaticallyImplyLeading: false,
-          title: CustomSearchField(
-            controller: _inputController,
-            hintText: '搜索',
-            expands: false,
-            maxHeight: 40,
-            minHeight: 40,
-            onSubmitted: (val) {
-              _formatData();
-            },
+          flexibleSpace: Container(
+            height: 56,
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(12, 7, 12, 5),
+            child: CustomSearchField(
+              controller: _inputController,
+              hintText: '搜索',
+              expands: false,
+              maxHeight: 40,
+              minHeight: 40,
+              onTap: () {},
+            ),
           ),
         ),
       ),
