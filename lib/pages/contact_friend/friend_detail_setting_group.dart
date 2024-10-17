@@ -31,9 +31,13 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
   void initState() {
     super.initState();
     talkObj = Get.arguments ?? {};
+
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
+
+    if (talkObj.isNotEmpty) {
+      contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
+    }
   }
 
   @override
