@@ -75,32 +75,61 @@ class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
       contactFriendObj = contactFriendController.getOneContactFriend(uid, talkObj['objId']);
       return ListView(
         children: [
-          ListTile(
-            leading: const Text(
-              "个性签名",
-              style: TextStyle(fontSize: 16),
-            ),
-            subtitle: Text(
-              userObj['info'],
-              style: const TextStyle(fontSize: 14),
-              maxLines: 5,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.end,
-            ),
-            onTap: () {},
-          ),
-          contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0
-              ? ListTile(
-                  leading: const Text(
-                    "加好友时间",
-                    style: TextStyle(fontSize: 16),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(15, 20, 15, 10),
+            child: Row(
+              children: [
+                const SizedBox(
+                  width: 120,
+                  child: Text(
+                    "个性签名",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
-                  subtitle: Text(
-                    formatDate(contactFriendObj['joinTime']),
-                    style: const TextStyle(fontSize: 16),
+                ),
+                Expanded(
+                  child: Container(),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.95 - 150,
+                  child: Text(
+                    userObj['info'] != "" ? userObj['info'] : "暂无",
+                    style: const TextStyle(fontSize: 14),
+                    maxLines: 5,
+                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.end,
                   ),
-                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+          contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0 ? const Divider() : Container(),
+          contactFriendObj.isNotEmpty && contactFriendObj['joinTime'] > 0
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                  child: Row(
+                    children: [
+                      const SizedBox(
+                        width: 120,
+                        child: Text(
+                          "加好友时间",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(),
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.95 - 150,
+                        child: Text(
+                          formatDate(contactFriendObj['joinTime']),
+                          style: const TextStyle(fontSize: 14),
+                          maxLines: 5,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               : Container(),
         ],

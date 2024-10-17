@@ -9,7 +9,7 @@ class AppConstants {
 class AppColors {
   static const Color backgroundColor = Color.fromARGB(255, 255, 255, 255);
   static const Color systemNavigationBarColor = Color.fromARGB(255, 255, 255, 255);
-  static const Color appBackgroundColor = Color.fromARGB(255, 224, 224, 224);
+  static const Color appBackgroundColor = Color.fromARGB(255, 237, 237, 237);
   static const Color bottomBackgroundColor = Color.fromARGB(255, 247, 247, 247);
   static const Color textButtonColor = Color.fromARGB(255, 20, 20, 20);
 }
