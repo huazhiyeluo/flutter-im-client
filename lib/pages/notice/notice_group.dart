@@ -66,7 +66,7 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
 
   @override
   void initState() {
-    ever(applyController.allGroupChats, (_) => _formatData());
+    ever(applyController.allGroupApplys, (_) => _formatData());
     _formatData();
 
     userInfo = userInfoController.userInfo;
@@ -87,7 +87,7 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
   void _formatData() {
     if (!mounted) return;
     setState(() {
-      _applys = applyController.allGroupChats;
+      _applys = applyController.allGroupApplys;
     });
   }
 
@@ -190,7 +190,7 @@ class _NoticeGroupPageState extends State<NoticeGroupPage> {
   }
 
   Future<void> _getApplyList() async {
-    if (applyController.allFriendChats.isEmpty) {
+    if (applyController.allFriendApplys.isEmpty) {
       List applys = await DBHelper.getData('apply', [
         ['type', '=', 2]
       ]);

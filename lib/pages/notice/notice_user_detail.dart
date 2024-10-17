@@ -66,7 +66,7 @@ class _NoticeFriendDetailPageState extends State<NoticeFriendDetailPage> {
 
   @override
   void initState() {
-    ever(applyController.allFriendChats, (_) => _formatData());
+    ever(applyController.allFriendApplys, (_) => _formatData());
     _formatData();
 
     userInfo = userInfoController.userInfo;
@@ -82,7 +82,7 @@ class _NoticeFriendDetailPageState extends State<NoticeFriendDetailPage> {
   void _formatData() {
     if (!mounted) return;
     setState(() {
-      _applys = applyController.allFriendChats;
+      _applys = applyController.allFriendApplys;
     });
   }
 

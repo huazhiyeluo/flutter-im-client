@@ -87,7 +87,6 @@ class _PlayAudioState extends State<PlayAudio> {
 
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).primaryColor;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -111,12 +110,7 @@ class _PlayAudioState extends State<PlayAudio> {
                       final position = value * duration.inMilliseconds;
                       _audioPlayer.seek(Duration(milliseconds: position.round()));
                     },
-                    value: (_position != null &&
-                            _duration != null &&
-                            _position!.inMilliseconds > 0 &&
-                            _position!.inMilliseconds < _duration!.inMilliseconds)
-                        ? _position!.inMilliseconds / _duration!.inMilliseconds
-                        : 0.0,
+                    value: (_position != null && _duration != null && _position!.inMilliseconds > 0 && _position!.inMilliseconds < _duration!.inMilliseconds) ? _position!.inMilliseconds / _duration!.inMilliseconds : 0.0,
                   ),
                 ],
               ),

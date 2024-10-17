@@ -12,14 +12,8 @@ class ContactFriendRoutes {
   static final routes = [
     GetPage(name: "/friend-chat-setting", page: () => const FriendSettingChat(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/friend-detail-more", page: () => const FriendDetailMore(), middlewares: [HomeMiddleware()]),
-    GetPage(
-        name: "/friend-detail-setting-remark",
-        page: () => const FriendDetailSettingRemark(),
-        middlewares: [HomeMiddleware()]),
-    GetPage(
-        name: "/friend-detail-setting-group",
-        page: () => const FriendDetailSettingGroup(),
-        middlewares: [HomeMiddleware()]),
+    GetPage(name: "/friend-detail-setting-remark", page: () => const FriendDetailSettingRemark(), middlewares: [HomeMiddleware()]),
+    GetPage(name: "/friend-detail-setting-group", page: () => const FriendDetailSettingGroup(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/friend-detail-setting", page: () => const FriendDetailSetting(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/friend-detail", page: () => const FriendDetail(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/friend-group", page: () => const FriendGroup(), middlewares: [HomeMiddleware()]),

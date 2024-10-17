@@ -103,7 +103,5 @@ Future<void> initialDb(int uid) async {
         'icon TEXT, '
         'operateTime INTEGER)',
   ];
-
-  // Initialize the database with the specified name and tables
   await DBHelper.initDatabase(dbName, tableSQLs);
 }

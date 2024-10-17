@@ -19,13 +19,7 @@ class ContactGroupRoutes {
     GetPage(name: "/group-user-add-friend", page: () => const GroupUserAddFriend(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/group-join", page: () => const GroupJoin(), middlewares: [HomeMiddleware()]),
     GetPage(name: "/group-join-show", page: () => const GroupJoinShow(), middlewares: [HomeMiddleware()]),
-    GetPage(
-        name: "/group-chat-setting-nickname",
-        page: () => const GroupChatSettingNickname(),
-        middlewares: [HomeMiddleware()]),
-    GetPage(
-        name: "/group-chat-setting-remark",
-        page: () => const GroupChatSettingRemark(),
-        middlewares: [HomeMiddleware()]),
+    GetPage(name: "/group-chat-setting-nickname", page: () => const GroupChatSettingNickname(), middlewares: [HomeMiddleware()]),
+    GetPage(name: "/group-chat-setting-remark", page: () => const GroupChatSettingRemark(), middlewares: [HomeMiddleware()]),
   ];
 }

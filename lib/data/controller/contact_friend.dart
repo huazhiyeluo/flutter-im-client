@@ -48,12 +48,7 @@ class ContactFriendController extends GetxController {
 
   void upsetContactFriendByFriendGroupId(int friendGroupId, Map contactFriend) {
     // 查找是否已经存在相同的数据
-    final matchingIndexes = allContactFriends
-        .asMap()
-        .entries
-        .where((entry) => entry.value['friendGroupId'] == friendGroupId)
-        .map((entry) => entry.key)
-        .toList();
+    final matchingIndexes = allContactFriends.asMap().entries.where((entry) => entry.value['friendGroupId'] == friendGroupId).map((entry) => entry.key).toList();
 
     if (matchingIndexes.isNotEmpty) {
       for (int index in matchingIndexes) {

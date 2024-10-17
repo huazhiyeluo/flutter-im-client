@@ -19,7 +19,7 @@ class CustomTextFieldMore extends StatelessWidget {
   final Color fillColor;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
-  final bool showUnderline; // 新增控制下划线的参数
+  final bool showUnderline;
 
   const CustomTextFieldMore({
     super.key,
@@ -40,7 +40,7 @@ class CustomTextFieldMore extends StatelessWidget {
     this.inputFormatters,
     this.keyboardType,
     this.suffixIcon,
-    this.showUnderline = true, // 默认显示下划线
+    this.showUnderline = true,
   });
 
   @override
@@ -70,7 +70,7 @@ class CustomTextFieldMore extends StatelessWidget {
                   width: 1.0,
                 ),
               )
-            : InputBorder.none, // 控制下划线是否显示
+            : InputBorder.none,
         focusedBorder: showUnderline
             ? UnderlineInputBorder(
                 borderSide: BorderSide(
@@ -78,7 +78,7 @@ class CustomTextFieldMore extends StatelessWidget {
                   width: 1.0,
                 ),
               )
-            : InputBorder.none, // 控制获取焦点时是否显示下划线
+            : InputBorder.none,
         enabledBorder: showUnderline
             ? UnderlineInputBorder(
                 borderSide: BorderSide(
@@ -86,7 +86,7 @@ class CustomTextFieldMore extends StatelessWidget {
                   width: 1.0,
                 ),
               )
-            : InputBorder.none, // 控制未聚焦时是否显示下划线
+            : InputBorder.none,
       ),
       onTap: onTap,
       onSubmitted: onSubmitted,

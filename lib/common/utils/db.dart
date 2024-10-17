@@ -30,8 +30,7 @@ class DBHelper {
   }
 
   // 查询
-  static Future<List<Map>> getData(String tbl, List<List<dynamic>> where,
-      {String? orderBy, int? limit, int? offset}) async {
+  static Future<List<Map>> getData(String tbl, List<List<dynamic>> where, {String? orderBy, int? limit, int? offset}) async {
     final db = _database;
 
     // 构建 WHERE 子句
@@ -83,8 +82,7 @@ class DBHelper {
       whereArgs.add(item[2]);
     }
     // 直接赋值给结果变量
-    List<Map<String, Object?>> result =
-        whereArgs.isNotEmpty ? await db.query(tbl, where: whereClause, whereArgs: whereArgs) : await db.query(tbl);
+    List<Map<String, Object?>> result = whereArgs.isNotEmpty ? await db.query(tbl, where: whereClause, whereArgs: whereArgs) : await db.query(tbl);
     // 返回结果是否为空
     return result.isNotEmpty ? result.first : {};
   }

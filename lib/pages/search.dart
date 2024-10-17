@@ -126,10 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ],
                     ));
-                screenshotController
-                    .captureFromWidget(InheritedTheme.captureAll(context, Material(child: container)),
-                        delay: const Duration(seconds: 1))
-                    .then((capturedImage) {
+                screenshotController.captureFromWidget(InheritedTheme.captureAll(context, Material(child: container)), delay: const Duration(seconds: 1)).then((capturedImage) {
                   ShowCapturedWidget(context, capturedImage);
                 });
               },

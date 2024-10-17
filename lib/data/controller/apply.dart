@@ -2,8 +2,8 @@ import 'package:get/get.dart';
 
 class ApplyController extends GetxController {
   final RxList<Map> allApplys = <Map>[].obs;
-  final RxList<Map> allFriendChats = <Map>[].obs;
-  final RxList<Map> allGroupChats = <Map>[].obs;
+  final RxList<Map> allFriendApplys = <Map>[].obs;
+  final RxList<Map> allGroupApplys = <Map>[].obs;
   RxBool showFriendRedPoint = false.obs;
   RxBool showGroupRedPoint = false.obs;
 
@@ -26,14 +26,25 @@ class ApplyController extends GetxController {
       // 否则，将数据添加到列表中
       allApplys.add(apply);
     }
-    allFriendChats.assignAll(allApplys.where((c) => c['type'] == 1).toList());
-    allGroupChats.assignAll(allApplys.where((c) => c['type'] == 2).toList());
+    allFriendApplys.assignAll(allApplys.where((c) => c['type'] == 1).toList());
+    allGroupApplys.assignAll(allApplys.where((c) => c['type'] == 2).toList());
 
-    allFriendChats.sort((a, b) {
-      return a['status'].compareTo(b['status']);
+    allFriendApplys.sort((a, b) {
+      int compareStatus = a['status'].compareTo(b['status']);
+      if (compareStatus != 0) {
+        return compareStatus;
+      } else {
+        return b['operateTime'].compareTo(a['operateTime']);
+      }
     });
-    allGroupChats.sort((a, b) {
-      return a['status'].compareTo(b['status']);
+
+    allGroupApplys.sort((a, b) {
+      int compareStatus = a['status'].compareTo(b['status']);
+      if (compareStatus != 0) {
+        return compareStatus;
+      } else {
+        return b['operateTime'].compareTo(a['operateTime']);
+      }
     });
 
     showFriendRedPoint.value = false;
@@ -60,8 +71,8 @@ class ApplyController extends GetxController {
 
   void clearApply(int type) {
     allApplys.removeWhere((c) => c['type'] == type);
-    allFriendChats.assignAll(allApplys.where((c) => c['type'] == 1).toList());
-    allGroupChats.assignAll(allApplys.where((c) => c['type'] == 2).toList());
+    allFriendApplys.assignAll(allApplys.where((c) => c['type'] == 1).toList());
+    allGroupApplys.assignAll(allApplys.where((c) => c['type'] == 2).toList());
     if (type == 1) {
       showFriendRedPoint.value = false;
     }

@@ -67,7 +67,7 @@ Future<void> saveDbContactFriend(Map data) async {
     'isHidden',
     'isQuiet',
     'joinTime',
-    'isOnline'
+    'isOnline',
   ];
 
   for (var field in fields) {

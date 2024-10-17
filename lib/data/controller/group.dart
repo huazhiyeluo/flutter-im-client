@@ -1,6 +1,4 @@
 import 'package:get/get.dart';
-import 'package:qim/data/api/getdata.dart';
-import 'package:qim/data/db/get.dart';
 
 class GroupController extends GetxController {
   final RxList<Map> allGroups = <Map>[].obs;

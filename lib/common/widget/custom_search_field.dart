@@ -38,7 +38,7 @@ class CustomSearchField extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20.0,
             vertical: 5.0,
-          ), // 调整内容的内边距
+          ),
           prefixIcon: const Icon(
             Icons.search,
             size: 20,

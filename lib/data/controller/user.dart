@@ -1,9 +1,4 @@
-import 'dart:async';
-
 import 'package:get/get.dart';
-import 'package:qim/data/api/getdata.dart';
-import 'package:qim/data/api/user.dart';
-import 'package:qim/data/db/get.dart';
 
 class UserController extends GetxController {
   final RxList<Map> allUsers = <Map>[].obs;
