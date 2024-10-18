@@ -330,18 +330,18 @@ class _ContactPageState extends State<ContactPage> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
       ),
-      color: Colors.grey,
+      color: Colors.white,
       position: RelativeRect.fromRect(
         _tapPosition & const Size(40, 40),
         Offset.zero & overlay.size,
       ),
       items: [
         const PopupMenuItem<String>(
-          height: 25,
+          height: 30,
           value: 'group_manage',
           child: Text(
             '分组管理',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.grey),
           ),
         ),
       ],

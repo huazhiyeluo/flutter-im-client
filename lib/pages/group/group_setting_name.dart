@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/group.dart';
 import 'package:qim/data/controller/group.dart';
@@ -77,6 +78,9 @@ class _GroupSettingNameState extends State<GroupSettingName> {
         children: [
           TextField(
             controller: _nameController,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(15),
+            ],
             decoration: const InputDecoration(
               hintText: '填写群名称',
             ),
@@ -88,7 +92,7 @@ class _GroupSettingNameState extends State<GroupSettingName> {
           ),
           const SizedBox(height: 8),
           Text(
-            "$characterCount/50字",
+            "$characterCount/15字",
             textAlign: TextAlign.end,
           ),
         ],

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:qim/common/widget/custom_text_field_more.dart';
@@ -76,9 +77,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final ImagePicker _picker = ImagePicker();
   XFile? _imageFile;
-
-  bool _isShowNicknameClear = false;
-  bool _isShowUsernameClear = false;
 
   bool isButtonEnabled = true;
 
@@ -253,32 +251,55 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Expanded(
-              child: CustomTextFieldMore(
-                focusNode: _focusNode1,
-                isFocused: _isFocusNode1,
-                controller: _nicknameController,
-                hintText: '请输入昵称',
-                keyboardType: TextInputType.text,
-                suffixIcon: _isShowNicknameClear
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-                        ),
-                        onPressed: _clearNickname,
-                      )
-                    : const SizedBox.shrink(),
-                focusedColor: const Color.fromARGB(255, 60, 183, 21),
-                unfocusedColor: Colors.grey,
-                showUnderline: false,
-                onChanged: (val) {
-                  _checkNickname(val);
-                },
+              child: Stack(
+                children: [
+                  CustomTextFieldMore(
+                    focusNode: _focusNode1,
+                    isFocused: _isFocusNode1,
+                    controller: _nicknameController,
+                    hintText: '请输入昵称',
+                    keyboardType: TextInputType.text,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(15),
+                    ],
+                    suffixIcon: _isFocusNode1 && _nicknameController.text.trim() != ""
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                              color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                            ),
+                            onPressed: () {
+                              _nicknameController.text = "";
+                              setState(() {});
+                            },
+                          )
+                        : const SizedBox.shrink(),
+                    focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                    unfocusedColor: Colors.grey,
+                    showUnderline: false,
+                    onChanged: (val) {
+                      setState(() {});
+                    },
+                  ),
+                  Positioned(
+                    right: 8,
+                    bottom: 8,
+                    child: Text(
+                      "${_nicknameController.text.characters.length}/15字",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        const Divider(),
+        Divider(
+          color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+        ),
         const SizedBox(height: 20),
         Row(
           textBaseline: TextBaseline.alphabetic,
@@ -291,32 +312,56 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Expanded(
-              child: CustomTextFieldMore(
-                focusNode: _focusNode2,
-                isFocused: _isFocusNode2,
-                controller: _usernameController,
-                hintText: '请输入用户名',
-                keyboardType: TextInputType.text,
-                suffixIcon: _isShowUsernameClear
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-                        ),
-                        onPressed: _clearUsername,
-                      )
-                    : const SizedBox.shrink(),
-                focusedColor: const Color.fromARGB(255, 60, 183, 21),
-                unfocusedColor: Colors.grey,
-                showUnderline: false,
-                onChanged: (val) {
-                  _checkUsername(val);
-                },
+              child: Stack(
+                children: [
+                  CustomTextFieldMore(
+                    focusNode: _focusNode2,
+                    isFocused: _isFocusNode2,
+                    controller: _usernameController,
+                    hintText: '请输入用户名',
+                    keyboardType: TextInputType.text,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+                      LengthLimitingTextInputFormatter(15),
+                    ],
+                    suffixIcon: _isFocusNode2 && _usernameController.text.trim() != ""
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                              color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                            ),
+                            onPressed: () {
+                              _usernameController.text = "";
+                              setState(() {});
+                            },
+                          )
+                        : const SizedBox.shrink(),
+                    focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                    unfocusedColor: Colors.grey,
+                    showUnderline: false,
+                    onChanged: (val) {
+                      setState(() {});
+                    },
+                  ),
+                  Positioned(
+                    right: 8,
+                    bottom: 8,
+                    child: Text(
+                      "${_usernameController.text.characters.length}/15字",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        const Divider(),
+        Divider(
+          color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+        ),
         const SizedBox(height: 20),
         Row(
           textBaseline: TextBaseline.alphabetic,
@@ -329,28 +374,53 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Expanded(
-              child: CustomTextFieldMore(
-                focusNode: _focusNode3,
-                isFocused: _isFocusNode3,
-                controller: _passwordController,
-                obscureText: _obscureText,
-                hintText: '请输入密码',
-                keyboardType: TextInputType.text,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: _isFocusNode3 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+              child: Stack(
+                children: [
+                  CustomTextFieldMore(
+                    focusNode: _focusNode3,
+                    isFocused: _isFocusNode3,
+                    controller: _passwordController,
+                    obscureText: _obscureText,
+                    hintText: '请输入密码',
+                    keyboardType: TextInputType.text,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(20),
+                    ],
+                    suffixIcon: _isFocusNode3 && _passwordController.text.trim() != ""
+                        ? IconButton(
+                            icon: Icon(
+                              _obscureText ? Icons.visibility_off : Icons.visibility,
+                              color: _isFocusNode3 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                            ),
+                            onPressed: _togglePasswordVisibility,
+                          )
+                        : const SizedBox.shrink(),
+                    focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                    unfocusedColor: Colors.grey,
+                    showUnderline: false,
+                    onChanged: (val) {
+                      setState(() {});
+                    },
                   ),
-                  onPressed: _togglePasswordVisibility,
-                ),
-                focusedColor: const Color.fromARGB(255, 60, 183, 21),
-                unfocusedColor: Colors.grey,
-                showUnderline: false,
+                  Positioned(
+                    right: 8,
+                    bottom: 8,
+                    child: Text(
+                      "${_passwordController.text.characters.length}/20字",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        const Divider(),
+        Divider(
+          color: _isFocusNode3 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+        ),
         const SizedBox(height: 20),
         Row(
           textBaseline: TextBaseline.alphabetic,
@@ -363,28 +433,53 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
             Expanded(
-              child: CustomTextFieldMore(
-                focusNode: _focusNode4,
-                isFocused: _isFocusNode4,
-                controller: _repasswordController,
-                obscureText: _obscureTextRe,
-                hintText: '请输入确认密码',
-                keyboardType: TextInputType.text,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureTextRe ? Icons.visibility_off : Icons.visibility,
-                    color: _isFocusNode4 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+              child: Stack(
+                children: [
+                  CustomTextFieldMore(
+                    focusNode: _focusNode4,
+                    isFocused: _isFocusNode4,
+                    controller: _repasswordController,
+                    obscureText: _obscureTextRe,
+                    hintText: '请输入确认密码',
+                    keyboardType: TextInputType.text,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(20),
+                    ],
+                    suffixIcon: _isFocusNode4 && _repasswordController.text.trim() != ""
+                        ? IconButton(
+                            icon: Icon(
+                              _obscureTextRe ? Icons.visibility_off : Icons.visibility,
+                              color: _isFocusNode4 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                            ),
+                            onPressed: _toggleRepasswordVisibility,
+                          )
+                        : const SizedBox.shrink(),
+                    focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                    unfocusedColor: Colors.grey,
+                    showUnderline: false,
+                    onChanged: (val) {
+                      setState(() {});
+                    },
                   ),
-                  onPressed: _toggleRepasswordVisibility,
-                ),
-                focusedColor: const Color.fromARGB(255, 60, 183, 21),
-                unfocusedColor: Colors.grey,
-                showUnderline: false,
+                  Positioned(
+                    right: 8,
+                    bottom: 8,
+                    child: Text(
+                      "${_repasswordController.text.characters.length}/20字",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        const Divider(),
+        Divider(
+          color: _isFocusNode4 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+        ),
         const SizedBox(height: 10),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -434,44 +529,6 @@ class _RegisterPageState extends State<RegisterPage> {
   _clearAvatar() {
     setState(() {
       _imageFile = null;
-    });
-  }
-
-  _checkNickname(val) {
-    if (val != "") {
-      setState(() {
-        _isShowNicknameClear = true;
-      });
-    } else {
-      setState(() {
-        _isShowNicknameClear = false;
-      });
-    }
-  }
-
-  _clearNickname() {
-    _nicknameController.text = "";
-    setState(() {
-      _isShowNicknameClear = false;
-    });
-  }
-
-  _checkUsername(val) {
-    if (val != "") {
-      setState(() {
-        _isShowUsernameClear = true;
-      });
-    } else {
-      setState(() {
-        _isShowUsernameClear = false;
-      });
-    }
-  }
-
-  _clearUsername() {
-    _usernameController.text = "";
-    setState(() {
-      _isShowUsernameClear = false;
     });
   }
 
@@ -528,6 +585,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (_repasswordController.text.trim() == "") {
       TipHelper.instance.showToast("请输入确认密码");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+
+    if (_repasswordController.text.trim() != _passwordController.text.trim()) {
+      TipHelper.instance.showToast("密码和确认密码不一致");
       setState(() {
         isButtonEnabled = true;
       });

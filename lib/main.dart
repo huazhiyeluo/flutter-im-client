@@ -67,6 +67,9 @@ class _MyAppState extends State<MyApp> {
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.bottomBackgroundColor,
       ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: AppColors.sheetBackgroundColor,
+      ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.appBackgroundColor,
         elevation: 1,

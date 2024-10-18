@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/contact_group.dart';
@@ -77,6 +78,9 @@ class _GroupChatSettingNicknameState extends State<GroupChatSettingNickname> {
         children: [
           TextField(
             controller: _nicknameController,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(15),
+            ],
             decoration: const InputDecoration(
               hintText: '填写群昵称',
             ),
@@ -88,7 +92,7 @@ class _GroupChatSettingNicknameState extends State<GroupChatSettingNickname> {
           ),
           const SizedBox(height: 8),
           Text(
-            "$characterCount/50字",
+            "$characterCount/15字",
             textAlign: TextAlign.end,
           ),
         ],

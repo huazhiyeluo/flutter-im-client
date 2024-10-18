@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/contact_group.dart';
@@ -48,7 +49,6 @@ class _GroupChatSettingRemarkState extends State<GroupChatSettingRemark> {
     groupObj = groupController.getOneGroup(talkObj['objId']);
     contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
     _remarkController.text = contactGroupObj['remark'];
-    characterCount = _remarkController.text.characters.length;
   }
 
   @override
@@ -113,17 +113,33 @@ class _GroupChatSettingRemarkState extends State<GroupChatSettingRemark> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: TextField(
-                  controller: _remarkController,
-                  decoration: const InputDecoration(
-                    hintText: '填写群聊备注',
-                    border: InputBorder.none,
-                  ),
-                  onChanged: (val) {
-                    setState(() {
-                      characterCount = val.characters.length;
-                    });
-                  },
+                child: Stack(
+                  children: [
+                    TextField(
+                      controller: _remarkController,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(15),
+                      ],
+                      decoration: const InputDecoration(
+                        hintText: '填写群聊备注',
+                        border: InputBorder.none,
+                      ),
+                      onChanged: (val) {
+                        setState(() {});
+                      },
+                    ),
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: Text(
+                        "${_remarkController.text.characters.length}/15字",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -139,6 +155,7 @@ class _GroupChatSettingRemarkState extends State<GroupChatSettingRemark> {
               TextButton(
                 onPressed: () {
                   _remarkController.text = groupObj['name'];
+                  setState(() {});
                 },
                 child: const Text(
                   "填入",

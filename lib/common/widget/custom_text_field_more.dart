@@ -5,6 +5,7 @@ class CustomTextFieldMore extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final bool expands;
+  final int? minLines;
   final int? maxLines;
   final VoidCallback? onTap;
   final ValueChanged<String>? onSubmitted;
@@ -26,6 +27,7 @@ class CustomTextFieldMore extends StatelessWidget {
     required this.controller,
     required this.hintText,
     this.expands = false,
+    this.minLines = 1,
     this.maxLines = 1,
     this.onTap,
     this.onSubmitted,
@@ -52,6 +54,7 @@ class CustomTextFieldMore extends StatelessWidget {
       obscureText: obscureText,
       inputFormatters: inputFormatters,
       style: const TextStyle(textBaseline: TextBaseline.alphabetic),
+      minLines: minLines,
       maxLines: maxLines,
       decoration: InputDecoration(
         fillColor: fillColor,

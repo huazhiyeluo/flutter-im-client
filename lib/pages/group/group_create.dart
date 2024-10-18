@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:qim/common/widget/custom_text_field_more.dart';
 import 'package:qim/config/constants.dart';
 import 'package:qim/data/api/common.dart';
 import 'package:qim/data/api/group.dart';
@@ -109,13 +111,14 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    controller: _nameController,
-                    keyboardType: TextInputType.text,
-                    onChanged: (val) {
-                      _checkName(val);
-                    },
-                    decoration: InputDecoration(
+                  child: Stack(children: [
+                    CustomTextFieldMore(
+                      controller: _nameController,
+                      hintText: '填写群名称(2-15个字)',
+                      keyboardType: TextInputType.text,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(15),
+                      ],
                       suffixIcon: _isShowNameClear
                           ? IconButton(
                               icon: const Icon(
@@ -125,21 +128,25 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                               onPressed: _clearName,
                             )
                           : const SizedBox.shrink(),
-                      hintText: '填写群名称(2-32个字)',
-                      border: UnderlineInputBorder(
-                        borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.circular(0),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.circular(0),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.circular(0),
+                      focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                      unfocusedColor: Colors.grey,
+                      showUnderline: false,
+                      onChanged: (val) {
+                        _checkName(val);
+                      },
+                    ),
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: Text(
+                        "${_nameController.text.characters.length}/15字",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
-                  ),
+                  ]),
                 ),
               ],
             ),
@@ -147,7 +154,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-            color: Colors.white, // 设置白色背景
+            color: Colors.white,
             child: Row(
               textBaseline: TextBaseline.alphabetic,
               children: [
@@ -159,38 +166,44 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    maxLines: 5,
-                    controller: _infoController,
-                    keyboardType: TextInputType.text,
-                    onChanged: (val) {
-                      _checkInfo(val);
-                    },
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: InputDecoration(
-                      suffixIcon: _isShowInfoClear
-                          ? IconButton(
-                              icon: const Icon(
-                                Icons.clear,
-                                color: Color.fromARGB(199, 171, 175, 169),
-                              ),
-                              onPressed: _clearInfo,
-                            )
-                          : const SizedBox.shrink(),
-                      hintText: '填写群介绍(2-500个字)',
-                      border: UnderlineInputBorder(
-                        borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.circular(0),
+                  child: Stack(
+                    children: [
+                      CustomTextFieldMore(
+                        maxLines: 5,
+                        controller: _infoController,
+                        hintText: '填写群介绍(2-500个字)',
+                        keyboardType: TextInputType.text,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(500),
+                        ],
+                        suffixIcon: _isShowInfoClear
+                            ? IconButton(
+                                icon: const Icon(
+                                  Icons.clear,
+                                  color: Color.fromARGB(199, 171, 175, 169),
+                                ),
+                                onPressed: _clearInfo,
+                              )
+                            : const SizedBox.shrink(),
+                        focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                        unfocusedColor: Colors.grey,
+                        showUnderline: false,
+                        onChanged: (val) {
+                          _checkInfo(val);
+                        },
                       ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.circular(0),
+                      Positioned(
+                        right: 8,
+                        bottom: 8,
+                        child: Text(
+                          "${_infoController.text.characters.length}/500字",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
                       ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide.none,
-                        borderRadius: BorderRadius.circular(0),
-                      ),
-                    ),
+                    ],
                   ),
                 ),
               ],

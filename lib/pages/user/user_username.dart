@@ -70,9 +70,9 @@ class _UserUsernameState extends State<UserUsername> {
                   _actUser();
                 },
                 text: "修改用户名",
-                backgroundColor: const Color.fromARGB(255, 223, 219, 219),
+                backgroundColor: const Color.fromARGB(255, 237, 237, 237),
                 foregroundColor: Colors.black,
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(8),
                 padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               ),
             ],

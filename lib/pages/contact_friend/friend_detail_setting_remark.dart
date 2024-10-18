@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/chat.dart';
@@ -97,11 +98,32 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
                 child: Text("备注名"),
               ),
               Expanded(
-                child: TextField(
-                  controller: _remarkController,
-                  decoration: const InputDecoration(
-                    hintText: '填写备注名',
-                  ),
+                child: Stack(
+                  children: [
+                    TextField(
+                      controller: _remarkController,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(15),
+                      ],
+                      decoration: const InputDecoration(
+                        hintText: '填写备注名',
+                      ),
+                      onChanged: (val) {
+                        setState(() {});
+                      },
+                    ),
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: Text(
+                        "${_remarkController.text.characters.length}/15字",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               )
             ],
@@ -113,16 +135,34 @@ class _FriendDetailSettingRemarkState extends State<FriendDetailSettingRemark> {
                 child: Text("描述"),
               ),
               Expanded(
-                child: TextField(
-                  controller: _descController,
-                  textAlignVertical: TextAlignVertical.center,
-                  minLines: 1,
-                  maxLines: null,
-                  decoration: const InputDecoration(
-                    hintText: '填写描述',
-                  ),
+                child: Stack(
+                  children: [
+                    TextField(
+                      controller: _descController,
+                      textAlignVertical: TextAlignVertical.center,
+                      minLines: 1,
+                      maxLines: 10,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(500),
+                      ],
+                      decoration: const InputDecoration(
+                        hintText: '填写描述',
+                      ),
+                    ),
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: Text(
+                        "${_descController.text.characters.length}/500字",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              )
+              ),
             ],
           ),
         ],

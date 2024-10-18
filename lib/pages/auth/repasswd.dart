@@ -112,47 +112,87 @@ class _RepasswdPageState extends State<RepasswdPage> {
       children: [
         const SizedBox(height: 30),
         SizedBox(
-          height: 50, // 设置TextField的高度
-          child: CustomTextFieldMore(
-            focusNode: _focusNode1,
-            isFocused: _isFocusNode1,
-            controller: _usernameController,
-            hintText: '请输入用户名',
-            keyboardType: TextInputType.text,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')), // 只允许字母和数字
+          height: 50,
+          child: Stack(
+            children: [
+              CustomTextFieldMore(
+                focusNode: _focusNode1,
+                isFocused: _isFocusNode1,
+                controller: _usernameController,
+                hintText: '请输入用户名',
+                keyboardType: TextInputType.text,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+                  LengthLimitingTextInputFormatter(15),
+                ],
+                prefixIcon: Icon(
+                  Icons.person,
+                  color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                ),
+                focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                unfocusedColor: Colors.grey,
+                onChanged: (val) {
+                  setState(() {});
+                },
+              ),
+              Positioned(
+                right: 8,
+                bottom: 8,
+                child: Text(
+                  "${_usernameController.text.characters.length}/15字",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
             ],
-            prefixIcon: Icon(
-              Icons.person,
-              color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-            ),
-            focusedColor: const Color.fromARGB(255, 60, 183, 21),
-            unfocusedColor: Colors.grey,
           ),
         ),
         const SizedBox(height: 20),
         SizedBox(
           height: 50, // 设置TextField的高度
-          child: CustomTextFieldMore(
-            focusNode: _focusNode2,
-            isFocused: _isFocusNode2,
-            controller: _passwordController,
-            obscureText: _obscureText,
-            hintText: '请输入密码',
-            keyboardType: TextInputType.text,
-            prefixIcon: Icon(
-              Icons.lock,
-              color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscureText ? Icons.visibility_off : Icons.visibility,
-                color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+          child: Stack(
+            children: [
+              CustomTextFieldMore(
+                focusNode: _focusNode2,
+                isFocused: _isFocusNode2,
+                controller: _passwordController,
+                obscureText: _obscureText,
+                hintText: '请输入密码',
+                keyboardType: TextInputType.text,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(20),
+                ],
+                prefixIcon: Icon(
+                  Icons.lock,
+                  color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                    color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                  ),
+                  onPressed: _togglePasswordVisibility,
+                ),
+                focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                unfocusedColor: Colors.grey,
+                onChanged: (val) {
+                  setState(() {});
+                },
               ),
-              onPressed: _togglePasswordVisibility,
-            ),
-            focusedColor: const Color.fromARGB(255, 60, 183, 21),
-            unfocusedColor: Colors.grey,
+              Positioned(
+                right: 8,
+                bottom: 8,
+                child: Text(
+                  "${_passwordController.text.characters.length}/20字",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 20),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/friend_group.dart';
@@ -28,6 +29,8 @@ class _FriendGroupState extends State<FriendGroup> {
 
   Map talkObj = {};
 
+  bool isButtonEnabled = true;
+
   @override
   void initState() {
     super.initState();
@@ -48,28 +51,72 @@ class _FriendGroupState extends State<FriendGroup> {
       title = "编辑分组";
     }
     _nameController.text = name;
+
     showCustomDialog(
       title: title,
       context: context,
-      content: TextField(
-        controller: _nameController,
-        decoration: const InputDecoration(hintText: "分组名"),
+      content: StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return Stack(
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(hintText: "分组名"),
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(15),
+                ],
+                onChanged: (val) {
+                  // 每次输入变化时都调用 setState 来更新字数显示
+                  setState(() {});
+                },
+              ),
+              Positioned(
+                right: 8,
+                bottom: 8,
+                child: Text(
+                  "${_nameController.text.characters.length}/15字",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
       onConfirm: () async {
-        var params = {'friendGroupId': friendGroupId, 'ownerUid': uid, 'name': _nameController.text};
-        ContactFriendApi.editContactFriendGroup(params, onSuccess: (res) async {
-          friendGroupController.upsetFriendGroup(res['data']);
-          saveDbFriendGroup(res['data']);
-        }, onError: (res) {
-          TipHelper.instance.showToast(res['msg']);
-        });
+        isButtonEnabled ? _doneAction(friendGroupId) : null;
       },
       onConfirmText: "确定",
-      onCancel: () {
-        // 处理取消逻辑
-      },
+      onCancel: () {},
       onCancelText: "取消",
     );
+  }
+
+  void _doneAction(int friendGroupId) {
+    if (!isButtonEnabled) return;
+    setState(() {
+      isButtonEnabled = false;
+    });
+
+    if (_nameController.text.trim() == "") {
+      TipHelper.instance.showToast("请输入名称");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+
+    var params = {'friendGroupId': friendGroupId, 'ownerUid': uid, 'name': _nameController.text};
+    ContactFriendApi.editContactFriendGroup(params, onSuccess: (res) async {
+      friendGroupController.upsetFriendGroup(res['data']);
+      saveDbFriendGroup(res['data']);
+      isButtonEnabled = true;
+    }, onError: (res) {
+      TipHelper.instance.showToast(res['msg']);
+      isButtonEnabled = true;
+    });
   }
 
   Future _operateList(int friendGroupId) {
@@ -183,32 +230,11 @@ class _FriendGroupState extends State<FriendGroup> {
                       key: ValueKey(temp['friendGroupId']),
                       title: GestureDetector(
                         child: Text(temp["name"]),
-                        onLongPress: () {},
                       ),
-                      trailing: temp['isDeleteStatus'] != null && temp['isDeleteStatus']
-                          ? TextButton(
-                              onPressed: () {
-                                _operateList(temp['friendGroupId']);
-                              },
-                              style: TextButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                padding: EdgeInsets.zero, // 去掉 padding
-                                minimumSize: const Size(40, 25), // 控制最小宽高
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 减小点击区域
-                              ),
-                              child: const Text(
-                                "删除",
-                                style: TextStyle(color: Colors.white, fontSize: 14),
-                              ),
-                            )
-                          : const Padding(
-                              padding: EdgeInsets.fromLTRB(0, 0, 7, 0),
-                              child: Icon(Icons.menu),
-                            ),
                       leading: IconButton(
-                        padding: EdgeInsets.zero, // 设置为零填充
+                        padding: EdgeInsets.zero,
                         iconSize: 25,
-                        visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+                        visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
                         onPressed: () {
                           setState(() {
                             if (temp['isDeleteStatus'] == null) {
@@ -219,6 +245,26 @@ class _FriendGroupState extends State<FriendGroup> {
                         },
                         icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
                       ),
+                      trailing: temp['isDeleteStatus'] != null && temp['isDeleteStatus']
+                          ? TextButton(
+                              onPressed: () {
+                                _operateList(temp['friendGroupId']);
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                padding: EdgeInsets.zero,
+                                minimumSize: const Size(45, 30),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: const Text(
+                                "删除",
+                                style: TextStyle(color: Colors.white, fontSize: 14),
+                              ),
+                            )
+                          : const Padding(
+                              padding: EdgeInsets.fromLTRB(0, 0, 7, 0),
+                              child: Icon(Icons.menu),
+                            ),
                       onTap: () {
                         _editGroup(friendGroupId: temp['friendGroupId'], name: temp["name"]);
                       },

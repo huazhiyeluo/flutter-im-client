@@ -23,6 +23,7 @@ class DialogConfirm extends StatelessWidget {
     return AlertDialog(
       title: title != null ? Text(title!) : null,
       content: content,
+      backgroundColor: const Color.fromARGB(255, 247, 247, 247),
       contentPadding: const EdgeInsets.fromLTRB(20, 30, 20, 10),
       actions: <Widget>[
         Row(
@@ -33,7 +34,12 @@ class DialogConfirm extends StatelessWidget {
                 onCancel();
                 Navigator.of(context).pop();
               },
-              child: Text(onCancelText != null ? onCancelText! : "取消"),
+              child: Text(
+                onCancelText != null ? onCancelText! : "取消",
+                style: const TextStyle(
+                  color: Colors.black87,
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {

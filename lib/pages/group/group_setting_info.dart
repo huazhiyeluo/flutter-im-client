@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/group.dart';
 import 'package:qim/data/controller/group.dart';
@@ -79,6 +80,9 @@ class _GroupSettingInfoState extends State<GroupSettingInfo> {
             controller: _infoController,
             minLines: 1,
             maxLines: null,
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(500),
+            ],
             decoration: const InputDecoration(
               hintText: '填写群介绍',
             ),

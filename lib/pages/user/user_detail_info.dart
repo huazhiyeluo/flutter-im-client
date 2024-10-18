@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/widget/custom_text_field_more.dart';
 import 'package:qim/data/api/user.dart';
 import 'package:qim/data/cache/keys.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -56,15 +58,16 @@ class _UserDetailInfoState extends State<UserDetailInfo> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("个性签名"),
+        centerTitle: true,
         actions: [
           CustomButton(
             onPressed: () {
               _actUser();
             },
             text: "保存",
-            backgroundColor: const Color.fromARGB(255, 223, 219, 219),
-            foregroundColor: Colors.grey,
-            borderRadius: BorderRadius.circular(2),
+            backgroundColor: const Color.fromARGB(255, 87, 189, 106),
+            foregroundColor: Colors.white,
+            borderRadius: BorderRadius.circular(6),
             padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
           ),
           const SizedBox(
@@ -76,36 +79,37 @@ class _UserDetailInfoState extends State<UserDetailInfo> {
         padding: const EdgeInsets.all(20),
         children: [
           SizedBox(
-            height: 150, // 设置TextField的高度
-            child: TextField(
-              controller: _infoController, // 用户名控制器
-              keyboardType: TextInputType.text,
-              minLines: 1,
-              maxLines: 5,
-              decoration: InputDecoration(
-                hintText: '请输入个性签名',
-                border: UnderlineInputBorder(
-                  borderSide: const BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  ),
-                  borderRadius: BorderRadius.circular(0),
+            child: Stack(
+              children: [
+                CustomTextFieldMore(
+                  focusNode: _focusNode1,
+                  isFocused: _isFocusNode1,
+                  minLines: 1,
+                  maxLines: 10,
+                  controller: _infoController,
+                  hintText: '请输入个性签名',
+                  keyboardType: TextInputType.text,
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(500),
+                  ],
+                  focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                  unfocusedColor: Colors.grey,
+                  onChanged: (val) {
+                    setState(() {});
+                  },
                 ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
-                    width: 1.0,
+                Positioned(
+                  right: 8,
+                  bottom: 8,
+                  child: Text(
+                    "${_infoController.text.characters.length}/500字",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(0),
                 ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: const BorderSide(
-                    color: Colors.grey,
-                    width: 1.0,
-                  ),
-                  borderRadius: BorderRadius.circular(0),
-                ),
-              ),
+              ],
             ),
           ),
           const SizedBox(height: 10),
