@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/common/utils/data.dart';
 import 'package:qim/config/constants.dart';
-import 'package:qim/config/urls.dart';
+import 'package:qim/config/configs.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/api/contact_group.dart';
 import 'package:qim/data/controller/apply.dart';
@@ -129,7 +129,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   }
 
   void _initOtherData() {
-    webSocketController = Get.put(WebSocketController(uid, Urls.socketUrl));
+    webSocketController = Get.put(WebSocketController(uid, Configs.socketUrl));
     signalingController = Get.put(SignalingController(fromId: uid, context: context, webSocketController: webSocketController));
     _initOnReceive();
   }

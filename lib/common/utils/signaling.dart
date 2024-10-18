@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:qim/common/utils/functions.dart';
 import 'package:qim/config/constants.dart';
+import 'package:qim/config/configs.dart';
 
 class Session {
   Session({required this.fromId, required this.toId});
@@ -31,7 +32,7 @@ class Signaling {
 
   final Map<String, dynamic> configuration = {
     'iceServers': [
-      {'urls': 'turn:139.196.98.139:3478?transport=tcp', 'credential': 'liaoabc', 'username': 'liao'},
+      Configs.iceServers,
     ],
     'sdpSemantics': 'unified-plan'
   };

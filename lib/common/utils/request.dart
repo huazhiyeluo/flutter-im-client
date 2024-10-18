@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:qim/common/utils/cache.dart';
-import 'package:qim/config/urls.dart';
+import 'package:qim/config/configs.dart';
 import 'package:qim/common/utils/device_info.dart';
 import 'package:qim/common/utils/functions.dart';
 import 'package:qim/data/cache/keys.dart';
@@ -17,7 +17,7 @@ class RequestHelper {
 
   RequestHelper._() {
     BaseOptions options = BaseOptions(
-      baseUrl: Urls.apiPrefix,
+      baseUrl: Configs.apiPrefix,
       connectTimeout: const Duration(milliseconds: 5000),
       receiveTimeout: const Duration(milliseconds: 3000),
     );
