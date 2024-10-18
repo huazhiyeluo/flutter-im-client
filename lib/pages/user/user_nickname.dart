@@ -97,8 +97,8 @@ class _UserNicknameState extends State<UserNickname> {
                   },
                 ),
                 Positioned(
-                  right: 8,
-                  bottom: 8,
+                  right: 0,
+                  bottom: 1,
                   child: Text(
                     "${_nicknameController.text.characters.length}/15字",
                     style: const TextStyle(

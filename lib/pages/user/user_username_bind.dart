@@ -196,9 +196,9 @@ class _UserUsernameBindState extends State<UserUsernameBind> {
                       ],
                       suffixIcon: _isShowUsernameClear && _isFocusNode1
                           ? IconButton(
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.clear,
-                                color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                                color: Colors.grey,
                               ),
                               onPressed: _clearUsername,
                             )
@@ -211,8 +211,8 @@ class _UserUsernameBindState extends State<UserUsernameBind> {
                       },
                     ),
                     Positioned(
-                      right: 8,
-                      bottom: 8,
+                      right: 0,
+                      bottom: 1,
                       child: Text(
                         "${_usernameController.text.characters.length}/15字",
                         style: const TextStyle(
@@ -257,7 +257,7 @@ class _UserUsernameBindState extends State<UserUsernameBind> {
                           ? IconButton(
                               icon: Icon(
                                 _obscureText ? Icons.visibility_off : Icons.visibility,
-                                color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                                color: Colors.grey,
                               ),
                               onPressed: _togglePasswordVisibility,
                             )
@@ -267,8 +267,8 @@ class _UserUsernameBindState extends State<UserUsernameBind> {
                       showUnderline: false,
                     ),
                     Positioned(
-                      right: 8,
-                      bottom: 8,
+                      right: 0,
+                      bottom: 1,
                       child: Text(
                         "${_passwordController.text.characters.length}/20字",
                         style: const TextStyle(
@@ -313,7 +313,7 @@ class _UserUsernameBindState extends State<UserUsernameBind> {
                           ? IconButton(
                               icon: Icon(
                                 _obscureTextRe ? Icons.visibility_off : Icons.visibility,
-                                color: _isFocusNode3 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                                color: Colors.grey,
                               ),
                               onPressed: _toggleRepasswordVisibility,
                             )
@@ -323,8 +323,8 @@ class _UserUsernameBindState extends State<UserUsernameBind> {
                       showUnderline: false,
                     ),
                     Positioned(
-                      right: 8,
-                      bottom: 8,
+                      right: 0,
+                      bottom: 1,
                       child: Text(
                         "${_repasswordController.text.characters.length}/20字",
                         style: const TextStyle(

@@ -150,9 +150,9 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                       ],
                       suffixIcon: _isFocusNode1 && _nameController.text.trim() != ""
                           ? IconButton(
-                              icon: Icon(
+                              icon: const Icon(
                                 Icons.clear,
-                                color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                                color: Colors.grey,
                               ),
                               onPressed: () {
                                 _nameController.text = "";
@@ -168,8 +168,8 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                       },
                     ),
                     Positioned(
-                      right: 8,
-                      bottom: 8,
+                      right: 0,
+                      bottom: 1,
                       child: Text(
                         "${_nameController.text.characters.length}/15字",
                         style: const TextStyle(
@@ -212,9 +212,9 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                         ],
                         suffixIcon: _isFocusNode2 && _infoController.text.trim() != ""
                             ? IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.clear,
-                                  color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                                  color: Colors.grey,
                                 ),
                                 onPressed: () {
                                   _infoController.text = "";
@@ -230,8 +230,8 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                         },
                       ),
                       Positioned(
-                        right: 8,
-                        bottom: 8,
+                        right: 0,
+                        bottom: 1,
                         child: Text(
                           "${_infoController.text.characters.length}/500字",
                           style: const TextStyle(

@@ -71,8 +71,8 @@ class _FriendGroupState extends State<FriendGroup> {
                 },
               ),
               Positioned(
-                right: 8,
-                bottom: 8,
+                right: 0,
+                bottom: 1,
                 child: Text(
                   "${_nameController.text.characters.length}/15字",
                   style: const TextStyle(

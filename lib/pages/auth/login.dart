@@ -158,9 +158,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 suffixIcon: _isFocusNode1 && _usernameController.text.trim() != ""
                     ? IconButton(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.clear,
-                          color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                          color: Colors.grey,
                         ),
                         onPressed: () {
                           _usernameController.text = "";
@@ -168,15 +168,15 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       )
                     : const SizedBox.shrink(),
-                focusedColor: const Color.fromARGB(255, 60, 183, 21),
+                focusedColor: const Color.fromARGB(255, 160, 163, 159),
                 unfocusedColor: Colors.grey,
                 onChanged: (val) {
                   setState(() {});
                 },
               ),
               Positioned(
-                right: 8,
-                bottom: 8,
+                right: 0,
+                bottom: 1,
                 child: Text(
                   "${_usernameController.text.characters.length}/15字",
                   style: const TextStyle(
@@ -211,7 +211,7 @@ class _LoginPageState extends State<LoginPage> {
                     ? IconButton(
                         icon: Icon(
                           _obscureText ? Icons.visibility_off : Icons.visibility,
-                          color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                          color: Colors.grey,
                         ),
                         onPressed: _togglePasswordVisibility,
                       )
@@ -223,8 +223,8 @@ class _LoginPageState extends State<LoginPage> {
                 },
               ),
               Positioned(
-                right: 8,
-                bottom: 8,
+                right: 0,
+                bottom: 1,
                 child: Text(
                   "${_passwordController.text.characters.length}/20字",
                   style: const TextStyle(

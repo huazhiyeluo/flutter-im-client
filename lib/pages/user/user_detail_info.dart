@@ -99,8 +99,8 @@ class _UserDetailInfoState extends State<UserDetailInfo> {
                   },
                 ),
                 Positioned(
-                  right: 8,
-                  bottom: 8,
+                  right: 0,
+                  bottom: 1,
                   child: Text(
                     "${_infoController.text.characters.length}/500字",
                     style: const TextStyle(

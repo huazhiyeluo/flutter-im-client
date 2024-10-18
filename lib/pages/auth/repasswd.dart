@@ -136,8 +136,8 @@ class _RepasswdPageState extends State<RepasswdPage> {
                 },
               ),
               Positioned(
-                right: 8,
-                bottom: 8,
+                right: 0,
+                bottom: 1,
                 child: Text(
                   "${_usernameController.text.characters.length}/15字",
                   style: const TextStyle(
@@ -171,7 +171,7 @@ class _RepasswdPageState extends State<RepasswdPage> {
                 suffixIcon: IconButton(
                   icon: Icon(
                     _obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
+                    color: Colors.grey,
                   ),
                   onPressed: _togglePasswordVisibility,
                 ),
@@ -182,8 +182,8 @@ class _RepasswdPageState extends State<RepasswdPage> {
                 },
               ),
               Positioned(
-                right: 8,
-                bottom: 8,
+                right: 0,
+                bottom: 1,
                 child: Text(
                   "${_passwordController.text.characters.length}/20字",
                   style: const TextStyle(
