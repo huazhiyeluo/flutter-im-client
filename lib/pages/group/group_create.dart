@@ -61,13 +61,15 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _infoController = TextEditingController();
 
+  final FocusNode _focusNode1 = FocusNode();
+  final FocusNode _focusNode2 = FocusNode();
+  bool _isFocusNode1 = false;
+  bool _isFocusNode2 = false;
+
   bool _isChecked = false;
 
   final ImagePicker _picker = ImagePicker();
   XFile? _imageFile;
-
-  bool _isShowNameClear = false;
-  bool _isShowInfoClear = false;
 
   int _defaultSelect = 0;
 
@@ -78,9 +80,34 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
 
   @override
   void initState() {
+    super.initState();
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
-    super.initState();
+
+    // 监听焦点变化事件
+    _focusNode1.addListener(() {
+      if (_focusNode1.hasFocus) {
+        setState(() {
+          _isFocusNode1 = true;
+        });
+      } else {
+        setState(() {
+          _isFocusNode1 = false;
+        });
+      }
+    });
+
+    _focusNode2.addListener(() {
+      if (_focusNode2.hasFocus) {
+        setState(() {
+          _isFocusNode2 = true;
+        });
+      } else {
+        setState(() {
+          _isFocusNode2 = false;
+        });
+      }
+    });
   }
 
   @override
@@ -113,26 +140,31 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                 Expanded(
                   child: Stack(children: [
                     CustomTextFieldMore(
+                      focusNode: _focusNode1,
+                      isFocused: _isFocusNode1,
                       controller: _nameController,
                       hintText: '填写群名称(2-15个字)',
                       keyboardType: TextInputType.text,
                       inputFormatters: [
                         LengthLimitingTextInputFormatter(15),
                       ],
-                      suffixIcon: _isShowNameClear
+                      suffixIcon: _isFocusNode1 && _nameController.text.trim() != ""
                           ? IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.clear,
-                                color: Color.fromARGB(199, 171, 175, 169),
+                                color: _isFocusNode1 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
                               ),
-                              onPressed: _clearName,
+                              onPressed: () {
+                                _nameController.text = "";
+                                setState(() {});
+                              },
                             )
                           : const SizedBox.shrink(),
                       focusedColor: const Color.fromARGB(255, 60, 183, 21),
                       unfocusedColor: Colors.grey,
                       showUnderline: false,
                       onChanged: (val) {
-                        _checkName(val);
+                        setState(() {});
                       },
                     ),
                     Positioned(
@@ -169,6 +201,8 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                   child: Stack(
                     children: [
                       CustomTextFieldMore(
+                        focusNode: _focusNode2,
+                        isFocused: _isFocusNode2,
                         maxLines: 5,
                         controller: _infoController,
                         hintText: '填写群介绍(2-500个字)',
@@ -176,20 +210,23 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                         inputFormatters: [
                           LengthLimitingTextInputFormatter(500),
                         ],
-                        suffixIcon: _isShowInfoClear
+                        suffixIcon: _isFocusNode2 && _infoController.text.trim() != ""
                             ? IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.clear,
-                                  color: Color.fromARGB(199, 171, 175, 169),
+                                  color: _isFocusNode2 ? const Color.fromARGB(255, 60, 183, 21) : Colors.grey,
                                 ),
-                                onPressed: _clearInfo,
+                                onPressed: () {
+                                  _infoController.text = "";
+                                  setState(() {});
+                                },
                               )
                             : const SizedBox.shrink(),
                         focusedColor: const Color.fromARGB(255, 60, 183, 21),
                         unfocusedColor: Colors.grey,
                         showUnderline: false,
                         onChanged: (val) {
-                          _checkInfo(val);
+                          setState(() {});
                         },
                       ),
                       Positioned(
@@ -370,44 +407,6 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
     });
   }
 
-  void _checkName(val) {
-    if (val != "") {
-      setState(() {
-        _isShowNameClear = true;
-      });
-    } else {
-      setState(() {
-        _isShowNameClear = false;
-      });
-    }
-  }
-
-  void _clearName() {
-    _nameController.text = "";
-    setState(() {
-      _isShowNameClear = false;
-    });
-  }
-
-  void _checkInfo(val) {
-    if (val != "") {
-      setState(() {
-        _isShowInfoClear = true;
-      });
-    } else {
-      setState(() {
-        _isShowInfoClear = false;
-      });
-    }
-  }
-
-  void _clearInfo() {
-    _infoController.text = "";
-    setState(() {
-      _isShowInfoClear = false;
-    });
-  }
-
   Future<void> _uploadAvatar() async {
     var isGrantedStorage = await PermissionUtil.requestStoragePermission();
     if (!isGrantedStorage) {
@@ -481,7 +480,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
         'ownerUid': uid,
         'type': 0,
         'name': _nameController.text,
-        'icon': "http://img.siyuwen.com/godata/avatar/$_defaultSelect.jpg",
+        'icon': "https://img.siyuwen.com/godata/avatar/$_defaultSelect.jpg",
         'info': _infoController.text,
       };
       _createGroupDo(params);
