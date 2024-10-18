@@ -1,6 +1,5 @@
 class Configs {
-
-  static const String apiPrefix = 'https://xxx';
-  static const String socketUrl = 'wss://xxx';
-  static const Map iceServers = {'urls': 'xxx', 'credential': 'xxx', 'username': 'xxx'};
+  static const String apiPrefix = 'https://xxx';                                          // api 接口地址
+  static const String socketUrl = 'wss://xxx';                                            // websocket 地址
+  static const Map iceServers = {'urls': 'xxx', 'credential': 'xxx', 'username': 'xxx'};  //服务
 }
