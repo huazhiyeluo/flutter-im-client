@@ -315,7 +315,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         currentIndex: _currentIndex,
         items: [
           BottomNavigationBarItem(
-            backgroundColor: Colors.yellow,
             label: '聊天',
             icon: Obx(() {
               int num = chatController.getTipsTotalNum();

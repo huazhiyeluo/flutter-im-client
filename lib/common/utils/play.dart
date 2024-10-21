@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 
 class AudioPlayerManager {
   late AudioPlayer? _audioPlayer;
+  DateTime? _lastPlayTime;
 
   void _initializePlayer() {
     _audioPlayer = AudioPlayer();
@@ -14,10 +15,14 @@ class AudioPlayerManager {
   Future<void> playSound(String mp3) async {
     try {
       if (_audioPlayer == null) {
-        _initializePlayer(); // 如果未初始化，则初始化
+        _initializePlayer();
       }
-      _audioPlayer?.audioCache = AudioCache(prefix: '');
-      await _audioPlayer?.play(AssetSource('lib/assets/voices/$mp3'), mode: PlayerMode.mediaPlayer);
+      final currentTime = DateTime.now();
+      if (_lastPlayTime == null || currentTime.difference(_lastPlayTime!).inSeconds >= 1) {
+        _audioPlayer?.audioCache = AudioCache(prefix: '');
+        await _audioPlayer?.play(AssetSource('lib/assets/voices/$mp3'), mode: PlayerMode.mediaPlayer);
+        _lastPlayTime = currentTime;
+      }
     } catch (e) {
       throw Exception('Failed to play sound: $e');
     }
