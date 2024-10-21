@@ -35,12 +35,12 @@ class _ShareSelectState extends State<ShareSelect> {
   double picWidth = 45;
   double screenWidth = 0;
   double leftWidth = 0;
-  double rightWidth = 0;
 
   List _cateArrs = [];
   List<Map> _userSelectArrs = [];
   Map<int, bool> _status = <int, bool>{};
   Set<int> processedFromIds = {};
+  Map<int, ExpansionTileController> expansionTileControllers = {};
 
   @override
   void initState() {
@@ -82,6 +82,11 @@ class _ShareSelectState extends State<ShareSelect> {
     for (var friendGroupObj in _cateArrs) {
       _status[friendGroupObj['friendGroupId']] = false;
       friendGroupObj['children'] = [];
+
+      if (!expansionTileControllers.containsKey(friendGroupObj['friendGroupId'])) {
+        expansionTileControllers[friendGroupObj['friendGroupId']] = ExpansionTileController();
+      }
+
       friendGroupObj['controller'] = ExpansionTileController();
       for (var contactFriendObj in contactFriendController.allContactFriends) {
         if (contactFriendObj['friendGroupId'] == friendGroupObj['friendGroupId']) {
@@ -220,16 +225,16 @@ class _ShareSelectState extends State<ShareSelect> {
           childrenPadding: EdgeInsets.zero,
           backgroundColor: Colors.transparent,
           collapsedBackgroundColor: Colors.transparent,
-          controller: item['controller'],
+          controller: expansionTileControllers[item['friendGroupId']],
           title: GestureDetector(
             child: Text("${item['name']} (${visibleData.length}${item['friendGroupId'] == 0 ? '个' : '人'})"),
             onTapDown: (TapDownDetails details) {},
             onTapUp: (TapUpDetails details) {
               setState(() {
-                if (item['controller'].isExpanded) {
-                  item['controller'].collapse(); // 收起
+                if (expansionTileControllers[item['friendGroupId']]!.isExpanded) {
+                  expansionTileControllers[item['friendGroupId']]!.collapse(); // 收起
                 } else {
-                  item['controller'].expand(); // 展开
+                  expansionTileControllers[item['friendGroupId']]!.expand(); // 展开
                 }
               });
             },
@@ -297,10 +302,12 @@ class _ShareSelectState extends State<ShareSelect> {
     setState(() {
       screenWidth = MediaQuery.of(context).size.width;
       leftWidth = _userSelectArrs.length * picWidth + 1;
+      if (_userSelectArrs.isNotEmpty) {
+        leftWidth = leftWidth + 15;
+      }
       if (leftWidth > screenWidth - 120 - 35) {
         leftWidth = screenWidth - 120 - 35;
       }
-      rightWidth = screenWidth - 35 - leftWidth;
     });
     return Scaffold(
       appBar: AppBar(

@@ -18,8 +18,8 @@ class RequestHelper {
   RequestHelper._() {
     BaseOptions options = BaseOptions(
       baseUrl: Configs.apiPrefix,
-      connectTimeout: const Duration(milliseconds: 5000),
-      receiveTimeout: const Duration(milliseconds: 3000),
+      connectTimeout: const Duration(milliseconds: 10000),
+      receiveTimeout: const Duration(milliseconds: 10000),
     );
     _dio = Dio(options);
   }

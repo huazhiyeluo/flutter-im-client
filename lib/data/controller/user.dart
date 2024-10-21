@@ -6,12 +6,11 @@ class UserController extends GetxController {
   //1、更新
   void upsetUser(Map user) {
     final uid = user['uid'];
-    // 查找是否已经存在相同的数据
+
     final existingIndex = allUsers.indexWhere((c) => c['uid'] == uid);
 
     if (existingIndex != -1) {
-      // 如果已经存在相同的数据，则更新对应字段的值
-      final existingUser = allUsers[existingIndex];
+      final existingUser = Map<String, dynamic>.from(allUsers[existingIndex]);
       user.forEach((key, value) {
         if (existingUser.containsKey(key)) {
           existingUser[key] = value;
@@ -19,7 +18,6 @@ class UserController extends GetxController {
       });
       allUsers[existingIndex] = existingUser;
     } else {
-      // 否则，将数据添加到列表中
       allUsers.add(user);
     }
     update();
@@ -38,7 +36,7 @@ class UserController extends GetxController {
 
   Map getOneUser(int uid) {
     Map userObj = {};
-    // 查找是否已经存在相同的数据
+
     final existingUserIndex = allUsers.indexWhere((c) => c['uid'] == uid);
     if (existingUserIndex != -1) {
       return allUsers[existingUserIndex];

@@ -102,7 +102,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
             SliverAppBar(
               backgroundColor: Colors.grey[200],
               pinned: false,
-              expandedHeight: 159,
+              expandedHeight: 179,
               flexibleSpace: FlexibleSpaceBar(
                 background: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -128,7 +128,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                       color: Colors.grey[200],
                     ),
                     Container(
-                      height: 44,
+                      height: 54,
                       padding: EdgeInsets.zero,
                       color: const Color.fromARGB(255, 255, 255, 255),
                       margin: const EdgeInsets.fromLTRB(0, 3, 0, 0),
@@ -157,7 +157,7 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
                       ),
                     ),
                     Container(
-                      height: 44,
+                      height: 54,
                       padding: EdgeInsets.zero,
                       color: const Color.fromARGB(255, 255, 255, 255),
                       margin: const EdgeInsets.fromLTRB(0, 0, 0, 2),
@@ -199,9 +199,24 @@ class _ContactState extends State<Contact> with SingleTickerProviderStateMixin {
               delegate: _SliverAppBarDelegate(
                 TabBar(
                   tabs: const [
-                    Tab(text: '好友'),
-                    Tab(text: '分组'),
-                    Tab(text: '群聊'),
+                    Tab(
+                      child: Text(
+                        '好友',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    Tab(
+                      child: Text(
+                        '分组',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                    Tab(
+                      child: Text(
+                        '群聊',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
                   ],
                   controller: _tabController,
                   labelColor: Colors.red,
@@ -248,6 +263,8 @@ class _ContactPageState extends State<ContactPage> {
 
   late Offset _tapPosition;
 
+  Map<int, ExpansionTileController> expansionTileControllers = {};
+
   @override
   void initState() {
     super.initState();
@@ -291,7 +308,9 @@ class _ContactPageState extends State<ContactPage> {
     _tabArr2.clear();
     _tabArr2 = List.from(friendGroupController.allFriendGroups);
     for (var friendGroupObj in _tabArr2) {
-      friendGroupObj['controller'] = ExpansionTileController();
+      if (!expansionTileControllers.containsKey(friendGroupObj['friendGroupId'])) {
+        expansionTileControllers[friendGroupObj['friendGroupId']] = ExpansionTileController();
+      }
       friendGroupObj['children'] = [];
       for (var contactFriendObj in contactFriendController.allContactFriends) {
         if (contactFriendObj['friendGroupId'] == friendGroupObj['friendGroupId']) {
@@ -438,10 +457,11 @@ class _ContactPageState extends State<ContactPage> {
           if (isExpandeds[index] == null) {
             isExpandeds[index] = false;
           }
+
           return Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              controller: _tabArr2[index]['controller'],
+              controller: expansionTileControllers[_tabArr2[index]['friendGroupId']],
               title: GestureDetector(
                 child: Text(_tabArr2[index]['name']),
                 onTapDown: (TapDownDetails details) {
@@ -449,10 +469,10 @@ class _ContactPageState extends State<ContactPage> {
                 },
                 onTapUp: (TapUpDetails details) {
                   setState(() {
-                    if (_tabArr2[index]['controller'].isExpanded) {
-                      _tabArr2[index]['controller'].collapse(); // 收起
+                    if (expansionTileControllers[_tabArr2[index]['friendGroupId']]!.isExpanded) {
+                      expansionTileControllers[_tabArr2[index]['friendGroupId']]!.collapse(); // 收起
                     } else {
-                      _tabArr2[index]['controller'].expand(); // 展开
+                      expansionTileControllers[_tabArr2[index]['friendGroupId']]!.expand(); // 展开
                     }
                   });
                 },

@@ -156,7 +156,10 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(groupObj['info']),
+                Text(
+                  groupObj['info'],
+                  textAlign: TextAlign.justify,
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [

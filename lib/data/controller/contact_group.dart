@@ -15,7 +15,7 @@ class ContactGroupController extends GetxController {
       );
 
       if (existingIndex != -1) {
-        final existingContactGroup = contactList[existingIndex];
+        final existingContactGroup = Map<String, dynamic>.from(contactList[existingIndex]);
         contactGroup.forEach((key, value) {
           existingContactGroup[key] = value;
         });

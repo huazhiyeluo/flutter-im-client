@@ -90,7 +90,7 @@ class _UserDetailInfoState extends State<UserDetailInfo> {
                   hintText: '请输入个性签名',
                   keyboardType: TextInputType.text,
                   inputFormatters: [
-                    LengthLimitingTextInputFormatter(500),
+                    LengthLimitingTextInputFormatter(100),
                   ],
                   focusedColor: const Color.fromARGB(255, 60, 183, 21),
                   unfocusedColor: Colors.grey,
@@ -102,7 +102,7 @@ class _UserDetailInfoState extends State<UserDetailInfo> {
                   right: 0,
                   bottom: 1,
                   child: Text(
-                    "${_infoController.text.characters.length}/500字",
+                    "${_infoController.text.characters.length}/100字",
                     style: const TextStyle(
                       fontSize: 12,
                       color: Colors.grey,

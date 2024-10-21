@@ -281,17 +281,19 @@ class _RegisterPageState extends State<RegisterPage> {
                       setState(() {});
                     },
                   ),
-                  Positioned(
-                    right: 0,
-                    bottom: 1,
-                    child: Text(
-                      "${_nicknameController.text.characters.length}/15字",
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
+                  _isFocusNode1 && _nicknameController.text.trim() != ""
+                      ? Positioned(
+                          right: 0,
+                          bottom: 1,
+                          child: Text(
+                            "${_nicknameController.text.characters.length}/15字",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
+                      : Container(),
                 ],
               ),
             ),
@@ -343,17 +345,19 @@ class _RegisterPageState extends State<RegisterPage> {
                       setState(() {});
                     },
                   ),
-                  Positioned(
-                    right: 0,
-                    bottom: 1,
-                    child: Text(
-                      "${_usernameController.text.characters.length}/15字",
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
+                  _isFocusNode2 && _usernameController.text.trim() != ""
+                      ? Positioned(
+                          right: 0,
+                          bottom: 1,
+                          child: Text(
+                            "${_usernameController.text.characters.length}/15字",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
+                      : Container(),
                 ],
               ),
             ),
@@ -402,17 +406,19 @@ class _RegisterPageState extends State<RegisterPage> {
                       setState(() {});
                     },
                   ),
-                  Positioned(
-                    right: 0,
-                    bottom: 1,
-                    child: Text(
-                      "${_passwordController.text.characters.length}/20字",
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
+                  _isFocusNode3 && _passwordController.text.trim() != ""
+                      ? Positioned(
+                          right: 0,
+                          bottom: 1,
+                          child: Text(
+                            "${_passwordController.text.characters.length}/20字",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
+                      : Container(),
                 ],
               ),
             ),
@@ -461,17 +467,19 @@ class _RegisterPageState extends State<RegisterPage> {
                       setState(() {});
                     },
                   ),
-                  Positioned(
-                    right: 0,
-                    bottom: 1,
-                    child: Text(
-                      "${_repasswordController.text.characters.length}/20字",
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
+                  _isFocusNode4 && _repasswordController.text.trim() != ""
+                      ? Positioned(
+                          right: 0,
+                          bottom: 1,
+                          child: Text(
+                            "${_repasswordController.text.characters.length}/20字",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
+                      : Container(),
                 ],
               ),
             ),

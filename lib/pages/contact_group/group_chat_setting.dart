@@ -68,10 +68,6 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
 
-    contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
-    if ([GroupPowers.admin, GroupPowers.owner].contains(contactGroupObj['groupPower'])) {
-      optShow = 2;
-    }
     _initData();
   }
 
@@ -117,6 +113,12 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
     return Obx(() {
       groupObj = groupController.getOneGroup(talkObj['objId']);
       contactGroups = contactGroupController.allContactGroups[talkObj['objId']] ?? RxList<Map>.from([]);
+
+      contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
+      if ([GroupPowers.admin, GroupPowers.owner].contains(contactGroupObj['groupPower'])) {
+        optShow = 2;
+      }
+
       int count = contactGroups.length >= 15 - optShow ? 15 : contactGroups.length + optShow;
 
       if (contactGroups.isEmpty) {
@@ -159,13 +161,13 @@ class _GroupChatSettingPageState extends State<GroupChatSettingPage> {
             },
           ),
           Container(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             child: GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 5,
-                crossAxisSpacing: 10.0,
+                crossAxisSpacing: 6.0,
                 mainAxisSpacing: 10.0,
                 childAspectRatio: 1.0,
               ),

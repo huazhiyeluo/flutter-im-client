@@ -169,10 +169,10 @@ class _FriendGroupState extends State<FriendGroup> {
   void _doneDeleteGroup(int friendGroupId) {
     var params = {'friendGroupId': friendGroupId};
     ContactFriendApi.delContactFriendGroup(params, onSuccess: (res) async {
-      delDbFriendGroup(friendGroupId);
-      friendGroupController.delFriendGroup(friendGroupId);
       updateDbContactFriendByFriendGroupId(friendGroupId, {"friendGroupId": res['data']['friendGroupId']});
       contactFriendController.upsetContactFriendByFriendGroupId(friendGroupId, {"friendGroupId": res['data']['friendGroupId']});
+      delDbFriendGroup(friendGroupId);
+      friendGroupController.delFriendGroup(friendGroupId);
       Navigator.pop(context);
     }, onError: (res) {
       TipHelper.instance.showToast(res['msg']);

@@ -95,7 +95,7 @@ Future<void> updateDbContactFriendByFriendGroupId(int friendGroupId, Map data) a
     }
   }
 
-  await DBHelper.upsertData('contact_friend', contactFriend, [
+  await DBHelper.updateData('contact_friend', contactFriend, [
     ["friendGroupId", "=", friendGroupId]
   ]);
 }

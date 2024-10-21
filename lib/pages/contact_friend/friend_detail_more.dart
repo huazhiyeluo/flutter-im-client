@@ -92,10 +92,8 @@ class _FriendDetailMorePageState extends State<FriendDetailMorePage> {
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.95 - 150,
                   child: Text(
-                    userObj['info'] != "" ? userObj['info'] : "暂无",
+                    userObj['info'],
                     style: const TextStyle(fontSize: 14),
-                    maxLines: 5,
-                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.end,
                   ),
                 ),

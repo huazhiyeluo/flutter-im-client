@@ -30,6 +30,8 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
   Map userInfo = {};
 
   Map talkObj = {};
+  Map contactGroupObj = {};
+
   double picWidth = 45;
   double screenWidth = 0;
   double leftWidth = 0;
@@ -46,6 +48,9 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
     talkObj = Get.arguments ?? {};
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
+
+    contactGroupObj = contactGroupController.getOneContactGroup(uid, talkObj['objId']);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToEnd();
     });
@@ -56,6 +61,16 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
   void dispose() {
     super.dispose();
     _inputController.dispose();
+  }
+
+  // 检查用户权限，判断是否有删除权限
+
+  bool _checkPermission(int groupPower) {
+    if (contactGroupObj['groupPower'] > groupPower) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   // 自动滚动到最右边的方法
@@ -128,6 +143,10 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
       if (_userArrs[key]![i]['fromId'] == uid) {
         continue;
       }
+      if (!_checkPermission(_userArrs[key]![i]['groupPower'] as int)) {
+        continue;
+      }
+
       _userArrs[key]![i]['isSelect'] = tempStatus;
       _getSelect(_userArrs[key]![i], tempStatus);
       _status[key] = tempStatus;
@@ -219,6 +238,9 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
     setState(() {
       screenWidth = MediaQuery.of(context).size.width;
       leftWidth = _userSelectArrs.length * picWidth + 1;
+      if (_userSelectArrs.isNotEmpty) {
+        leftWidth = leftWidth + 15;
+      }
       if (leftWidth > screenWidth - 120 - 35) {
         leftWidth = screenWidth - 120 - 35;
       }
@@ -330,7 +352,7 @@ class _GroupUserDeleteState extends State<GroupUserDelete> {
                             scale: 1.3,
                             child: Checkbox(
                               value: item['isSelect'],
-                              onChanged: uid != item['fromId']
+                              onChanged: _checkPermission(item['groupPower'])
                                   ? (bool? value) {
                                       setSelected(gk, item['fromId']);
                                     }

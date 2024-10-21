@@ -6,12 +6,10 @@ class FriendGroupController extends GetxController {
   void upsetFriendGroup(Map friendGroup) {
     final friendGroupId = friendGroup['friendGroupId'];
 
-    // 查找是否已经存在相同的数据
     final existingFriendGroupIndex = allFriendGroups.indexWhere((c) => c['friendGroupId'] == friendGroupId);
 
     if (existingFriendGroupIndex != -1) {
-      // 如果已经存在相同的数据，则更新对应字段的值
-      final existingFriendGroup = allFriendGroups[existingFriendGroupIndex];
+      final existingFriendGroup = Map<String, dynamic>.from(allFriendGroups[existingFriendGroupIndex]);
       friendGroup.forEach((key, value) {
         if (existingFriendGroup.containsKey(key)) {
           existingFriendGroup[key] = value;
@@ -19,7 +17,6 @@ class FriendGroupController extends GetxController {
       });
       allFriendGroups[existingFriendGroupIndex] = existingFriendGroup;
     } else {
-      // 否则，将数据添加到列表中
       allFriendGroups.add(friendGroup);
     }
     update();
@@ -35,7 +32,6 @@ class FriendGroupController extends GetxController {
   }
 
   Map getOneFriendGroup(int friendGroupId) {
-    // 查找是否已经存在相同的数据
     final existingFriendGroupIndex = allFriendGroups.indexWhere((c) => c['friendGroupId'] == friendGroupId);
     if (existingFriendGroupIndex != -1) {
       return allFriendGroups[existingFriendGroupIndex];
@@ -45,7 +41,6 @@ class FriendGroupController extends GetxController {
 
   //默认组
   Map getOneDefaultFriendGroup() {
-    // 查找是否已经存在相同的数据
     final existingFriendGroupIndex = allFriendGroups.indexWhere((c) => c['isDefault'] == 1);
     if (existingFriendGroupIndex != -1) {
       return allFriendGroups[existingFriendGroupIndex];

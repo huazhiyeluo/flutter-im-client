@@ -148,23 +148,29 @@ class _UserDetailPageState extends State<UserDetailPage> {
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
           child: const Divider(),
         ),
-        ListTile(
-          leading: const Text(
-            "个性签名",
-            style: TextStyle(fontSize: 16),
-          ),
-          subtitle: Text(
-            userInfo['info'],
-            style: const TextStyle(fontSize: 16),
-            maxLines: 5,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.end,
-          ),
-          trailing: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.chevron_right),
-            ],
+        GestureDetector(
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(15, 16, 24, 16),
+            child: Row(
+              children: [
+                const Text(
+                  "个性签名",
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Expanded(
+                  child: Text(
+                    userInfo['info'],
+                    style: const TextStyle(fontSize: 16),
+                    maxLines: 10,
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+                const Icon(Icons.chevron_right),
+              ],
+            ),
           ),
           onTap: () {
             Navigator.pushNamed(

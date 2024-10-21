@@ -174,17 +174,6 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {});
                 },
               ),
-              Positioned(
-                right: 0,
-                bottom: 1,
-                child: Text(
-                  "${_usernameController.text.characters.length}/15字",
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
             ],
           ),
         ),
@@ -221,17 +210,6 @@ class _LoginPageState extends State<LoginPage> {
                 onChanged: (value) {
                   setState(() {});
                 },
-              ),
-              Positioned(
-                right: 0,
-                bottom: 1,
-                child: Text(
-                  "${_passwordController.text.characters.length}/20字",
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
               ),
             ],
           ),

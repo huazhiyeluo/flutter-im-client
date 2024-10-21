@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -19,8 +20,8 @@ AppBar chatBar() {
         children: [
           CircleAvatar(
             // 聊天对象的头像
-            radius: 14,
-            backgroundImage: NetworkImage(avatar),
+            radius: 16,
+            backgroundImage: CachedNetworkImageProvider(avatar),
           ),
           const SizedBox(width: 8),
           Text(
@@ -61,7 +62,7 @@ AppBar chatBar() {
           },
           icon: const Icon(
             Icons.add,
-            size: 28,
+            size: 30,
           ),
           color: Colors.white,
         ),

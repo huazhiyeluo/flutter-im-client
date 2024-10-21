@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/api/contact_friend.dart';
 import 'package:qim/data/controller/friend_group.dart';
@@ -27,6 +28,8 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
   Map talkObj = {};
   Map contactFriendObj = {};
 
+  bool isButtonEnabled = true;
+
   @override
   void initState() {
     super.initState();
@@ -46,7 +49,7 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
     _nameController.dispose();
   }
 
-  void _doneAction(int friendGroupId) async {
+  void _selectGroup(int friendGroupId) async {
     if (friendGroupId == contactFriendObj['friendGroupId']) {
       TipHelper.instance.showToast("已经在该分组中");
     }
@@ -64,18 +67,38 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
     showCustomDialog(
       title: title,
       context: context,
-      content: TextField(
-        controller: _nameController,
-        decoration: const InputDecoration(hintText: "分组名"),
+      content: StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return Stack(
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(hintText: "分组名"),
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(15),
+                ],
+                onChanged: (val) {
+                  // 每次输入变化时都调用 setState 来更新字数显示
+                  setState(() {});
+                },
+              ),
+              Positioned(
+                right: 0,
+                bottom: 1,
+                child: Text(
+                  "${_nameController.text.characters.length}/15字",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
       onConfirm: () async {
-        var params = {'friendGroupId': friendGroupId, 'ownerUid': uid, 'name': _nameController.text};
-        ContactFriendApi.editContactFriendGroup(params, onSuccess: (res) async {
-          friendGroupController.upsetFriendGroup(res['data']);
-          saveDbFriendGroup(res['data']);
-        }, onError: (res) {
-          TipHelper.instance.showToast(res['msg']);
-        });
+        isButtonEnabled ? _doneAction(friendGroupId) : null;
       },
       onConfirmText: "确定",
       onCancel: () {
@@ -83,6 +106,30 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
       },
       onCancelText: "取消",
     );
+  }
+
+  void _doneAction(int friendGroupId) {
+    if (!isButtonEnabled) return;
+    setState(() {
+      isButtonEnabled = false;
+    });
+
+    if (_nameController.text.trim() == "") {
+      TipHelper.instance.showToast("请输入名称");
+      setState(() {
+        isButtonEnabled = true;
+      });
+      return;
+    }
+    var params = {'friendGroupId': friendGroupId, 'ownerUid': uid, 'name': _nameController.text};
+    ContactFriendApi.editContactFriendGroup(params, onSuccess: (res) async {
+      friendGroupController.upsetFriendGroup(res['data']);
+      saveDbFriendGroup(res['data']);
+      isButtonEnabled = true;
+    }, onError: (res) {
+      TipHelper.instance.showToast(res['msg']);
+      isButtonEnabled = true;
+    });
   }
 
   @override
@@ -122,7 +169,7 @@ class _FriendDetailSettingGroupState extends State<FriendDetailSettingGroup> {
                                 )
                               : null,
                           onTap: () {
-                            _doneAction(temp['friendGroupId']);
+                            _selectGroup(temp['friendGroupId']);
                           },
                         ),
                         const Divider(),

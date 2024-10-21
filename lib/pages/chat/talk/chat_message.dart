@@ -158,7 +158,7 @@ class _ChatMessageState extends State<ChatMessage> {
           _loadData(msg, details);
         },
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: isSentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: _getContentAll(isSentByMe, msg),
         ),
       ),
@@ -182,6 +182,7 @@ class _ChatMessageState extends State<ChatMessage> {
     }
     lists.add(const SizedBox(height: 4));
     lists.add(_getContent(isSentByMe, msg));
+    lists.add(const SizedBox(height: 4));
     lists.add(Text(
       formatDate(msg['createTime'], customFormat: "MM-dd HH:mm"),
       style: TextStyle(
@@ -396,7 +397,7 @@ class _ChatMessageState extends State<ChatMessage> {
 
   Widget _getContentSkin(bool isSentByMe, Widget temp) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
         color: isSentByMe ? const Color.fromARGB(255, 168, 208, 128) : Colors.white,
         borderRadius: BorderRadius.circular(5),

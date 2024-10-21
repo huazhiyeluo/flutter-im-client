@@ -6,12 +6,11 @@ class ShareController extends GetxController {
   void upsetShare(Map share) {
     final objId = share['objId'];
     final type = share['type'];
-    // 查找是否已经存在相同的数据
+
     final existingShareIndex = allShares.indexWhere((c) => c['objId'] == objId && c['type'] == type);
 
     if (existingShareIndex != -1) {
-      // 如果已经存在相同的数据，则更新对应字段的值
-      final existingShare = allShares[existingShareIndex];
+      final existingShare = Map<String, dynamic>.from(allShares[existingShareIndex]);
       share.forEach((key, value) {
         if (existingShare.containsKey(key)) {
           existingShare[key] = value;
@@ -19,7 +18,6 @@ class ShareController extends GetxController {
       });
       allShares[existingShareIndex] = existingShare;
     } else {
-      // 否则，将数据添加到列表中
       allShares.add(share);
     }
     allShares.sort((a, b) {
@@ -38,7 +36,6 @@ class ShareController extends GetxController {
   }
 
   Map getOneShare(int objId, int type) {
-    // 查找是否已经存在相同的数据
     final existingShareIndex = allShares.indexWhere((c) => c['objId'] == objId && c['type'] == type);
     if (existingShareIndex != -1) {
       return allShares[existingShareIndex];

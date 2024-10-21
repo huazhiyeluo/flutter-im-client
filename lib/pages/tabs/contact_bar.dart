@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/controller/userinfo.dart';
@@ -11,8 +12,8 @@ AppBar contactBar() {
     title: Row(
       children: [
         CircleAvatar(
-          radius: 14,
-          backgroundImage: NetworkImage(avatar),
+          radius: 16,
+          backgroundImage: CachedNetworkImageProvider(avatar),
         ),
         const SizedBox(width: 8),
         const Text(
@@ -31,7 +32,7 @@ AppBar contactBar() {
           },
           icon: const Icon(
             Icons.person_add_alt,
-            size: 28,
+            size: 30,
           ))
     ],
   );

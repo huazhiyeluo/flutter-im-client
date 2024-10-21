@@ -8,12 +8,10 @@ class ContactFriendController extends GetxController {
     final fromId = contactFriend['fromId'];
     final toId = contactFriend['toId'];
 
-    // 查找是否已经存在相同的数据
     final existingIndex = allContactFriends.indexWhere((c) => c['fromId'] == fromId && c['toId'] == toId);
 
     if (existingIndex != -1) {
-      // 如果已经存在相同的数据，则更新对应字段的值
-      final existingContactFriend = allContactFriends[existingIndex];
+      final existingContactFriend = Map<String, dynamic>.from(allContactFriends[existingIndex]);
       contactFriend.forEach((key, value) {
         if (existingContactFriend.containsKey(key)) {
           existingContactFriend[key] = value;
@@ -21,7 +19,6 @@ class ContactFriendController extends GetxController {
       });
       allContactFriends[existingIndex] = existingContactFriend;
     } else {
-      // 否则，将数据添加到列表中
       allContactFriends.add(contactFriend);
     }
     update();
@@ -38,7 +35,6 @@ class ContactFriendController extends GetxController {
 
   //3、获得单条记录
   Map getOneContactFriend(int fromId, int toId) {
-    // 查找是否已经存在相同的数据
     final existingIndex = allContactFriends.indexWhere((c) => c['fromId'] == fromId && c['toId'] == toId);
     if (existingIndex != -1) {
       return allContactFriends[existingIndex];
@@ -47,22 +43,15 @@ class ContactFriendController extends GetxController {
   }
 
   void upsetContactFriendByFriendGroupId(int friendGroupId, Map contactFriend) {
-    // 查找是否已经存在相同的数据
-    final matchingIndexes = allContactFriends.asMap().entries.where((entry) => entry.value['friendGroupId'] == friendGroupId).map((entry) => entry.key).toList();
-
+    final matchingIndexes = allContactFriends.where((c) => c['friendGroupId'] == friendGroupId).toList();
     if (matchingIndexes.isNotEmpty) {
-      for (int index in matchingIndexes) {
-        final existingContactFriend = allContactFriends[index];
+      for (var existingContactFriend in matchingIndexes) {
         contactFriend.forEach((key, value) {
           if (existingContactFriend.containsKey(key)) {
-            existingContactFriend[key] = value;
+            existingContactFriend[key] = value; // 直接更新现有的 map
           }
         });
-        allContactFriends[index] = existingContactFriend; // 更新列表中的 Map
       }
-    } else {
-      // 否则，将数据添加到列表中
-      allContactFriends.add(contactFriend);
     }
     update();
   }

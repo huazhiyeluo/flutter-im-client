@@ -56,6 +56,8 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
   Map<int, bool> _status = <int, bool>{};
   Set<int> processedFromIds = {};
 
+  Map<int, ExpansionTileController> expansionTileControllers = {};
+
   @override
   void initState() {
     super.initState();
@@ -89,7 +91,10 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
     for (var friendGroupObj in _userArrs) {
       _status[friendGroupObj['friendGroupId']] = false;
       friendGroupObj['children'] = [];
-      friendGroupObj['controller'] = ExpansionTileController();
+
+      if (!expansionTileControllers.containsKey(friendGroupObj['friendGroupId'])) {
+        expansionTileControllers[friendGroupObj['friendGroupId']] = ExpansionTileController();
+      }
       for (var contactFriendObj in contactFriendController.allContactFriends) {
         if (contactFriendObj['friendGroupId'] == friendGroupObj['friendGroupId']) {
           if (friendGroupObj['children'] == null) {
@@ -251,7 +256,7 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
           childrenPadding: EdgeInsets.zero,
           backgroundColor: Colors.transparent,
           collapsedBackgroundColor: Colors.transparent,
-          controller: item['controller'],
+          controller: expansionTileControllers[item['friendGroupId']],
           title: GestureDetector(
             child: Text("${item['name']} (${item['children'].length}人)"),
             onTapDown: (TapDownDetails details) {
@@ -259,10 +264,10 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
             },
             onTapUp: (TapUpDetails details) {
               setState(() {
-                if (item['controller'].isExpanded) {
-                  item['controller'].collapse(); // 收起
+                if (expansionTileControllers[item['friendGroupId']]!.isExpanded) {
+                  expansionTileControllers[item['friendGroupId']]!.collapse(); // 收起
                 } else {
-                  item['controller'].expand(); // 展开
+                  expansionTileControllers[item['friendGroupId']]!.expand(); // 展开
                 }
               });
             },
@@ -359,6 +364,9 @@ class _GroupUserInviteState extends State<GroupUserInvite> {
     setState(() {
       screenWidth = MediaQuery.of(context).size.width;
       leftWidth = _userSelectArrs.length * picWidth + 1;
+      if (_userSelectArrs.isNotEmpty) {
+        leftWidth = leftWidth + 15;
+      }
       if (leftWidth > screenWidth - 120 - 35) {
         leftWidth = screenWidth - 120 - 35;
       }
