@@ -88,7 +88,7 @@ Doctor summary (to see all details, run flutter doctor -v):
 class Configs {
   static const String apiPrefix = 'https://xxx';                                          // api 接口地址
   static const String socketUrl = 'wss://xxx';                                            // websocket 地址
-  static const Map iceServers = {'urls': 'xxx', 'credential': 'xxx', 'username': 'xxx'};  //服务
+  static const Map iceServers = {'urls': 'xxx', 'credential': 'xxx', 'username': 'xxx'};  // Coturn服务器配置
 }
 ```
 
