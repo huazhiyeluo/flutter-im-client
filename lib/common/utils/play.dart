@@ -1,6 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 
-class AudioPlayerManager {
+class PlayerTips {
   late AudioPlayer? _audioPlayer;
   DateTime? _lastPlayTime;
 
@@ -8,7 +8,7 @@ class AudioPlayerManager {
     _audioPlayer = AudioPlayer();
   }
 
-  AudioPlayerManager() {
+  PlayerTips() {
     _initializePlayer();
   }
 

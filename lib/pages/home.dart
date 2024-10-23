@@ -45,7 +45,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with WidgetsBindingObserver {
   late WebSocketController webSocketController;
   late SignalingController signalingController;
-  late AudioPlayerManager _audioPlayerManager;
+  late PlayerTips _playerTips;
 
   final UserController userController = Get.put(UserController());
   final FriendGroupController friendGroupController = Get.put(FriendGroupController());
@@ -75,7 +75,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     super.initState();
 
     WidgetsBinding.instance.addObserver(this);
-    _audioPlayerManager = AudioPlayerManager();
+    _playerTips = PlayerTips();
 
     userInfo = CacheHelper.getMapData(Keys.userInfo)!;
     uid = userInfo['uid'];
@@ -102,7 +102,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     Get.delete<UserInfoController>();
     Get.delete<WebSocketController>();
     Get.delete<SignalingController>();
-    _audioPlayerManager.dispose();
+    _playerTips.dispose();
   }
 
   @override
@@ -138,7 +138,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     webSocketController.message.listen((msg) async {
       // 1、私聊和群聊消息到数据库  2、加入chat列表|保存chat数据到  3、obj对象
       if ([AppWebsocket.msgTypeSingle, AppWebsocket.msgTypeRoom].contains(msg['msgType'])) {
-        joinData(uid, msg, audioPlayerManager: _audioPlayerManager);
+        joinData(uid, msg, playerTips: _playerTips);
       }
       if ([AppWebsocket.msgTypeNotice].contains(msg['msgType'])) {
         _handleMessage(msg);
@@ -186,7 +186,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     contactFriendController.upsetContactFriend(item);
     saveDbContactFriend(item);
     if (msg['msgMedia'] == AppWebsocket.msgMediaOnline) {
-      _audioPlayerManager.playSound("1.mp3");
+      _playerTips.playSound("1.mp3");
     }
   }
 

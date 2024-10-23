@@ -69,8 +69,8 @@ class _TalkState extends State<Talk> {
 
   @override
   void dispose() {
-    talkObjController.setTalk({});
     super.dispose();
+    talkObjController.setTalk({});
   }
 
   Widget _buildTitle() {

@@ -19,14 +19,14 @@ import 'package:qim/data/controller/userinfo.dart';
 import 'package:qim/data/db/get.dart';
 import 'package:qim/data/db/save.dart';
 
-Future<void> joinData(int uid, Map msg, {AudioPlayerManager? audioPlayerManager}) async {
+Future<void> joinData(int uid, Map msg, {PlayerTips? playerTips}) async {
   if ([AppWebsocket.msgTypeSingle, AppWebsocket.msgTypeRoom].contains(msg['msgType'])) {
     joinMessage(uid, msg);
   }
-  joinChat(uid, msg, audioPlayerManager);
+  joinChat(uid, msg, playerTips);
 }
 
-Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager) async {
+Future<void> joinChat(int uid, Map temp, PlayerTips? playerTips) async {
   Map msg = Map.from(temp);
 
   int objId = 0;
@@ -99,16 +99,16 @@ Future<void> joinChat(int uid, Map temp, AudioPlayerManager? audioPlayerManager)
       chatData['tips'] = 0;
     } else {
       chatData['tips'] = (lastChat['tips'] ?? 0) + 1;
-      audioPlayerManager ??= AudioPlayerManager();
-      await audioPlayerManager.playSound("2.mp3");
+      playerTips ??= PlayerTips();
+      await playerTips.playSound("2.mp3");
     }
   } else {
     if (uid == msg['fromId']) {
       chatData['tips'] = 0;
     } else {
       chatData['tips'] = (lastChat['tips'] ?? 0) + 1;
-      audioPlayerManager ??= AudioPlayerManager();
-      await audioPlayerManager.playSound("2.mp3");
+      playerTips ??= PlayerTips();
+      await playerTips.playSound("2.mp3");
     }
   }
 

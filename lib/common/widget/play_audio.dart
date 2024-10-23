@@ -1,88 +1,25 @@
-import 'dart:async';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:qim/common/widget/play_audio_manager.dart';
 
 class PlayAudio extends StatefulWidget {
-  final String audioUrl;
+  final AudioManager audioManager;
 
-  const PlayAudio(
-    this.audioUrl, {
-    super.key,
-  });
+  const PlayAudio(this.audioManager, {super.key});
 
   @override
   State<PlayAudio> createState() => _PlayAudioState();
 }
 
 class _PlayAudioState extends State<PlayAudio> {
-  late AudioPlayer _audioPlayer;
-  PlayerState? _playerState;
-  Duration? _duration;
-  Duration? _position;
-
-  StreamSubscription? _durationSubscription;
-  StreamSubscription? _positionSubscription;
-  StreamSubscription? _playerCompleteSubscription;
-  StreamSubscription? _playerStateChangeSubscription;
-
   @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer();
-
-    _playerState = _audioPlayer.state;
-    _audioPlayer.getDuration().then(
-          (value) => setState(() {
-            _duration = value;
-          }),
-        );
-    _audioPlayer.getCurrentPosition().then(
-          (value) => setState(() {
-            _position = value;
-          }),
-        );
-
-    _initStreams();
-    _initPlayer();
   }
 
   @override
   void dispose() {
-    _durationSubscription?.cancel();
-    _positionSubscription?.cancel();
-    _playerCompleteSubscription?.cancel();
-    _playerStateChangeSubscription?.cancel();
-    _audioPlayer.dispose();
     super.dispose();
-  }
-
-  void _initStreams() {
-    _durationSubscription = _audioPlayer.onDurationChanged.listen((duration) {
-      setState(() => _duration = duration);
-    });
-
-    _positionSubscription = _audioPlayer.onPositionChanged.listen(
-      (p) => setState(() => _position = p),
-    );
-
-    _playerCompleteSubscription = _audioPlayer.onPlayerComplete.listen((event) {
-      setState(() {
-        _playerState = PlayerState.stopped;
-        _position = Duration.zero;
-      });
-    });
-
-    _playerStateChangeSubscription = _audioPlayer.onPlayerStateChanged.listen((state) {
-      setState(() {
-        _playerState = state;
-      });
-    });
-  }
-
-  void _initPlayer() async {
-    await _audioPlayer.setSource(UrlSource(widget.audioUrl));
-    await _audioPlayer.setReleaseMode(ReleaseMode.stop);
   }
 
   @override
@@ -94,8 +31,15 @@ class _PlayAudioState extends State<PlayAudio> {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: Icon(_playerState == PlayerState.playing ? Icons.pause : Icons.play_arrow),
-              onPressed: _playerState == PlayerState.playing ? _pause : _play,
+              icon: Icon(widget.audioManager.playerState == PlayerState.playing ? Icons.pause : Icons.play_arrow),
+              onPressed: () {
+                if (widget.audioManager.playerState == PlayerState.playing) {
+                  widget.audioManager.pause();
+                } else {
+                  widget.audioManager.play();
+                }
+                setState(() {});
+              },
             ),
             Expanded(
               child: Column(
@@ -103,14 +47,12 @@ class _PlayAudioState extends State<PlayAudio> {
                 children: [
                   Slider(
                     onChanged: (value) {
-                      final duration = _duration;
-                      if (duration == null) {
-                        return;
-                      }
-                      final position = value * duration.inMilliseconds;
-                      _audioPlayer.seek(Duration(milliseconds: position.round()));
+                      widget.audioManager.seek(value);
+                      setState(() {});
                     },
-                    value: (_position != null && _duration != null && _position!.inMilliseconds > 0 && _position!.inMilliseconds < _duration!.inMilliseconds) ? _position!.inMilliseconds / _duration!.inMilliseconds : 0.0,
+                    value: (widget.audioManager.position != null && widget.audioManager.duration != null && widget.audioManager.position!.inMilliseconds > 0 && widget.audioManager.position!.inMilliseconds < widget.audioManager.duration!.inMilliseconds)
+                        ? widget.audioManager.position!.inMilliseconds / widget.audioManager.duration!.inMilliseconds
+                        : 0.0,
                   ),
                 ],
               ),
@@ -118,32 +60,14 @@ class _PlayAudioState extends State<PlayAudio> {
           ],
         ),
         Text(
-          _position != null
-              ? '${_position!.toString().split('.').first} / ${_duration!.toString().split('.').first}'
-              : _duration != null
-                  ? _duration!.toString().split('.').first
+          widget.audioManager.position != null
+              ? '${widget.audioManager.position!.toString().split('.').first} / ${widget.audioManager.duration!.toString().split('.').first}'
+              : widget.audioManager.duration != null
+                  ? widget.audioManager.duration!.toString().split('.').first
                   : '',
           style: const TextStyle(fontSize: 16.0),
         ),
       ],
     );
-  }
-
-  Future<void> _play() async {
-    await _audioPlayer.resume();
-    setState(() => _playerState = PlayerState.playing);
-  }
-
-  Future<void> _pause() async {
-    await _audioPlayer.pause();
-    setState(() => _playerState = PlayerState.paused);
-  }
-
-  Future<void> _stop() async {
-    await _audioPlayer.stop();
-    setState(() {
-      _playerState = PlayerState.stopped;
-      _position = Duration.zero;
-    });
   }
 }

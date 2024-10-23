@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:chewie/chewie.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qim/common/utils/functions.dart';
+import 'package:qim/common/widget/play_audio_manager.dart';
 import 'package:qim/config/constants.dart';
 import 'package:qim/data/controller/message.dart';
 import 'package:qim/data/controller/talk.dart';
@@ -16,12 +19,65 @@ import 'package:photo_view/photo_view.dart';
 import 'package:qim/common/widget/play_audio.dart';
 import 'package:qim/common/widget/play_video.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
+
+class AudioPlayerManager {
+  static final Map<String, AudioManager> _controllers = {};
+
+  static AudioManager getController(String audioUrl) {
+    if (!_controllers.containsKey(audioUrl)) {
+      AudioManager audioManager = AudioManager();
+      audioManager.setAudioSource(audioUrl);
+      _controllers[audioUrl] = audioManager;
+    }
+    return _controllers[audioUrl]!;
+  }
+
+  static void disposeAll() {
+    for (var controller in _controllers.values) {
+      controller.disposeA();
+    }
+    _controllers.clear();
+  }
+}
+
+class VideoPlayerManager {
+  static final Map<String, ChewieController> _controllers = {};
+
+  static ChewieController getController(String videoUrl) {
+    if (!_controllers.containsKey(videoUrl)) {
+      VideoPlayerController videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+      _controllers[videoUrl] = ChewieController(
+        videoPlayerController: videoPlayerController,
+        autoInitialize: true,
+        showControlsOnInitialize: false,
+        autoPlay: false,
+        aspectRatio: 16 / 9,
+        errorBuilder: (context, errorMessage) {
+          return Center(
+            child: Text(
+              errorMessage,
+              style: const TextStyle(color: Colors.white),
+            ),
+          );
+        },
+      );
+    }
+    return _controllers[videoUrl]!;
+  }
+
+  static void disposeAll() {
+    for (var controller in _controllers.values) {
+      controller.dispose();
+    }
+    _controllers.clear();
+  }
+}
 
 class ChatMessage extends StatefulWidget {
   const ChatMessage({
     super.key,
   });
-
   @override
   State<ChatMessage> createState() => _ChatMessageState();
 }
@@ -53,8 +109,11 @@ class _ChatMessageState extends State<ChatMessage> {
 
   @override
   void dispose() {
+    logPrint("ChatMessage-dispose");
     super.dispose();
     _scrollController.dispose();
+    AudioPlayerManager.disposeAll();
+    VideoPlayerManager.disposeAll();
   }
 
   @override
@@ -82,7 +141,6 @@ class _ChatMessageState extends State<ChatMessage> {
                 children: [
                   _showLeft(isSentByMe, messageList[index]),
                   Flexible(
-                    flex: 3,
                     child: _showCenter(isSentByMe, messageList[index]),
                   ),
                   _showRight(isSentByMe, messageList[index]),
@@ -147,11 +205,11 @@ class _ChatMessageState extends State<ChatMessage> {
 
   Widget _showCenter(bool isSentByMe, Map msg) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+      padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
       margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
       constraints: BoxConstraints(
         minWidth: MediaQuery.of(context).size.width * 0.1,
-        maxWidth: MediaQuery.of(context).size.width * 0.65,
+        maxWidth: MediaQuery.of(context).size.width * 0.7,
       ),
       child: GestureDetector(
         onLongPressStart: (LongPressStartDetails details) {
@@ -255,12 +313,12 @@ class _ChatMessageState extends State<ChatMessage> {
           Text(
             msg['content']['name'],
           ),
-          PlayAudio(msg['content']['url']),
+          PlayAudio(AudioPlayerManager.getController(msg['content']['url'])),
         ],
       );
       item = _getContentSkin(isSentByMe, tempWidget);
     } else if ([AppWebsocket.msgMediaVideo].contains(msg['msgMedia'])) {
-      item = PlayVideo(msg['content']['url']);
+      item = PlayVideo(VideoPlayerManager.getController(msg['content']['url']));
     } else if ([AppWebsocket.msgMediaFile].contains(msg['msgMedia'])) {
       item = InkWell(
         onTap: () {
