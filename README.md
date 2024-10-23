@@ -112,7 +112,7 @@ https://github.com/huazhiyeluo/im-api
 
 ##### b、app下载地址
 
-[https://github.com/huazhiyeluo/flutter-im-client/releases/tag/v1.0.0](https://github.com/huazhiyeluo/flutter-im-client/releases/tag/v1.0.0)
+[https://github.com/huazhiyeluo/flutter-im-client/releases/](https://github.com/huazhiyeluo/flutter-im-client/releases/)
 
 #### 7、APP界面截图：
 
