@@ -43,15 +43,15 @@ dependencies:
   shared_preferences: ^2.2.3
   synchronized: ^3.1.0+1
   path: ^1.9.0
-  sqflite: ^2.3.3+1
+  sqflite: ^2.4.0
+  sqflite_common_ffi: ^2.3.3
+  sqflite_common_ffi_web: ^0.4.5+3
   azlistview_plus: ^3.0.0
   lpinyin: ^2.0.3
   flutter_slidable: ^3.1.0
   image_picker: ^1.1.1
   permission_handler: ^11.3.1
   photo_view: ^0.15.0
-  sqflite_common_ffi: ^2.3.3
-  sqflite_common_ffi_web: ^0.4.3+1
   extended_text_field: ^16.0.0
   image: ^3.0.1
   path_provider: ^2.1.3

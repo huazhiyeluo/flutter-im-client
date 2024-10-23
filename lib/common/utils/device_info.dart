@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:qim/common/utils/functions.dart';
 
 class DeviceInfo {
   final String deviceId;
@@ -17,7 +18,11 @@ class DeviceInfo {
     String deviceName = '';
 
     try {
-      if (Platform.isAndroid) {
+      if (kIsWeb) {
+        WebBrowserInfo websInfo = await deviceInfo.webBrowserInfo;
+        deviceId = getDeviceId();
+        deviceName = websInfo.userAgent!;
+      } else if (Platform.isAndroid) {
         AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
         deviceId = androidInfo.id;
         deviceName = "${androidInfo.manufacturer}${androidInfo.model}";
@@ -37,10 +42,6 @@ class DeviceInfo {
         WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
         deviceId = windowsInfo.deviceId;
         deviceName = windowsInfo.computerName;
-      } else if (kIsWeb) {
-        WebBrowserInfo websInfo = await deviceInfo.webBrowserInfo;
-        deviceId = websInfo.platform!;
-        deviceName = websInfo.userAgent!;
       }
     } catch (e) {
       deviceId = 'Error: $e';
@@ -51,7 +52,9 @@ class DeviceInfo {
   }
 
   static Future<int> getPlatformType() async {
-    if (Platform.isAndroid) {
+    if (kIsWeb) {
+      return 0;
+    } else if (Platform.isAndroid) {
       return 2;
     } else if (Platform.isIOS) {
       return 1;

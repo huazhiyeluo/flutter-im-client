@@ -250,7 +250,15 @@ class _ChatMessageState extends State<ChatMessage> {
         // item = Image.network(data['content']['url']);
       }
     } else if ([AppWebsocket.msgMediaAudio].contains(msg['msgMedia'])) {
-      item = PlayAudio(msg['content']['url']);
+      Widget tempWidget = Column(
+        children: [
+          Text(
+            msg['content']['name'],
+          ),
+          PlayAudio(msg['content']['url']),
+        ],
+      );
+      item = _getContentSkin(isSentByMe, tempWidget);
     } else if ([AppWebsocket.msgMediaVideo].contains(msg['msgMedia'])) {
       item = PlayVideo(msg['content']['url']);
     } else if ([AppWebsocket.msgMediaFile].contains(msg['msgMedia'])) {

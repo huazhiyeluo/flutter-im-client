@@ -64,6 +64,7 @@ class _AddContactGroupDoPageState extends State<AddContactGroupDoPage> {
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     _inputReasonController.text = "我是${userInfo['nickname']}";
+    _inputInfoController.text = "大家好，很高兴认识加入群聊！";
   }
 
   @override

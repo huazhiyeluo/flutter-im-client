@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qim/config/constants.dart';
@@ -24,9 +25,10 @@ void main() async {
     systemNavigationBarColor: AppColors.systemNavigationBarColor,
     systemNavigationBarIconBrightness: Brightness.light,
   ));
-
-  if (Platform.isAndroid) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  if (!kIsWeb) {
+    if (Platform.isAndroid) {
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+    }
   }
 
   ErrorWidget.builder = (FlutterErrorDetails flutterErrorDetails) {

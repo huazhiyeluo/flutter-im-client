@@ -40,13 +40,10 @@ class Signaling {
   final Map<String, dynamic> mediaConstraints = {
     'audio': true,
     'video': {
-      'mandatory': {
-        'maxWidth': '480', // 设置最大值
-        'maxHeight': '640', // 设置最小值
-        'maxFrameRate': '15', // 设置最大值
-      },
-      'facingMode': 'user',
-      'optional': [],
+      'width': {'max': 480}, // 设置最大宽度
+      'height': {'max': 640}, // 设置最大高度
+      'frameRate': {'max': 15}, // 设置最大帧率
+      'facingMode': 'user', // 前置摄像头
     }
   };
 

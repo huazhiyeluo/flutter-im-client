@@ -104,16 +104,21 @@ https://github.com/huazhiyeluo/im-api
 370838500@qq.com
 ```
 
-#### 6、APP下载地址：
+#### 6、展示地址：
 
-[地址](https://github.com/huazhiyeluo/flutter-im-client/releases/tag/v1.0.0)
+##### a H5地址
+
+[https://im.siyuwen.com](https://im.siyuwen.com)
+
+##### b、app下载地址
+
+[https://github.com/huazhiyeluo/flutter-im-client/releases/tag/v1.0.0](https://github.com/huazhiyeluo/flutter-im-client/releases/tag/v1.0.0)
 
 #### 7、APP界面截图：
 
-[地址](https://github.com/huazhiyeluo/flutter-im-client/wiki/%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D%E5%8F%8AApp%E9%83%A8%E5%88%86%E6%88%AA%E5%9B%BE)
+[https://github.com/huazhiyeluo/flutter-im-client/wiki](https://github.com/huazhiyeluo/flutter-im-client/wiki/)
 
 #### 捐赠账号：
 
 <img src="https://github.com/user-attachments/assets/9cf0485d-4c96-499f-915a-d3c437bb40b7" alt="1-支付宝" width="180" style="padding:5px;" />
 <img src="https://github.com/user-attachments/assets/e7986b02-c09f-411b-ade0-f1940d92ad0e" alt="2-微信" width="180" style="padding:5px;" />
-

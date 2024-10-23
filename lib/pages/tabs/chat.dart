@@ -179,23 +179,23 @@ class _ChatPageState extends State<ChatPage> {
         ),
         trailing: Column(
           children: [
-            const SizedBox(height: 5),
+            const SizedBox(height: 4),
             Text(
               getSpecialDate(temp["operateTime"]),
               style: const TextStyle(fontSize: 13),
             ),
-            const SizedBox(height: 5),
+            const SizedBox(height: 4),
             temp['isQuiet'] == 1
-                ? const Icon(Icons.notifications_off_outlined)
+                ? const Icon(Icons.notifications_off_outlined, size: 14)
                 : Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                     decoration: BoxDecoration(
                       color: temp["type"] == 1 ? Colors.red[200] : Colors.grey[200],
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(3),
                     ),
                     child: Text(
                       '${temp["tips"]}',
-                      style: const TextStyle(fontSize: 15),
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ),
           ],

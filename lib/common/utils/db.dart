@@ -1,13 +1,17 @@
-import 'package:qim/common/utils/functions.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DBHelper {
   static late Database _database;
 
   static Future<void> initDatabase(String dbName, List<String> tableSQLs) async {
+    if (kIsWeb) {
+      // Web 环境下使用 FFI Web 数据库工厂
+      databaseFactory = databaseFactoryFfiWeb;
+    }
     String path = await getDatabasesPath();
-    logPrint(path);
     _database = await openDatabase(
       join(path, dbName),
       onCreate: (db, version) async {

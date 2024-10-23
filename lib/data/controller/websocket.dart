@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:qim/data/controller/message.dart';
 import 'package:qim/common/utils/device_info.dart';
 import 'package:qim/common/utils/functions.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -13,7 +15,7 @@ class WebSocketController extends GetxController {
   final String serverUrl;
   final int uid;
 
-  IOWebSocketChannel? _channel;
+  var _channel;
   Timer? _heartBeatTimer;
   Timer? _reconnectTimer;
   bool _isConnected = false;
@@ -52,7 +54,13 @@ class WebSocketController extends GetxController {
 
       String url = "$serverUrl?uid=$uid";
       Map<String, dynamic> headers = {HttpHeaders.cookieHeader: 'sessionKey=${deviceInfo.deviceId};'};
-      _channel = IOWebSocketChannel.connect(Uri.parse(url), headers: headers);
+
+      if (kIsWeb) {
+        _channel = WebSocketChannel.connect(Uri.parse(url));
+      } else {
+        _channel = IOWebSocketChannel.connect(Uri.parse(url), headers: headers);
+      }
+
       _isConnected = true;
 
       logPrint(url);
