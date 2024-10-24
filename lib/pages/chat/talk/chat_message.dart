@@ -95,11 +95,13 @@ class _ChatMessageState extends State<ChatMessage> {
 
   @override
   void initState() {
+    logPrint("ChatMessage-initState");
     super.initState();
     talkObj = talkController.talkObj;
     userInfo = userInfoController.userInfo;
     uid = userInfo['uid'];
     key = getKey(msgType: talkObj['type'], fromId: uid, toId: talkObj['objId']);
+    logPrint("ChatMessage-$key");
     _initData();
   }
 

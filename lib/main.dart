@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qim/config/constants.dart';
+import 'package:qim/pages/error.dart';
 import 'routes/route.dart';
 import 'common/utils/cache.dart';
 import 'package:get/get.dart';
@@ -33,7 +34,7 @@ void main() async {
 
   ErrorWidget.builder = (FlutterErrorDetails flutterErrorDetails) {
     debugPrint(flutterErrorDetails.toString());
-    return const Center(child: Text("App错误,快去反馈给开发者!"));
+    return const ErrorPage();
   };
 }
 

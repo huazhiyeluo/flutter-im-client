@@ -55,7 +55,7 @@ class RequestHelper {
           options: Options(),
         );
       } else {
-        logPrint("send-headers:$mergedHeaders | send-data:$data");
+        logPrint("send-endpoint:$endpoint send-headers:$mergedHeaders | send-data:$data");
         response = await _dio.request(
           endpoint,
           data: data,
